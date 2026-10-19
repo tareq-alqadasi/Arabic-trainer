@@ -273,32 +273,54 @@ button{font-family:inherit}
 </script>
 <script>
 /* ==================== LANGUAGES ==================== */
-const LANGS = {
-  ar:{name:'Arabic',native:'العربية',rtl:true,arf:true,translit:true,hello:'مرحباً'},
-  de:{name:'German',native:'Deutsch',hello:'Hallo'},
-  fr:{name:'French',native:'Français',hello:'Bonjour'},
-  es:{name:'Spanish',native:'Español',hello:'Hola'},
-  it:{name:'Italian',native:'Italiano',hello:'Ciao'},
-  pt:{name:'Portuguese',native:'Português',hello:'Olá'},
-  nl:{name:'Dutch',native:'Nederlands',hello:'Hallo'},
-  sv:{name:'Swedish',native:'Svenska',hello:'Hej'},
-  pl:{name:'Polish',native:'Polski',hello:'Cześć'},
-  cs:{name:'Czech',native:'Čeština',hello:'Ahoj'},
-  ro:{name:'Romanian',native:'Română',hello:'Salut'},
-  tr:{name:'Turkish',native:'Türkçe',hello:'Merhaba'},
-  id:{name:'Indonesian',native:'Bahasa Indonesia',hello:'Halo'},
-  ru:{name:'Russian',native:'Русский',translit:true,hello:'Привет'},
-  uk:{name:'Ukrainian',native:'Українська',translit:true,hello:'Привіт'},
-  el:{name:'Greek',native:'Ελληνικά',translit:true,hello:'Γεια'},
-  fa:{name:'Persian',native:'فارسی',rtl:true,arf:true,translit:true,hello:'سلام'},
-  ur:{name:'Urdu',native:'اردو',rtl:true,arf:true,translit:true,hello:'سلام'},
-  he:{name:'Hebrew',native:'עברית',rtl:true,translit:true,hello:'שלום'},
-  hi:{name:'Hindi',native:'हिन्दी',translit:true,hello:'नमस्ते'},
-  th:{name:'Thai',native:'ไทย',noSpace:true,translit:true,hello:'สวัสดี'},
-  ja:{name:'Japanese',native:'日本語',noSpace:true,translit:true,hello:'こんにちは'},
-  zh:{name:'Chinese',native:'中文',noSpace:true,translit:true,hello:'你好'},
-  ko:{name:'Korean',native:'한국어',translit:true,hello:'안녕하세요'},
-};
+const LANGS = {};
+(function(){
+  const T = { translit:true }, R = { rtl:true, arf:true, translit:true }, N = { translit:true, noSpace:true };
+  const add = (code, name, native, hello, o)=>{ LANGS[code] = Object.assign({ name, native, hello:hello||'' }, o||{}); };
+  // Latin script
+  add('af','Afrikaans','Afrikaans','Hallo'); add('sq','Albanian','Shqip','Përshëndetje'); add('eu','Basque','Euskara','Kaixo');
+  add('bs','Bosnian','Bosanski','Zdravo'); add('ca','Catalan','Català','Hola'); add('hr','Croatian','Hrvatski','Zdravo');
+  add('cs','Czech','Čeština','Ahoj'); add('da','Danish','Dansk','Hej'); add('nl','Dutch','Nederlands','Hallo');
+  add('eo','Esperanto','Esperanto','Saluton'); add('et','Estonian','Eesti','Tere'); add('fi','Finnish','Suomi','Hei');
+  add('fr','French','Français','Bonjour'); add('gl','Galician','Galego','Ola'); add('de','German','Deutsch','Hallo');
+  add('ht','Haitian Creole','Kreyòl ayisyen','Bonjou'); add('ha','Hausa','Hausa','Sannu'); add('hu','Hungarian','Magyar','Szia');
+  add('is','Icelandic','Íslenska','Halló'); add('ig','Igbo','Igbo','Nnọọ'); add('id','Indonesian','Bahasa Indonesia','Halo');
+  add('ga','Irish','Gaeilge','Dia duit'); add('it','Italian','Italiano','Ciao'); add('jv','Javanese','Basa Jawa','Halo');
+  add('rw','Kinyarwanda','Ikinyarwanda','Muraho'); add('la','Latin','Latina','Salve'); add('lv','Latvian','Latviešu','Sveiki');
+  add('lt','Lithuanian','Lietuvių','Labas'); add('lb','Luxembourgish','Lëtzebuergesch','Moien'); add('mg','Malagasy','Malagasy','Salama');
+  add('ms','Malay','Bahasa Melayu','Hai'); add('mt','Maltese','Malti','Bonġu'); add('mi','Maori','Te Reo Māori','Kia ora');
+  add('no','Norwegian','Norsk','Hei'); add('ny','Chichewa','Chichewa','Moni'); add('om','Oromo','Afaan Oromoo','Akkam');
+  add('pl','Polish','Polski','Cześć'); add('pt','Portuguese','Português','Olá'); add('ro','Romanian','Română','Salut');
+  add('sm','Samoan','Gagana Samoa','Talofa'); add('sn','Shona','chiShona','Mhoro'); add('sk','Slovak','Slovenčina','Ahoj');
+  add('sl','Slovenian','Slovenščina','Živjo'); add('so','Somali','Soomaali','Salaan'); add('st','Sesotho','Sesotho','Dumela');
+  add('es','Spanish','Español','Hola'); add('sw','Swahili','Kiswahili','Jambo'); add('sv','Swedish','Svenska','Hej');
+  add('tl','Tagalog','Tagalog','Kumusta'); add('ceb','Cebuano','Cebuano','Kumusta'); add('tr','Turkish','Türkçe','Merhaba');
+  add('uz','Uzbek','Oʻzbek','Salom'); add('az','Azerbaijani','Azərbaycan','Salam'); add('vi','Vietnamese','Tiếng Việt','Xin chào');
+  add('cy','Welsh','Cymraeg','Helo'); add('xh','Xhosa','isiXhosa','Molo'); add('yo','Yoruba','Yorùbá','Báwo'); add('zu','Zulu','isiZulu','Sawubona');
+  // Cyrillic, Greek, Armenian, Georgian
+  add('ru','Russian','Русский','Привет',T); add('uk','Ukrainian','Українська','Привіт',T); add('bg','Bulgarian','Български','Здравей',T);
+  add('sr','Serbian','Српски','Здраво',T); add('mk','Macedonian','Македонски','Здраво',T); add('be','Belarusian','Беларуская','Прывітанне',T);
+  add('kk','Kazakh','Қазақша','Сәлем',T); add('ky','Kyrgyz','Кыргызча','Салам',T); add('mn','Mongolian','Монгол','Сайн уу',T);
+  add('tg','Tajik','Тоҷикӣ','Салом',T); add('tt','Tatar','Татарча','Исәнмесез',T);
+  add('el','Greek','Ελληνικά','Γεια',T); add('hy','Armenian','Հայերեն','Բարեւ',T); add('ka','Georgian','ქართული','გამარჯობა',T);
+  // Right-to-left
+  add('ar','Arabic','العربية','مرحباً',R); add('fa','Persian','فارسی','سلام',R); add('ur','Urdu','اردو','سلام',R);
+  add('ps','Pashto','پښتو','سلام',R); add('ckb','Kurdish (Sorani)','کوردی','سڵاو',R); add('sd','Sindhi','سنڌي','سلام',R);
+  add('ug','Uyghur','ئۇيغۇرچە','ياخشىمۇسىز',R);
+  add('he','Hebrew','עברית','שלום',{ rtl:true, translit:true }); add('yi','Yiddish','ייִדיש','שלום',{ rtl:true, translit:true });
+  add('dv','Divehi','ދިވެހި','',{ rtl:true, translit:true });
+  // South Asia
+  add('hi','Hindi','हिन्दी','नमस्ते',T); add('bn','Bengali','বাংলা','হ্যালো',T); add('ta','Tamil','தமிழ்','வணக்கம்',T);
+  add('te','Telugu','తెలుగు','నమస్కారం',T); add('mr','Marathi','मराठी','नमस्कार',T); add('gu','Gujarati','ગુજરાતી','નમસ્તે',T);
+  add('kn','Kannada','ಕನ್ನಡ','ನಮಸ್ಕಾರ',T); add('ml','Malayalam','മലയാളം','നമസ്കാരം',T); add('pa','Punjabi','ਪੰਜਾਬੀ','ਸਤ ਸ੍ਰੀ ਅਕਾਲ',T);
+  add('ne','Nepali','नेपाली','नमस्ते',T); add('si','Sinhala','සිංහල','ආයුබෝවන්',T); add('or','Odia','ଓଡ଼ିଆ','ନମସ୍କାର',T);
+  add('sa','Sanskrit','संस्कृतम्','नमस्ते',T);
+  // East and South-East Asia, Africa
+  add('zh','Chinese','中文','你好',N); add('yue','Cantonese','粵語','你好',N); add('ja','Japanese','日本語','こんにちは',N);
+  add('th','Thai','ไทย','สวัสดี',N); add('ko','Korean','한국어','안녕하세요',T);
+  add('lo','Lao','ລາວ','ສະບາຍດີ',T); add('km','Khmer','ខ្មែរ','សួស្តី',T); add('my','Burmese','မြန်မာ','မင်္ဂလာပါ',T);
+  add('am','Amharic','አማርኛ','ሰላም',T);
+})();
 const LG = c => LANGS[c] || { name:String(c).toUpperCase(), native:'', hello:'' };
 function langFromName(s){
   const t = String(s||'').trim().toLowerCase(); if (!t) return null;
@@ -319,6 +341,20 @@ function detectLang(text){
   if (/[\u3040-\u30FF]/.test(t)) return 'ja';
   if (/[\uAC00-\uD7AF]/.test(t)) return 'ko';
   if (/[\u4E00-\u9FFF]/.test(t)) return 'zh';
+  if (/[\u0530-\u058F]/.test(t)) return 'hy';
+  if (/[\u10A0-\u10FF]/.test(t)) return 'ka';
+  if (/[\u0980-\u09FF]/.test(t)) return 'bn';
+  if (/[\u0B80-\u0BFF]/.test(t)) return 'ta';
+  if (/[\u0C00-\u0C7F]/.test(t)) return 'te';
+  if (/[\u0C80-\u0CFF]/.test(t)) return 'kn';
+  if (/[\u0D00-\u0D7F]/.test(t)) return 'ml';
+  if (/[\u0A80-\u0AFF]/.test(t)) return 'gu';
+  if (/[\u0A00-\u0A7F]/.test(t)) return 'pa';
+  if (/[\u0D80-\u0DFF]/.test(t)) return 'si';
+  if (/[\u1780-\u17FF]/.test(t)) return 'km';
+  if (/[\u0E80-\u0EFF]/.test(t)) return 'lo';
+  if (/[\u1000-\u109F]/.test(t)) return 'my';
+  if (/[\u1200-\u137F]/.test(t)) return 'am';
   return null;
 }
 function toks(text, lang){
@@ -901,28 +937,6 @@ function addTashkil(arabic, translit){
   return aw.map((w,i)=>tashkilWord(w, tw[i])).join(' ');
 }
 
-const TOPICS = [
-  {name:'Morning & Routine', words:['wake','morning','brush','teeth','shower','breakfast','alarm','early','bed','sleep','dress','noon','clock','tired']},
-  {name:'Work & Study',     words:['work','office','job','meeting','boss','study','exam','school','teacher','student','class','report','homework','university','project','deadline','grade','learn']},
-  {name:'Food & Cooking',   words:['eat','cook','food','kitchen','soup','bread','rice','meat','fish','salt','cake','dinner','lunch','restaurant','dish','boil','fry','bake','taste','recipe','oven','coffee','tea']},
-  {name:'Travel',           words:['travel','plane','train','bus','hotel','airport','ticket','flight','passport','trip','station','luggage','journey','taxi','road','map','city']},
-  {name:'Family & Home',    words:['family','mother','father','brother','sister','house','room','home','grandmother','grandfather','parents','baby','children','wife','husband','son','daughter','married']},
-  {name:'Weather & Nature', words:['weather','rain','snow','sun','cold','hot','wind','storm','river','mountain','tree','sea','sky','cloud','forest','lake','season','spring','winter','summer']},
-  {name:'Health & Body',    words:['doctor','hospital','medicine','pain','sick','health','nurse','head','hand','eye','hurt','patient','fever','wound','surgery','recover','body']},
-  {name:'Shopping & Money', words:['buy','price','store','money','shop','pay','cost','expensive','cheap','market','receipt','cash','sale','refund','bill','card']},
-  {name:'Feelings & People',words:['love','happy','sad','friend','angry','feel','heart','miss','laugh','cry','sorry','forgive','afraid','worry','smile']},
-  {name:'Free Time',        words:['play','music','movie','book','game','watch','read','sing','dance','sport','football','paint','concert','guitar','match','team']},
-  {name:'Around the House', words:['clean','wash','door','window','trash','laundry','dishes','floor','table','chair','light','key','towel','wall','garden']},
-];
-function guessTopic(items){
-  const txt = items.map(s=>s.english.toLowerCase()).join(' ');
-  let best='Mixed practice', bestScore=1;
-  for (const t of TOPICS){
-    let sc=0; for (const w of t.words) if (txt.includes(w)) sc++;
-    if (sc > bestScore){ bestScore=sc; best=t.name; }
-  }
-  return best;
-}
 /* ==================== NORMALIZATION ==================== */
 const AR_DIA = /[\u064B-\u0652\u0670\u0640\u06D6-\u06ED]/g;
 function normAr(s){
@@ -1105,9 +1119,11 @@ function buildInitialLib(){
   let rows = null, legacy = null;
   try { legacy = localStorage.getItem(LS.customCSV); } catch(e){}
   if (legacy){ const p = parseAny(legacy); if (p.rows.length >= 5) rows = p.rows; }
-  if (!rows) rows = parseRaw(RAW);
-  const items = mkItems(rows, 'ar');
-  const lib = { groups: oneGroup(items, 'ar') };
+  const fromRaw = !rows;
+  if (fromRaw) rows = parseRaw(RAW);                       // built-in 500 Arabic sentences
+  const groups = oneGroup(mkItems(rows, 'ar'), 'ar');
+  if (fromRaw) groups[0].pack = { id:'arabic', rev:'embedded' };   // lets arabic.txt in the store extend this group
+  const lib = { groups };
   return { lib, legacy: !!legacy };
 }
 function backupOnce(){
@@ -1189,6 +1205,7 @@ function addUnique(dest, items){
   return n;
 }
 function pageTitle(){
+  if (!LIB.groups.length) return 'Language Trainer';
   const names = ACTIVE.map(c=>LG(c).name);
   return names.length === 1 ? names[0] + ' Trainer' : names.join(' · ');
 }
@@ -1715,6 +1732,30 @@ function deleteGroups(gs){
   LIB.groups = LIB.groups.filter(g=>!gs.includes(g));
   afterLibChange(); toast('Deleted');
 }
+function relabelGroup(g, nl){
+  const old = g.lang; if (old === nl) return;
+  const stillOld = new Set();
+  for (const o of LIB.groups) if (o !== g && o.lang === old) o.items.forEach(s=>stillOld.add(s.uid));
+  const map = {};
+  for (const s of g.items){
+    const nu = nl + ':' + s.uid.replace(/^[^:]*:/, '');
+    if (nu !== s.uid){ if (!stillOld.has(s.uid)) map[s.uid] = nu; s.uid = nu; }
+    s.lang = nl;
+  }
+  g.lang = nl;
+  for (const a of ATTEMPTS) if (map[a.id]){ a.id = map[a.id]; a.lang = nl; }
+  const nf = {}; for (const k of Object.keys(FLAGS)) nf[map[k] || k] = FLAGS[k]; FLAGS = nf;
+  const ni = {}; for (const k of Object.keys(INTRO_SEEN)) ni[map[k] || k] = INTRO_SEEN[k]; INTRO_SEEN = ni;
+  for (const c of Object.keys(LEVELS)){
+    const d = LEVELS[c].done || {}, nd = {};
+    for (const k of Object.keys(d)) nd[map[k] || k] = d[k];
+    LEVELS[c].done = nd;
+  }
+  saveAttempts(); saveFlags(); saveLS(LS.intro, INTRO_SEEN); saveLS(LS.levels, LEVELS);
+  if (ACTIVE.includes(old) && !ACTIVE.includes(nl)) ACTIVE.push(nl);
+  afterLibChange();
+  toast('Language changed to ' + LG(nl).name);
+}
 function singleLang(gs){
   const ls = [...new Set(gs.map(g=>g.lang))];
   if (ls.length > 1){ toast('Select groups of one language'); return null; }
@@ -1727,13 +1768,14 @@ function render(keep){
   if (!keep) window.scrollTo(0,0);
   if (state.screen !== 'home') state.ddOpen = false;
   app.innerHTML = '';
-  const m = { home:renderHome, lesson:renderLesson, group:renderGroup, stats:renderStats, flags:renderFlags, addlang:renderAddLang, settings:renderSettings };
+  const m = { home:renderHome, lesson:renderLesson, group:renderGroup, stats:renderStats, flags:renderFlags, addlang:renderAddLang, settings:renderSettings, store:renderStore };
   app.appendChild((m[state.screen] || renderHome)());
   syncHistory();
 }
 /* Phone back button: moves between screens instead of closing the app */
 function wantDepth(){
   if (state.screen === 'home') return 0;
+  if (state.screen === 'addlang') return 2;
   if (state.screen === 'lesson') return (state.sess && (state.sess.from === 'group' || state.sess.from === 'flags')) ? 2 : 1;
   return 1;
 }
@@ -1751,6 +1793,7 @@ window.addEventListener('popstate', ()=>{
   if (histDepth > 0){
     histDepth--;
     if (state.screen === 'lesson') exitSession();
+    else if (state.screen === 'addlang'){ state.screen = 'store'; render(); }
     else { state.screen = 'home'; render(); }
   }
 });
@@ -1835,15 +1878,15 @@ function renderHome(){
     </div>
     <div class="wrap">
       <div class="hero">
-        <h1>${esc(L0.hello)} 👋</h1>
-        <p>Real ${esc(names)} sentences. Read, build, translate — then rate yourself honestly. Anki-style.</p>
+        <h1>${L0.hello && LIB.groups.length ? esc(L0.hello) + ' ' : ''}👋</h1>
+        <p>${LIB.groups.length ? 'Real ' + esc(names) + ' sentences. Read, build, translate — then rate yourself honestly. Anki-style.' : 'Pick a language to start.'}</p>
       </div>
       <div class="statgrid">
         <div class="statcard"><b>${items.length}</b><span>Sentences</span></div>
         <div class="statcard"><b>${acc}%</b><span>Accuracy</span></div>
         <div class="statcard"><b>${known}/${items.length}</b><span>Known</span></div>
       </div>
-      ${ACTIVE.map(levelCardHTML).join('')}
+      ${ACTIVE.filter(c=>EN_IDX[c]).map(levelCardHTML).join('')}
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px">
         <button class="btn btn-blue btn-sm" id="loadBtn">📂 Import</button>
         <button class="btn btn-ghost btn-sm" id="allBtn">▶ Practice all</button>
@@ -1875,14 +1918,12 @@ function renderHome(){
 
   const list = f.querySelector('#decklist');
   if (!groups.length){
-    list.innerHTML = `<div class="empty">Library is empty.<br>Tap <b>Import</b> to add sentences.<br><br>
-      <button class="btn btn-ghost btn-sm" id="restoreBtn">Restore embedded 500 (Arabic)</button></div>`;
-    const rb = list.querySelector('#restoreBtn');
-    rb.onclick = ()=>{
-      const its = mkItems(parseRaw(RAW), 'ar');
-      LIB.groups.push(...oneGroup(its, 'ar'));
-      if (!ACTIVE.includes('ar')) ACTIVE.push('ar');
-      saveLS(LS.langs, ACTIVE); afterLibChange();
+    list.innerHTML = `<div class="empty">No languages yet.<br><br><button class="btn btn-green" id="getLang">Choose a language</button>
+      <br><br><button class="btn btn-ghost btn-sm" id="restoreBtn">Restore the 500 Arabic sentences</button></div>`;
+    list.querySelector('#getLang').onclick = openStore;
+    list.querySelector('#restoreBtn').onclick = ()=>{
+      const g = oneGroup(mkItems(parseRaw(RAW), 'ar'), 'ar'); g[0].pack = { id:'arabic', rev:'embedded' };
+      LIB.groups.push(...g); ACTIVE = ['ar']; saveLS(LS.langs, ACTIVE); afterLibChange();
     };
   }
   groups.forEach((g, i)=>{
@@ -1921,7 +1962,7 @@ function renderHome(){
       saveLS(LS.langs, ACTIVE); state.sel.clear(); render(true);
     };
   });
-  f.querySelector('#ddAdd').onclick = ()=>{ state.al.tr = !!LG(state.al.lang).translit; state.screen = 'addlang'; render(); };
+  f.querySelector('#ddAdd').onclick = openStore;
 
   f.querySelector('#loadBtn').onclick = ()=>document.getElementById('fileInput').click();
   f.querySelector('#allBtn').onclick = ()=>startSession(items, 'Practice all', 'home');
@@ -1980,6 +2021,7 @@ function renderGroup(){
         <button class="btn btn-green btn-sm" id="gPractice">▶ Practice</button>
         <button class="btn btn-ghost btn-sm" id="gRename">Rename</button>
         <button class="btn btn-ghost btn-sm" id="gSplit">Split…</button>
+        <button class="btn btn-ghost btn-sm" id="gLang">Language: ${esc(LG(g.lang).name)}</button>
         <button class="btn btn-ghost btn-sm" id="gShare">Share</button>
         <button class="btn btn-redg btn-sm" id="gDel">Delete</button>
       </div>
@@ -2017,6 +2059,7 @@ function renderGroup(){
   q('#gPractice').onclick = ()=>startSession(g.items, g.name, 'group');
   q('#gRename').onclick = ()=>openRename(g);
   q('#gSplit').onclick = ()=>openSplit(g);
+  q('#gLang').onclick = ()=>openLangPicker(g);
   q('#gShare').onclick = ()=>openShare([{ name:g.name, lang:g.lang, items:g.items }]);
   q('#gDel').onclick = ()=>deleteGroups([g]);
   if (q('#gAll')) q('#gAll').onclick = ()=>{
@@ -2482,6 +2525,148 @@ function renderFlags(){
   return f;
 }
 
+/* ==================== LANGUAGE STORE ==================== */
+// Every .txt/.csv file placed in the repository's `languages` folder (or next to index.html) appears here automatically.
+const STORE_REPO = '';   // optional override, e.g. 'user/repo'; empty = detected from the github.io address
+const STORE_SKIP = /^(readme|license|licence|notice|robots|manifest)/i;
+state.store = { status:'idle', packs:[], busy:{} };
+function storeRepo(){
+  if (STORE_REPO) return STORE_REPO;
+  const h = location.hostname;
+  if (!/\.github\.io$/i.test(h)) return '';
+  const owner = h.split('.')[0];
+  const seg = location.pathname.split('/').filter(Boolean)[0];
+  return owner + '/' + ((seg && seg.indexOf('.') < 0) ? seg : owner + '.github.io');
+}
+async function listDir(repo, dir){
+  const r = await fetch('https://api.github.com/repos/' + repo + '/contents/' + dir, { headers:{ Accept:'application/vnd.github+json' } });
+  if (r.status === 404) return [];
+  if (!r.ok) throw new Error('http ' + r.status);
+  const j = await r.json();
+  return Array.isArray(j) ? j.filter(x=>x.type === 'file') : [];
+}
+function openStore(){ state.screen = 'store'; render(); loadCatalog(); }
+async function loadCatalog(){
+  const st = state.store; st.status = 'loading';
+  if (state.screen === 'store') render(true);
+  try {
+    const repo = storeRepo(); if (!repo) throw new Error('no repo');
+    const [a, b] = await Promise.all([listDir(repo, 'languages'), listDir(repo, '')]);
+    const seen = new Set(), packs = [];
+    for (const f of a.concat(b)){
+      if (!/\.(txt|csv)$/i.test(f.name) || STORE_SKIP.test(f.name)) continue;
+      const stem = f.name.replace(/\.[^.]+$/, '').toLowerCase();
+      if (seen.has(stem)) continue; seen.add(stem);
+      packs.push({ id:stem, file:f.path, bytes:f.size, rev:f.sha });
+    }
+    st.packs = packs; st.status = 'ok';
+  } catch(e){ st.status = 'error'; }
+  if (state.screen === 'store') render(true);
+}
+// which language is this file? 1) header of the 4th column  2) file name  3) script of the text
+function guessPackLang(text, stem){
+  let hdr = null;
+  try { hdr = rowsToItems(parseCSVRows(text)).hint; } catch(e){}
+  return hdr || langFromName(stem) || parseAny(text).hint || null;
+}
+function askLang(stem){
+  return new Promise(resolve=>{
+    let done = false;
+    const fin = v=>{ if (!done){ done = true; resolve(v); } };
+    openSheet((sh, close)=>{
+      const codes = Object.keys(LANGS).sort((a,b)=>LANGS[a].name.localeCompare(LANGS[b].name));
+      sh.innerHTML = `<h3>Which language is “${esc(stem)}”?</h3>
+        <select class="field" id="alSel">${codes.map(c=>`<option value="${c}">${esc(LANGS[c].name)} — ${esc(LANGS[c].native)}</option>`).join('')}</select>
+        <div class="sheet-actions"><button class="btn btn-ghost" id="alC">Cancel</button><button class="btn btn-green" id="alOk">Add</button></div>`;
+      sh.querySelector('#alC').onclick = ()=>{ close(); fin(null); };
+      sh.querySelector('#alOk').onclick = ()=>{ const v = sh.querySelector('#alSel').value; close(); fin(v); };
+      sh.parentNode.addEventListener('click', e=>{ if (e.target === sh.parentNode) fin(null); });
+    });
+  });
+}
+async function installPack(p){
+  const st = state.store; if (st.busy[p.id]) return;
+  st.busy[p.id] = true; render(true);
+  try {
+    const r = await fetch(new URL(p.file, location.href), { cache:'no-cache' });
+    if (!r.ok) throw new Error('http ' + r.status);
+    const text = (await r.text()).replace(/^\uFEFF/, '');
+    const parsed = parseAny(text);
+    if (!parsed.rows.length) throw new Error('empty');
+    const dest = LIB.groups.find(g=>g.pack && g.pack.id === p.id);
+    const lang = dest ? dest.lang : (guessPackLang(text, p.id) || await askLang(p.id));
+    if (lang){
+      const name = LG(lang).name;
+      const wasEmpty = !LIB.groups.length;
+      const res = importItems(parsed.rows, lang, false, new Set(BY_UID.keys()));
+      if (!res.items.length && !dest){ toast('Already in your library'); }
+      else {
+        if (dest){ dest.items.push(...res.items); dest.pack = { id:p.id, rev:p.rev }; }
+        else LIB.groups.push({ id:gid(), name, lang, items:res.items, pack:{ id:p.id, rev:p.rev } });
+        ACTIVE = wasEmpty ? [lang] : (ACTIVE.includes(lang) ? ACTIVE : [...ACTIVE, lang]);
+        saveLS(LS.langs, ACTIVE);
+        afterLibChange();
+        toast(dest ? (res.items.length ? 'Updated · ' + res.items.length + ' new' : 'Up to date') : name + ' added · ' + res.items.length + ' sentences');
+      }
+    }
+  } catch(e){ toast("Couldn't download. Check your connection and try again."); }
+  delete st.busy[p.id];
+  if (state.screen === 'store') render(true);
+}
+function renderStore(){
+  const f = document.createElement('div'), st = state.store;
+  f.innerHTML = `<div class="topbar"><button class="iconbtn" id="backBtn">←</button>
+    <div style="font-weight:800;font-size:19px;flex:1">Languages</div></div>
+    <div class="wrap statwrap">
+      <div class="hint" style="margin-top:6px">Tap <b>Get</b> to add a language. It is saved on this device and works offline.</div>
+      <div id="packs"></div>
+      <div class="sectionhead">Your own</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-ghost btn-sm" id="stImp">📂 Import a file</button>
+        <button class="btn btn-ghost btn-sm" id="stAdv">Add from a website (advanced)</button>
+      </div></div>`;
+  const box = f.querySelector('#packs');
+  if (st.status === 'loading' || st.status === 'idle') box.innerHTML = '<div class="empty">Loading…</div>';
+  else if (st.status === 'error'){
+    box.innerHTML = `<div class="empty">Couldn't load the language list.<br>Check your internet connection.<br><br><button class="btn btn-ghost btn-sm" id="retry">Try again</button></div>`;
+    box.querySelector('#retry').onclick = loadCatalog;
+  } else if (!st.packs.length) box.innerHTML = '<div class="empty">No languages published yet.</div>';
+  else {
+    const label = p=>{
+      const code = langFromName(p.id), L = code ? LG(code) : null;
+      return { code, name: L ? L.name : p.id.replace(/[-_]+/g, ' ').replace(/\b\w/g, m=>m.toUpperCase()), native: L ? L.native : '' };
+    };
+    st.packs.slice().sort((a,b)=>label(a).name.localeCompare(label(b).name)).forEach(p=>{
+      const inst = LIB.groups.find(g=>g.pack && g.pack.id === p.id);
+      const outdated = inst && p.rev && inst.pack.rev !== p.rev;
+      const lb = label(p), busy = !!st.busy[p.id];
+      const el = document.createElement('div'); el.className = 'deck'; el.style.cursor = 'default';
+      el.innerHTML = `<div class="deck-ico">${esc((lb.code || p.id.slice(0,2)).toUpperCase())}</div>
+        <div class="deck-body"><div class="deck-title">${esc(lb.name)}${lb.native && lb.native !== lb.name ? `<span class="lbadge" style="text-transform:none">${esc(lb.native)}</span>` : ''}</div>
+        <div class="deck-sub">${p.bytes ? Math.max(1, Math.round(p.bytes/1024)) + ' KB' : ''}</div></div>
+        <button class="btn ${inst && !outdated ? 'btn-ghost' : outdated ? 'btn-blue' : 'btn-green'} btn-sm" ${busy || (inst && !outdated) ? 'disabled' : ''}>${busy ? '…' : inst ? (outdated ? 'Update' : 'Added ✓') : 'Get'}</button>`;
+      el.querySelector('button').onclick = ()=>installPack(p);
+      box.appendChild(el);
+    });
+  }
+  f.querySelector('#backBtn').onclick = ()=>{ state.screen = 'home'; render(); };
+  f.querySelector('#stImp').onclick = ()=>document.getElementById('fileInput').click();
+  f.querySelector('#stAdv').onclick = ()=>{ state.al.tr = !!LG(state.al.lang).translit; state.screen = 'addlang'; render(); };
+  return f;
+}
+function openLangPicker(g){
+  openSheet((sh, close)=>{
+    const codes = Object.keys(LANGS).sort((a,b)=>LANGS[a].name.localeCompare(LANGS[b].name));
+    if (!codes.includes(g.lang)) codes.unshift(g.lang);
+    sh.innerHTML = `<h3>Language of “${esc(g.name)}”</h3>
+      <div class="hint">Your progress is kept. Use this if the language is wrong.</div>
+      <select class="field" id="lpSel">${codes.map(c=>`<option value="${c}"${c===g.lang?' selected':''}>${esc(LG(c).name)}${LG(c).native ? ' — ' + esc(LG(c).native) : ''}</option>`).join('')}</select>
+      <div class="sheet-actions"><button class="btn btn-ghost" id="lpC">Cancel</button><button class="btn btn-green" id="lpOk">Save</button></div>`;
+    sh.querySelector('#lpC').onclick = close;
+    sh.querySelector('#lpOk').onclick = ()=>{ const v = sh.querySelector('#lpSel').value; close(); relabelGroup(g, v); };
+  });
+}
+
 /* ==================== BACKUP ==================== */
 function buildBackup(){
   const data = {};
@@ -2659,7 +2844,7 @@ function renderAddLang(){
   const code = f.querySelector('#alCode');
   const sync = ()=>{ code.textContent = genCode(al.lang, al.tr); };
   sync();
-  f.querySelector('#backBtn').onclick = ()=>{ state.screen = 'home'; render(); };
+  f.querySelector('#backBtn').onclick = ()=>{ state.screen = 'store'; render(); };
   f.querySelector('#alLang').onchange = e=>{
     al.lang = e.target.value; al.tr = !!LG(al.lang).translit;
     f.querySelector('#alTr').checked = al.tr; sync();
