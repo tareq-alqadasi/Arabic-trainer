@@ -188,6 +188,259 @@ button{font-family:inherit}
 .sidetr{font-size:17px;font-weight:700;color:var(--ink2);margin-top:4px;line-height:1.7}
 .nomatch{font-size:11.5px;color:var(--ink3);font-weight:700;margin-top:4px}
 .choice .sidetr{font-size:15px;font-weight:600;margin-top:2px}
+:root{--hl:rgba(255,200,0,.38);--hl-line:rgba(230,150,0,.6)}
+.qtools{display:flex;gap:8px;align-items:center}
+.notebtn{width:38px;height:38px;font-size:17px}
+.flagbtn.notebtn.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.nt{background:var(--hl);border-radius:4px;box-shadow:0 1px 0 var(--hl-line);cursor:pointer}
+button .nt{cursor:inherit}
+.ntstrip{margin-top:10px;display:flex;flex-direction:column;gap:6px}
+.ntline{font-size:14px;line-height:1.5;color:var(--ink2);font-weight:600;white-space:pre-wrap;border-left:3px solid var(--hl-line);padding-left:10px}
+.ntline b{font-size:18px;color:var(--ink);margin-right:4px}
+.ntype{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;background:var(--amber-l);color:#8a5000;padding:2px 6px;border-radius:6px;vertical-align:middle}
+.ntag{display:inline-block;font-size:11px;font-weight:700;background:var(--blue-l);color:var(--blue-d);padding:2px 8px;border-radius:10px;margin-left:5px;vertical-align:middle}
+.nview{border:2px solid var(--line);border-radius:var(--r);padding:12px 14px;margin-bottom:10px}
+.nv-top b{font-size:22px}
+.nv-note{margin:6px 0;font-size:15px;line-height:1.55;white-space:pre-wrap}
+.nv-meta{font-size:11.5px;color:var(--ink3);font-weight:700}
+.nv-actions{display:flex;gap:8px;margin-top:8px}
+.npick{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 10px}
+.nletters{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
+.nletter{min-width:40px;height:44px;border:2px solid var(--line);background:#fff;border-radius:10px;font-size:20px;font-weight:700;cursor:pointer;color:var(--ink)}
+.nletter.on{background:var(--hl);border-color:var(--hl-line)}
+.nchips{display:flex;flex-wrap:wrap;gap:6px}
+.tchip{border:2px solid var(--line);background:#fff;border-radius:16px;padding:4px 12px;font-size:13px;font-weight:700;cursor:pointer;color:var(--ink2)}
+.tchip.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.nctl{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.nctl label{font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--ink3);display:block}
+.nctl .field{margin-top:4px;padding:8px 10px;font-size:14px}
+.nrow{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);cursor:pointer;align-items:flex-start}
+.npat{min-width:56px;max-width:110px;font-size:22px;font-weight:800;text-align:center;word-break:break-all}
+.nrow .body{flex:1;min-width:0}
+.nmeta{font-size:11.5px;color:var(--ink3);font-weight:700}
+.ntext{font-size:14.5px;line-height:1.5;margin-top:3px;white-space:pre-wrap}
+.themegrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.themecard{text-align:left;border:2px solid var(--line);background:#fff;border-radius:var(--r);padding:10px;cursor:pointer;display:flex;flex-direction:column;gap:3px;font-family:inherit;color:var(--ink)}
+.themecard.on{border-color:var(--blue);box-shadow:0 0 0 2px var(--blue-l)}
+.themecard small{font-size:11.5px;color:var(--ink2);font-weight:600;line-height:1.3}
+.tsw{display:flex;border-radius:8px;overflow:hidden;height:22px;margin-bottom:4px;border:1px solid rgba(0,0,0,.12)}
+.tsw i{flex:1}
+.flagbtn.gradebtn{width:auto;border-radius:21px;padding:0 12px;font-size:12px;font-weight:800;letter-spacing:.3px}
+.flagbtn.notebtn.nv-off{opacity:.55;position:relative}
+.flagbtn.notebtn.nv-off::after{content:'';position:absolute;left:22%;right:22%;top:50%;height:2px;background:currentColor;transform:rotate(-40deg)}
+.flagbtn.notebtn.nv-hl{border-color:var(--accent,var(--blue));color:var(--accent,var(--blue))}
+.flagbtn.notebtn.nv-list{background:var(--accent,var(--blue));border-color:var(--accent,var(--blue));color:var(--accent-ink,#fff)}
+
+.dbgpanel{margin-top:16px;border:2px dashed var(--line2);border-radius:12px;font:12px/1.5 ui-monospace,Menlo,Consolas,monospace;background:var(--bg2);color:var(--ink)}
+.dbgbar{display:flex;justify-content:space-between;gap:8px;padding:8px 12px;cursor:pointer;font-weight:700}
+.dbgrow{display:flex;gap:8px;padding:5px 12px;border-top:1px solid var(--line)}
+.dbgrow b{flex:0 0 84px;color:var(--ink2)}
+.dbgrow span{flex:1;white-space:pre-wrap;word-break:break-word}
+.dbgact{padding:8px 12px;border-top:1px solid var(--line)}
+.dbgsnap{font:12px/1.5 ui-monospace,Menlo,Consolas,monospace;background:var(--bg2);border-radius:10px;padding:10px;white-space:pre-wrap;margin:0 0 10px}
+.dbgent{border-bottom:1px solid var(--line);padding:6px 0;font-size:13px;word-break:break-word}
+.dbgent small{color:var(--ink3)}
+.dbgent pre{font:11px/1.4 ui-monospace,Menlo,Consolas,monospace;white-space:pre-wrap;margin:4px 0 0}
+.dbgk{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;padding:1px 6px;border-radius:6px;background:var(--blue-l);color:var(--blue-d)}
+.dbgk-retry,.dbgk-answer{background:var(--amber-l);color:var(--amber-d,var(--ink))}
+
+/* ===== Looks: every theme except "classic" is driven by these variables + shared structure ===== */
+@keyframes lt-blink{50%{opacity:0}}
+
+/* ---------- shared structure ---------- */
+html[data-theme]:not([data-theme="classic"]) body{font-family:var(--font);background:var(--bg);color:var(--ink)}
+html[data-theme]:not([data-theme="classic"]) .topbar{background:var(--topbg,var(--bg))}
+html[data-theme]:not([data-theme="classic"]) :is(.hero h1,.qhead h2,.sheet h3,.deck-title,.statcard b){font-family:var(--hfont,var(--font))}
+html[data-theme]:not([data-theme="classic"]) .btn{border-radius:var(--r);text-transform:var(--upper);letter-spacing:var(--ls);box-shadow:var(--btn-sh);border:var(--bw) solid var(--btn-line,transparent);font-weight:var(--btnw,800)}
+html[data-theme]:not([data-theme="classic"]) .btn:active:not(:disabled){transform:var(--press);box-shadow:var(--btn-sh-p)}
+html[data-theme]:not([data-theme="classic"]) .btn-green{background:var(--accent);color:var(--accent-ink);border-color:var(--accent-line,transparent)}
+html[data-theme]:not([data-theme="classic"]) .btn-green:hover:not(:disabled){background:var(--accent-d)}
+html[data-theme]:not([data-theme="classic"]) .btn-blue{background:var(--accent2);color:var(--accent2-ink)}
+html[data-theme]:not([data-theme="classic"]) .btn-red{background:var(--red);color:#fff}
+html[data-theme]:not([data-theme="classic"]) :is(.btn-ghost,.btn-amber,.btn-redg){background:var(--card);color:var(--ink);border:var(--bw) solid var(--line2);box-shadow:var(--btn-sh-g,none)}
+html[data-theme]:not([data-theme="classic"]) .btn-redg{color:var(--red)}
+html[data-theme]:not([data-theme="classic"]) .btn-ghost:hover:not(:disabled){background:var(--card2)}
+html[data-theme]:not([data-theme="classic"]) .btn-amber.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+html[data-theme]:not([data-theme="classic"]) .btn-sm{border-radius:var(--r)}
+html[data-theme]:not([data-theme="classic"]) :is(.deck,.lvcard,.choice,.chip,.improw,.introcard,.srow,.dd,.themecard,.nview,.tchip,.nletter,.field,.typein,.flagbtn,.cb,.sheet,.selbar,.footer){background:var(--card);border-color:var(--line);color:var(--ink)}
+html[data-theme]:not([data-theme="classic"]) :is(.choice,.chip){box-shadow:var(--chip-sh,none)}
+html[data-theme]:not([data-theme="classic"]) :is(.deck,.srow):hover{background:var(--card2);border-color:var(--accent)}
+html[data-theme]:not([data-theme="classic"]) :is(.choice,.chip):hover{background:var(--card2)}
+html[data-theme]:not([data-theme="classic"]) .deck.picked{background:var(--card2);border-color:var(--accent)}
+html[data-theme]:not([data-theme="classic"]) .choice.sel{border-color:var(--accent);background:var(--card2);color:var(--ink);box-shadow:var(--sel-sh,inset 0 0 0 1px var(--accent))}
+html[data-theme]:not([data-theme="classic"]) .choice.right{border-color:var(--green);background:var(--green-l);color:var(--green-t)}
+html[data-theme]:not([data-theme="classic"]) .choice.wrong{border-color:var(--red);background:var(--red-l);color:var(--red-t)}
+html[data-theme]:not([data-theme="classic"]) .cb.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+html[data-theme]:not([data-theme="classic"]) .tchip.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+html[data-theme]:not([data-theme="classic"]) .nletter.on{background:var(--hl);border-color:var(--hl-line)}
+html[data-theme]:not([data-theme="classic"]) .themecard.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft,transparent)}
+html[data-theme]:not([data-theme="classic"]) .flagbtn.on{background:var(--amber);border-color:var(--amber);color:#fff}
+html[data-theme]:not([data-theme="classic"]) .flagbtn.notebtn.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+html[data-theme]:not([data-theme="classic"]) .progress>i{background:var(--accent);box-shadow:none}
+html[data-theme]:not([data-theme="classic"]) .answerzone.filled{border-color:var(--accent)}
+html[data-theme]:not([data-theme="classic"]) .toast{background:var(--toast-bg,var(--ink));color:var(--toast-ink,var(--bg))}
+html[data-theme]:not([data-theme="classic"]) :is(.ntype,.flagbadge,.notice){color:var(--amber-t,#8a5000)}
+html[data-theme]:not([data-theme="classic"]) :is(.field,.typein)::placeholder{color:var(--ink3)}
+html[data-theme]:not([data-theme="classic"]) .code{background:#0c0c0c;color:#d6d6d6}
+html[data-theme]:not([data-theme="classic"]) .nt{background:var(--hl);box-shadow:0 1px 0 var(--hl-line)}
+
+/* ---------- PAPER: printed study sheet ---------- */
+html[data-theme="paper"]{
+ --bg:#f4eee0;--bg2:#ebe2cf;--card:#fbf7ec;--card2:#f1e9d6;--ink:#2b2218;--ink2:#66584a;--ink3:#9b8d78;--line:#d9ceb5;--line2:#bfb299;
+ --accent:#8d2d1a;--accent-d:#6e2112;--accent-ink:#fbf7ec;--accent2:#2d4a6a;--accent2-ink:#fbf7ec;--accent-soft:#e9d3c8;
+ --green:#2e6b3c;--green-d:#235230;--green-l:#dce8cf;--green-t:#235230;--blue:#2d4a6a;--blue-d:#223a54;--blue-l:#dde5ee;
+ --red:#a3281a;--red-d:#7f1b10;--red-l:#f2d8d1;--red-t:#7f1b10;--amber:#b0721a;--amber-l:#f3e2bd;--amber-t:#6b4506;--gold:#b0721a;
+ --hl:rgba(214,170,60,.38);--hl-line:rgba(160,110,20,.55);
+ --r:2px;--bw:1px;--upper:none;--ls:.2px;--btnw:600;--btn-sh:none;--btn-sh-p:none;--press:translateY(1px);--toast-bg:#2b2218;--toast-ink:#fbf7ec;
+ --font:'Iowan Old Style','Palatino Linotype',Palatino,Georgia,'Noto Serif',serif;
+}
+html[data-theme="paper"] .topbar{border-bottom:1px solid var(--line)}
+html[data-theme="paper"] .hero h1{font-size:36px;font-weight:400;font-style:italic;letter-spacing:-.5px}
+html[data-theme="paper"] .hero p{font-size:16px}
+html[data-theme="paper"] .btn{font-size:13px}
+html[data-theme="paper"] .btn-green{box-shadow:none}
+html[data-theme="paper"] .deck{background:transparent;border-width:0 0 1px 0;border-radius:0;padding:14px 4px}
+html[data-theme="paper"] .deck:hover{background:var(--card2)}
+html[data-theme="paper"] .deck-ico{background:transparent;border:1px solid var(--line2);color:var(--ink);border-radius:2px;font-weight:400;font-style:italic}
+html[data-theme="paper"] .statgrid{gap:22px}
+html[data-theme="paper"] .statcard{background:transparent;border-radius:0;border-top:2px solid var(--ink);padding:10px 0 0;text-align:left}
+html[data-theme="paper"] .statcard b{font-weight:400;font-size:30px}
+html[data-theme="paper"] .progress{height:3px;border-radius:0;background:var(--line2)}
+html[data-theme="paper"] .progress>i{border-radius:0}
+html[data-theme="paper"] .lvcard{border-width:0 0 0 4px;border-left:4px solid var(--accent);border-radius:0;background:var(--card);padding:12px 16px}
+html[data-theme="paper"] :is(.chip,.choice){border-radius:2px;font-weight:500;font-family:var(--font)}
+html[data-theme="paper"] .footer{border-top:1px solid var(--ink)}
+html[data-theme="paper"] .sectionhead{font-variant:small-caps;letter-spacing:2px;font-size:13px;color:var(--ink2);border-bottom:1px solid var(--line);padding-bottom:4px;text-transform:none}
+html[data-theme="paper"] .compare{background:var(--card);border:1px solid var(--line);border-radius:2px}
+html[data-theme="paper"] .answerzone{border-bottom:1px solid var(--ink)}
+html[data-theme="paper"] .introcard{border-radius:2px;border:1px solid var(--ink);background:var(--card)}
+
+/* ---------- TERMINAL: phosphor screen ---------- */
+html[data-theme="terminal"]{
+ --bg:#060b07;--bg2:#0d160e;--card:#0a120b;--card2:#12200f;--ink:#b7f7c4;--ink2:#6fbf84;--ink3:#3f7a50;--line:#1c3a22;--line2:#2b5a35;
+ --accent:#39ff7a;--accent-d:#1fd45d;--accent-ink:#03170a;--accent2:#ffb000;--accent2-ink:#1a1100;--accent-soft:rgba(57,255,122,.18);
+ --green:#39ff7a;--green-d:#1fd45d;--green-l:#0f3a1d;--green-t:#7dffa6;--blue:#ffb000;--blue-d:#ffcf5a;--blue-l:#2a2000;
+ --red:#ff4d4d;--red-d:#d93030;--red-l:#3a1111;--red-t:#ff8b8b;--amber:#ffb000;--amber-l:#2a2000;--amber-t:#ffcf5a;--gold:#ffb000;
+ --hl:rgba(57,255,122,.22);--hl-line:#39ff7a;--link:#39ff7a;
+ --r:0px;--bw:1px;--upper:uppercase;--ls:.08em;--btnw:700;--btn-sh:none;--btn-sh-p:none;--press:none;--toast-bg:#39ff7a;--toast-ink:#03170a;
+ --font:ui-monospace,'SF Mono',Menlo,Consolas,'Liberation Mono',monospace;
+}
+html[data-theme="terminal"] body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:200;opacity:.35;background:repeating-linear-gradient(0deg,rgba(0,0,0,.45) 0 1px,transparent 1px 3px)}
+html[data-theme="terminal"] .btn{font-size:12px;background:transparent;color:var(--accent);border:1px solid var(--accent)}
+html[data-theme="terminal"] .btn::before{content:"[ "}
+html[data-theme="terminal"] .btn::after{content:" ]"}
+html[data-theme="terminal"] .btn-green:hover:not(:disabled){background:var(--accent);color:var(--accent-ink)}
+html[data-theme="terminal"] .btn-blue{background:transparent;color:var(--accent2);border-color:var(--accent2)}
+html[data-theme="terminal"] .btn-red{background:transparent;color:var(--red);border-color:var(--red)}
+html[data-theme="terminal"] :is(.btn-ghost,.btn-amber,.btn-redg){background:transparent;color:var(--ink2);border:1px solid var(--line2)}
+html[data-theme="terminal"] .btn-redg{color:var(--red)}
+html[data-theme="terminal"] .hero h1::after{content:"_";animation:lt-blink 1s steps(2) infinite;color:var(--accent)}
+html[data-theme="terminal"] .hero h1{font-size:24px;color:var(--accent);letter-spacing:0}
+html[data-theme="terminal"] .sectionhead::before{content:"> "}
+html[data-theme="terminal"] .sectionhead{color:var(--ink2)}
+html[data-theme="terminal"] .deck{border-left:3px solid var(--accent);border-radius:0}
+html[data-theme="terminal"] .deck-ico{border-radius:0;background:transparent;border:1px solid var(--line2);color:var(--accent)}
+html[data-theme="terminal"] .statcard{background:transparent;border:1px solid var(--line2);border-radius:0;text-align:left}
+html[data-theme="terminal"] .statcard b{color:var(--accent);font-weight:700}
+html[data-theme="terminal"] .progress{height:10px;border-radius:0;background:var(--line)}
+html[data-theme="terminal"] .progress>i{border-radius:0;background:repeating-linear-gradient(90deg,var(--accent) 0 8px,transparent 8px 10px)}
+html[data-theme="terminal"] :is(.chip,.choice){border-radius:0;font-weight:500}
+html[data-theme="terminal"] .choice::before{content:"> ";color:var(--accent)}
+html[data-theme="terminal"] .compare{background:var(--card);border:1px solid var(--line2);border-radius:0}
+html[data-theme="terminal"] .lvcard{border-radius:0;border-style:dashed}
+html[data-theme="terminal"] .topbar{border-bottom:1px dashed var(--line2)}
+html[data-theme="terminal"] .footer{border-top:1px dashed var(--line2)}
+html[data-theme="terminal"] .introcard{border-radius:0;border:1px solid var(--accent)}
+html[data-theme="terminal"] .answerzone{border-bottom:1px dashed var(--line2)}
+
+/* ---------- AURORA: frosted glass on a dark gradient ---------- */
+html[data-theme="aurora"]{
+ --bg:#120f2e;--bg2:rgba(255,255,255,.07);--card:rgba(255,255,255,.07);--card2:rgba(255,255,255,.13);--ink:#eef0ff;--ink2:#b6b9e6;--ink3:#8286bd;--line:rgba(255,255,255,.14);--line2:rgba(255,255,255,.26);
+ --accent:#8b7bff;--accent-d:#7a69f5;--accent-ink:#0b0820;--accent2:#35d0ff;--accent2-ink:#06141c;--accent-soft:rgba(139,123,255,.3);
+ --green:#4ee0a4;--green-d:#2fc088;--green-l:rgba(78,224,164,.18);--green-t:#8cf0c6;--blue:#35d0ff;--blue-d:#8fe6ff;--blue-l:rgba(53,208,255,.16);
+ --red:#ff6b8a;--red-d:#e5456a;--red-l:rgba(255,107,138,.16);--red-t:#ff9db3;--amber:#ffc766;--amber-l:rgba(255,199,102,.16);--amber-t:#ffd990;--gold:#ffc766;
+ --hl:rgba(255,214,102,.28);--hl-line:rgba(255,214,102,.75);--link:#c9c2ff;
+ --r:22px;--bw:1px;--upper:none;--ls:.2px;--btnw:700;--btn-sh:0 8px 24px rgba(139,123,255,.35);--btn-sh-p:0 2px 8px rgba(139,123,255,.3);--press:translateY(1px) scale(.99);--btn-sh-g:none;--toast-bg:#eef0ff;--toast-ink:#120f2e;
+ --font:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;--topbg:rgba(18,15,46,.55);
+}
+html[data-theme="aurora"] body{background:radial-gradient(1100px 700px at 8% -10%,#40329a 0%,transparent 60%),radial-gradient(900px 640px at 100% 8%,#0d6f94 0%,transparent 58%),radial-gradient(800px 600px at 50% 110%,#5b2a8a 0%,transparent 60%),#120f2e;background-attachment:fixed;min-height:100vh}
+html[data-theme="aurora"] .topbar{backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+html[data-theme="aurora"] :is(.deck,.statcard,.lvcard,.compare,.improw,.introcard,.nview,.themecard){background:var(--card);border:1px solid var(--line);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 10px 30px rgba(0,0,0,.25)}
+html[data-theme="aurora"] :is(.footer,.selbar,.sheet,.dd){background:rgba(30,25,80,.78);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+html[data-theme="aurora"] .sheet{border:1px solid var(--line2)}
+html[data-theme="aurora"] .btn-green{background:linear-gradient(135deg,#8b7bff,#35d0ff);color:#0b0820}
+html[data-theme="aurora"] .btn-green:hover:not(:disabled){background:linear-gradient(135deg,#9a8cff,#5bdcff)}
+html[data-theme="aurora"] .btn-blue{background:rgba(53,208,255,.2);color:#8fe6ff;box-shadow:none;border:1px solid rgba(53,208,255,.5)}
+html[data-theme="aurora"] :is(.btn-ghost,.btn-amber,.btn-redg){background:rgba(255,255,255,.08);border:1px solid var(--line2);backdrop-filter:blur(10px)}
+html[data-theme="aurora"] .hero h1{font-size:32px;background:linear-gradient(90deg,#fff,#b8b0ff 60%,#8fe6ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+html[data-theme="aurora"] .progress{height:10px;border-radius:10px;background:rgba(255,255,255,.14)}
+html[data-theme="aurora"] .progress>i{border-radius:10px;background:linear-gradient(90deg,#8b7bff,#35d0ff);box-shadow:0 0 14px rgba(139,123,255,.8)}
+html[data-theme="aurora"] :is(.chip,.choice){border-radius:16px;background:rgba(255,255,255,.08);backdrop-filter:blur(8px)}
+html[data-theme="aurora"] :is(.field,.typein){background:rgba(255,255,255,.08)}
+html[data-theme="aurora"] .deck-ico{background:linear-gradient(135deg,rgba(139,123,255,.45),rgba(53,208,255,.35));color:#fff;border-radius:16px}
+html[data-theme="aurora"] .compare{background:rgba(255,255,255,.07)}
+html[data-theme="aurora"] .answerzone{border-bottom:1px solid var(--line2)}
+
+/* ---------- BRUTALIST: thick outlines, flat colour, hard shadows ---------- */
+html[data-theme="brutal"]{
+ --bg:#fff3b0;--bg2:#ffe36e;--card:#ffffff;--card2:#ffd9e4;--ink:#111;--ink2:#2b2b2b;--ink3:#555;--line:#111;--line2:#111;
+ --accent:#ff4f81;--accent-d:#ff2e68;--accent-ink:#111;--accent2:#22d3ee;--accent2-ink:#111;--accent-soft:#ffd9e4;
+ --green:#7cf29a;--green-d:#4fdc77;--green-l:#c9ffd6;--green-t:#0b5a22;--blue:#22d3ee;--blue-d:#0a6f84;--blue-l:#c9f6ff;
+ --red:#ff3b30;--red-d:#d92a20;--red-l:#ffd0cc;--red-t:#8f0f08;--amber:#ffb800;--amber-l:#fff0b8;--amber-t:#5c3d00;--gold:#ffb800;
+ --hl:#ffe14d;--hl-line:#111;--link:#111;
+ --r:0px;--bw:3px;--upper:uppercase;--ls:.03em;--btnw:900;--btn-sh:5px 5px 0 #111;--btn-sh-p:1px 1px 0 #111;--press:translate(4px,4px);--btn-line:#111;--chip-sh:3px 3px 0 #111;--sel-sh:3px 3px 0 #111;--btn-sh-g:3px 3px 0 #111;--toast-bg:#fff;--toast-ink:#111;
+ --font:'Arial Black','Helvetica Neue',Arial,system-ui,sans-serif;
+}
+html[data-theme="brutal"] body{font-weight:700}
+html[data-theme="brutal"] .topbar{border-bottom:3px solid #111}
+html[data-theme="brutal"] .footer{border-top:3px solid #111}
+html[data-theme="brutal"] .hero h1{display:inline-block;font-size:30px;text-transform:uppercase;background:#111;color:#fff;padding:4px 12px;transform:rotate(-1.2deg);letter-spacing:0}
+html[data-theme="brutal"] .hero p{color:#111;font-weight:700}
+html[data-theme="brutal"] .btn{border:3px solid #111}
+html[data-theme="brutal"] :is(.deck,.lvcard,.introcard,.nview,.themecard,.improw,.compare){border:3px solid #111;border-radius:0;box-shadow:5px 5px 0 #111}
+html[data-theme="brutal"] .statcard{background:#fff;border:3px solid #111;border-radius:0;box-shadow:4px 4px 0 #111}
+html[data-theme="brutal"] .statgrid{gap:14px}
+html[data-theme="brutal"] .deck:hover{background:var(--card2);border-color:#111}
+html[data-theme="brutal"] .deck-ico{background:var(--accent2);color:#111;border:3px solid #111;border-radius:0}
+html[data-theme="brutal"] .progress{height:20px;border:3px solid #111;border-radius:0;background:#fff}
+html[data-theme="brutal"] .progress>i{border-radius:0;background:var(--accent)}
+html[data-theme="brutal"] .sectionhead{display:inline-block;background:#111;color:#fff;padding:3px 9px;letter-spacing:.08em}
+html[data-theme="brutal"] :is(.chip,.choice){border:3px solid #111;border-radius:0;font-weight:800}
+html[data-theme="brutal"] .choice.sel{background:var(--accent2)}
+html[data-theme="brutal"] :is(.field,.typein){border:3px solid #111;border-radius:0}
+html[data-theme="brutal"] .sheet{border:3px solid #111;border-bottom:0;border-radius:0}
+html[data-theme="brutal"] .dd{border:3px solid #111;border-radius:0;box-shadow:5px 5px 0 #111}
+html[data-theme="brutal"] .toast{border:3px solid #111;border-radius:0;box-shadow:4px 4px 0 #111}
+html[data-theme="brutal"] .answerzone{border-bottom:3px solid #111}
+html[data-theme="brutal"] .flagbtn{border:3px solid #111;border-radius:0}
+html[data-theme="brutal"] .nt{box-shadow:none;border-bottom:3px solid #111;border-radius:0}
+html[data-theme="brutal"] .ntag,html[data-theme="brutal"] .ntype,html[data-theme="brutal"] .lbadge{border:2px solid #111;border-radius:0;color:#111}
+
+/* ---------- ZEN: sand, sage, soft shadows ---------- */
+html[data-theme="zen"]{
+ --bg:#f1ece1;--bg2:#e8e1d1;--card:#faf7f0;--card2:#f1ecdf;--ink:#3b3a33;--ink2:#6d6a5e;--ink3:#a29e8f;--line:#e2dccb;--line2:#cfc8b3;
+ --accent:#6f9275;--accent-d:#5a7b60;--accent-ink:#fff;--accent2:#c98f6b;--accent2-ink:#fff;--accent-soft:#dfe9df;
+ --green:#6f9275;--green-d:#5a7b60;--green-l:#e0ebe0;--green-t:#3f6247;--blue:#c98f6b;--blue-d:#a9714f;--blue-l:#f3e3d8;
+ --red:#c4685f;--red-d:#a8504a;--red-l:#f4dcd8;--red-t:#8f3d37;--amber:#d9a441;--amber-l:#f6e8c6;--amber-t:#7a5a14;--gold:#d9a441;
+ --hl:rgba(217,164,65,.30);--hl-line:rgba(190,130,30,.55);--link:#5a7b60;
+ --r:22px;--bw:1px;--upper:none;--ls:.01em;--btnw:600;--btn-sh:0 6px 18px rgba(111,146,117,.28);--btn-sh-p:0 2px 6px rgba(111,146,117,.25);--press:translateY(1px);--btn-sh-g:none;--toast-bg:#3b3a33;--toast-ink:#faf7f0;
+ --font:'Avenir Next','Nunito','Segoe UI',system-ui,sans-serif;--hfont:'Iowan Old Style',Georgia,serif;--topbg:transparent;
+}
+html[data-theme="zen"] body{background:linear-gradient(180deg,#f6f1e6 0%,#ebe4d3 100%);background-attachment:fixed}
+html[data-theme="zen"] .btn{border-radius:999px;padding-left:22px;padding-right:22px}
+html[data-theme="zen"] :is(.deck,.lvcard,.compare,.introcard,.nview){border:0;border-radius:26px;box-shadow:0 10px 28px rgba(80,70,40,.09)}
+html[data-theme="zen"] .statcard{background:var(--card);border-radius:26px;box-shadow:0 10px 28px rgba(80,70,40,.08)}
+html[data-theme="zen"] .hero h1{font-weight:500;font-size:32px;letter-spacing:.2px}
+html[data-theme="zen"] .progress{height:8px;border-radius:8px;background:var(--line)}
+html[data-theme="zen"] .progress>i{border-radius:8px}
+html[data-theme="zen"] .sectionhead{font-weight:600;letter-spacing:.16em;color:var(--ink3)}
+html[data-theme="zen"] .deck-ico{border-radius:50%;background:var(--accent-soft);color:var(--green-t)}
+html[data-theme="zen"] :is(.chip,.choice){border-radius:18px;border-color:var(--line);font-weight:600}
+html[data-theme="zen"] :is(.field,.typein){border-radius:18px}
+html[data-theme="zen"] .footer{border-top:0;box-shadow:0 -10px 30px rgba(80,70,40,.08);border-radius:26px 26px 0 0}
+html[data-theme="zen"] .sheet{border-radius:28px 28px 0 0}
+html[data-theme="zen"] .answerzone{border-bottom:1px dashed var(--line2)}
+html[data-theme="zen"] .selbar{border-top:0;box-shadow:0 -10px 30px rgba(80,70,40,.08)}
 </style>
 </head>
 <body>
@@ -1002,6 +1255,8 @@ let KNOWN = loadLS(LS.known, 'en');   // language shown as the known/question si
 let SIDE = loadLS(LS.side, '');      // optional extra translation shown beside the known side ('' = none)
 let EN_IDX = {};                     // lang -> Map(english key -> sentence)
 let EK = new Map();
+let LENC = new Map();                // uid -> sentence length in words of its own language
+const SEGS = {};
 let LIB = null;
 let BY_UID = new Map();
 let T2S = new Map();
@@ -1152,7 +1407,7 @@ function migrateLegacy(){
 }
 function getGroup(id){ return LIB.groups.find(g=>g.id===id); }
 function rebuild(){
-  BY_UID = new Map(); T2S = new Map(); WORD_TASHKIL = {}; EN_IDX = {}; EK = new Map();
+  BY_UID = new Map(); T2S = new Map(); WORD_TASHKIL = {}; EN_IDX = {}; EK = new Map(); LENC = new Map();
   for (const g of LIB.groups) for (const s of g.items){
     s.lang = g.lang;
     if (!BY_UID.has(s.uid)){
@@ -1173,6 +1428,7 @@ function rebuild(){
     }
   }
   fixLangPrefs();
+  rebuildSeen();
 }
 function fixLangPrefs(){
   if (KNOWN !== 'en' && !EN_IDX[KNOWN]){ KNOWN = 'en'; saveLS(LS.known, KNOWN); }
@@ -1422,7 +1678,25 @@ function stemSplit(a, b){
 const SUBS = ['a','b','c'];
 const SUB_NEW = [['match-en','match-fl'], ['bank-fl','choice-fl'], ['type-en','choice-en','bank-en']];
 const SUB_DESC = ['Intro & match','Build sentences','Translate to English'];
-function sentLen(s){ return LG(s.lang).noSpace ? s.english.split(/\s+/).filter(Boolean).length : toks(s.target, s.lang).length; }
+// Length in words of the sentence's OWN language (never English).
+// Languages written without spaces (Chinese, Japanese, Thai…) are split into real words with Intl.Segmenter; characters are the fallback.
+function wordCount(text, lang){
+  if (!LG(lang).noSpace) return toks(text, lang).length;
+  try {
+    if (typeof Intl !== 'undefined' && Intl.Segmenter){
+      const code = lang === 'yue' ? 'zh' : lang;
+      const seg = SEGS[code] || (SEGS[code] = new Intl.Segmenter(code, { granularity:'word' }));
+      let n = 0; for (const x of seg.segment(text)) if (x.isWordLike) n++;
+      if (n) return n;
+    }
+  } catch(e){}
+  return Array.from(String(text).replace(/[\s\p{P}\p{S}]/gu, '')).length;
+}
+function sentLen(s){
+  let n = LENC.get(s.uid);
+  if (n === undefined){ n = wordCount(s.target, s.lang); LENC.set(s.uid, n); }
+  return n;
+}
 function levelOfLen(n){ return Math.max(1, Math.ceil((n-1)/2)); }
 function levelWords(L){ return L === 1 ? '1–3' : (2*L) + '–' + (2*L+1); }
 function langSentences(lang){ return [...BY_UID.values()].filter(s=>s.lang === lang); }
@@ -1476,9 +1750,12 @@ function fillLevelQueue(){
   if (normalizeLevel(lang) === 'complete'){
     s.complete = true;
     s.queue = s.queue.concat(shuffle(langSentences(lang)).map(x=>({ sent:x, kind:'rev' })));
+    dbg('fill', 'all levels completed: ' + s.queue.length + ' card(s) of free review queued');
     return;
   }
-  const q = shuffle(levelPending(lang)).map(x=>({ sent:x, kind:'new' }));
+  const queued = new Set(s.queue.map(x=>x.sent.uid));
+  const q = shuffle(levelPending(lang).filter(x=>!queued.has(x.uid))).map(x=>({ sent:x, kind:'new' }));
+  const nNew = q.length;
   if (q.length > 1 && s.last && q[0].sent.uid === s.last){ const t = q[0]; q[0] = q[q.length-1]; q[q.length-1] = t; }
   // review mix: sentences already met (not in this chunk), unknown ones first; any enabled exercise type
   const last = lastMap(), cur = new Set(curChunk(lang).map(x=>x.uid));
@@ -1486,8 +1763,12 @@ function fillLevelQueue(){
   const n = Math.min(seen.length, Math.max(3, Math.ceil(q.length*0.5)));
   const unk = shuffle(seen.filter(x=>last.get(x.uid) === false));
   const ok = shuffle(seen.filter(x=>last.get(x.uid) === true));
-  unk.concat(ok).slice(0, n).forEach(x=>q.splice(Math.floor(Math.random()*(q.length+1)), 0, { sent:x, kind:'rev' }));
+  const picks = unk.concat(ok).slice(0, n);
+  picks.forEach(x=>q.splice(Math.floor(Math.random()*(q.length+1)), 0, { sent:x, kind:'rev' }));
   s.queue = s.queue.concat(q);
+  const v = lv(lang);
+  dbg('fill', 'level ' + v.level + SUBS[v.sub] + ' chunk ' + (v.chunk + 1) + ': ' + nNew + ' new + ' + picks.length + ' review card(s) queued',
+    { new:nNew, review:picks.length, reviewWrong:picks.filter(x=>last.get(x.uid) === false).length, reviewKnown:picks.filter(x=>last.get(x.uid) === true).length });
 }
 
 /* ==================== STATE / SESSION ==================== */
@@ -1505,14 +1786,21 @@ function lang_pool(lang){
   }
   return s.byLang[lang];
 }
-function fillQueue(){
-  const s = state.sess;
-  const q = shuffle(s.pool.slice()).map(x=>({ sent:x }));
-  if (q.length > 1 && s.last && q[0].sent.uid === s.last){ const t = q[0]; q[0] = q[q.length-1]; q[q.length-1] = t; }
-  s.queue = q;
+function roundItems(s){ return shuffle(s.pool.slice()).map(x=>({ sent:x })); }
+function fillQueue(){ state.sess.queue = roundItems(state.sess); }
+// Repetition guard: a sentence never comes back within the next N cards (setting "Repetition"), retries of wrong answers included.
+function gapN(){ const n = parseInt(GAP_N, 10); return n >= 1 ? Math.min(8, n) : 1; }
+function poolSize(s){ return s.mode === 'level' ? langSentences(s.lang).length : s.pool.length; }
+function pickIdx(s){
+  if (!s.queue.length) return -1;
+  const n = Math.min(gapN(), poolSize(s) - 1);
+  if (n < 1) return 0;                                   // one sentence only: repetition is unavoidable
+  const rec = (s.recent || []).slice(-n);
+  for (let i = 0; i < s.queue.length; i++) if (rec.indexOf(s.queue[i].sent.uid) < 0) return i;
+  return -1;                                             // everything queued is too recent: bring in more cards
 }
 function newSess(o){
-  state.sess = Object.assign({ mode:'free', pool:[], label:'', queue:[], round:1, roundDone:0, last:null, byLang:{}, from:'home' }, o);
+  state.sess = Object.assign({ mode:'free', pool:[], label:'', queue:[], recent:[], round:1, roundDone:0, last:null, byLang:{}, from:'home' }, o);
   state.xp = 0; state.session = 0; state.correctSession = 0; state.combo = 0;
 }
 function startSession(items, label, from){
@@ -1531,45 +1819,92 @@ function startLevel(lang){
 }
 function pickType(c){
   const en = enabledTypes(); let set = en;
-  const s = state.sess;
+  const s = state.sess, why = { base:'all enabled exercise types', note:'' };
   if (s.mode === 'level' && c.kind === 'new'){
-    const n = SUB_NEW[lv(s.lang).sub].filter(t=>en.includes(t));
-    if (n.length) set = n;
+    const lvl = lv(s.lang), n = SUB_NEW[lvl.sub].filter(t=>en.includes(t));
+    if (n.length){ set = n; why.base = 'new types of sub-level ' + lvl.level + SUBS[lvl.sub]; }
+    else why.note = 'all types of this sub-level are disabled in Settings';
   }
-  if (kn(c.sent).lang !== 'en'){ const w = set.filter(t=>t !== 'type-en'); if (w.length) set = w; }
-  return set[Math.floor(Math.random()*set.length)];
+  if (kn(c.sent).lang !== 'en'){
+    const w = set.filter(t=>t !== 'type-en');
+    if (w.length){ if (w.length !== set.length) why.note += ' type-en removed (known side is not English)'; set = w; }
+  }
+  const chosen = set[Math.floor(Math.random()*set.length)];
+  why.set = set.slice(); why.chosen = chosen; TYPE_WHY = why;
+  return chosen;
 }
 function makeEx(c){
   const pool = lang_pool(c.sent.lang);
-  const order = [c.forced || pickType(c)];
-  const ex0 = buildExercise(c.sent, pool, order[0]);
+  const t0 = c.forced || pickType(c);
+  if (c.forced) TYPE_WHY = { base:'same type as the earlier mistake', set:[c.forced], chosen:c.forced, note:'' };
+  const ex0 = buildExercise(c.sent, pool, t0);
   if (ex0) return ex0;
-  for (const t of shuffle(enabledTypes().filter(x=>!isMatch(x)))){ const e = buildExercise(c.sent, pool, t); if (e) return e; }
+  for (const t of shuffle(enabledTypes().filter(x=>!isMatch(x)))){
+    const e = buildExercise(c.sent, pool, t);
+    if (e){ TYPE_WHY.fallback = t + ' (' + t0 + ' cannot be built for this sentence)'; return e; }
+  }
+  TYPE_WHY.fallback = 'bank-fl (nothing else can be built)';
   return buildExercise(c.sent, pool, 'bank-fl');
 }
-function needsIntro(sent){ return TYPE_ON.intro !== false && !INTRO_SEEN[sent.uid]; }
+// The card is skipped when the sentence has at most `threshold` completely unknown words (threshold depends on the sentence's level).
+function needsIntro(sent){
+  if (TYPE_ON.intro === false || INTRO_SEEN[sent.uid]) return false;
+  const thr = introThreshold(levelOfLen(sentLen(sent)));
+  if (unknownCount(sent, thr) <= thr){ INTRO_SEEN[sent.uid] = 1; saveLS(LS.intro, INTRO_SEEN); addSeen(sent); return false; }
+  return true;
+}
 function showCard(c){
   state.cur = c; state.sess.last = c.sent.uid;
   state.flagged = !!FLAGS[c.sent.uid];
+  const info = DEBUG_ON ? { intro:introInfo(c.sent), pick:state.sess.pick } : null;   // read before needsIntro changes anything
   if (needsIntro(c.sent)){
     state.ex = { type:'intro', sent:c.sent, lang:c.sent.lang };
     state.answer = null; state.feedback = null;
   } else {
     state.ex = makeEx(c); prepareAnswer();
+    if (info) info.type = TYPE_WHY;
   }
+  DBG_CARD = info;
+  if (info) dbg('card', '#' + (state.session + 1) + ' ' + cardKind(c) + ' ' + state.ex.type + ' — ' + short(c.sent.target, 24),
+    { uid:c.sent.uid, kind:cardKind(c), intro:info.intro.why, pick:info.pick, type:info.type || null });
 }
 function introDone(){
-  INTRO_SEEN[state.ex.sent.uid] = 1; saveLS(LS.intro, INTRO_SEEN);
-  state.ex = makeEx(state.cur); prepareAnswer(); render();
+  const c = state.cur, s = state.sess;
+  INTRO_SEEN[c.sent.uid] = 1; saveLS(LS.intro, INTRO_SEEN); addSeen(c.sent);
+  const g = parseInt(INTRO_GAP, 10) || 0;
+  if (g > 0 && s){
+    // separate the question from its introduction card: it comes back after g other cards
+    s.queue.splice(Math.min(s.queue.length, g), 0, { sent:c.sent, kind:c.kind, forced:c.forced });
+    dbg('intro', 'intro done → question for "' + short(c.sent.target, 20) + '" postponed by ' + g + ' card(s)', { uid:c.sent.uid, after:g });
+    nextCard(); render(); return;
+  }
+  dbg('intro', 'intro done → question follows right away');
+  state.ex = makeEx(c); prepareAnswer();
+  if (DBG_CARD) DBG_CARD.type = TYPE_WHY;
+  render();
 }
 function nextCard(){
-  const s = state.sess;
-  if (!s.queue.length){
+  const s = state.sess; if (!s.recent) s.recent = [];
+  const queueBefore = s.queue.length;
+  let i = pickIdx(s), refilled = false;
+  if (i < 0){
+    refilled = true;
     if (s.mode === 'level') fillLevelQueue();
-    else { s.round++; s.roundDone = 0; fillQueue(); }
+    else {
+      s.round++; s.roundDone = 0;
+      const queued = new Set(s.queue.map(x=>x.sent.uid));
+      s.queue = s.queue.concat(roundItems(s).filter(x=>!queued.has(x.sent.uid)));
+      dbg('fill', 'round ' + s.round + ' started: ' + s.queue.length + ' card(s) queued');
+    }
+    i = pickIdx(s);
   }
   if (!s.queue.length){ exitSession(); return; }
-  showCard(s.queue.shift());
+  const unavoidable = i < 0;
+  if (i < 0) i = 0;
+  s.pick = { queueBefore, i, refilled, unavoidable, n:Math.min(gapN(), poolSize(s) - 1), recent:s.recent.slice(-6) };
+  const c = s.queue.splice(i, 1)[0];
+  s.recent.push(c.sent.uid); if (s.recent.length > 12) s.recent.shift();
+  showCard(c);
 }
 function prepareAnswer(){
   state.feedback = null;
@@ -1751,6 +2086,8 @@ function relabelGroup(g, nl){
     for (const k of Object.keys(d)) nd[map[k] || k] = d[k];
     LEVELS[c].done = nd;
   }
+  for (const n of NOTES) if (n.uid && map[n.uid]){ n.uid = map[n.uid]; n.lang = nl; }   // notes made on these sentences follow the new language
+  saveLS(LS.notes, NOTES); buildNoteIdx(); rebuildSeen();
   saveAttempts(); saveFlags(); saveLS(LS.intro, INTRO_SEEN); saveLS(LS.levels, LEVELS);
   if (ACTIVE.includes(old) && !ACTIVE.includes(nl)) ACTIVE.push(nl);
   afterLibChange();
@@ -1762,20 +2099,671 @@ function singleLang(gs){
   return ls[0];
 }
 
+/* ==================== NOTES · INTRO SKIP · THEMES ==================== */
+Object.assign(LS, {
+  notes:'arTrainer:notes', hl:'arTrainer:hl', notesShow:'arTrainer:notesShow',
+  introT:'arTrainer:introT', theme:'arTrainer:theme', grade:'arTrainer:grade', gap:'arTrainer:gap', debug:'arTrainer:debug', introGap:'arTrainer:introGap',
+});
+let NOTES = loadLS(LS.notes, []);
+let HL_ON = loadLS(LS.hl, true);                 // highlight words that have a note
+// notes in the lesson, 3 stages: 'off' = nothing · 'hl' = highlights only · 'list' = highlights + the notes listed under the sentence
+let NOTES_VIEW = (v=>v === true ? 'list' : (v === 'off' || v === 'hl' || v === 'list') ? v : 'hl')(loadLS(LS.notesShow, 'hl'));
+const notesHL = ()=>HL_ON && NOTES_VIEW !== 'off';     // the Settings switch (HL_ON) is the master: off = no highlights, no list, no lesson button
+const notesList = ()=>HL_ON && NOTES_VIEW === 'list';
+const INTRO_T_DEF = { mode:'fixed', fixed:1, a:1, b:0.5, max:6, manual:{}, other:1 };
+let INTRO_T = Object.assign({}, INTRO_T_DEF, loadLS(LS.introT, {}));
+let THEME = loadLS(LS.theme, 'classic');
+let INTRO_GAP = loadLS(LS.introGap, 0);          // 0 = ask about a sentence right after its intro card · 1–5 = after that many other cards
+let GAP_N = loadLS(LS.gap, 1);                   // cards that must pass before the same sentence may come again (1–8)
+let GRADE_MODE = loadLS(LS.grade, 'self');       // 'self' = you rate every answer (Anki style) · 'auto' = the app decides
+const autoGrade = ()=>GRADE_MODE === 'auto';
+state.nf = { by:'lang', lang:'', type:'', tag:'', group:'', level:'', q:'' };
+
+const NOTE_TYPES = [
+  { id:'word',   label:'Word' },
+  { id:'prefix', label:'Prefix' },
+  { id:'suffix', label:'Suffix' },
+  { id:'infix',  label:'Infix (inside)' },
+];
+const PRESET_TAGS = ['noun', 'verb', 'particle', 'preposition', 'adjective', 'adverb', 'pronoun'];
+const typeLabel = t => (NOTE_TYPES.find(x=>x.id === t) || { label:t }).label;
+const nid = ()=>'n' + Date.now().toString(36) + Math.random().toString(36).slice(2,5);
+const tagsHTML = tags => (tags || []).map(t=>`<span class="ntag">${esc(t)}</span>`).join('');
+function allTags(){ const s = new Set(); NOTES.forEach(n=>(n.tags || []).forEach(t=>s.add(t))); return [...s].sort(); }
+
+/* ---------- matching ---------- */
+// normalized form of ONE displayed character ('' = ignored: diacritic, punctuation, space)
+function nnChar(ch, lang){
+  if (LG(lang).arf) return normAr(ch).replace(/\s/g, '');
+  if (!/[\p{L}\p{N}\p{M}]/u.test(ch)) return '';
+  return ch.toLowerCase();
+}
+function noteNorm(s, lang){
+  let o = ''; for (const ch of Array.from(String(s).normalize('NFC'))) o += nnChar(ch, lang); return o;
+}
+function alignText(text, lang){
+  const info = []; let norm = '';
+  for (const c of Array.from(String(text).normalize('NFC'))){
+    const n = nnChar(c, lang);
+    info.push({ c, s:norm.length, n, mark:/[\p{M}\u0640]/u.test(c) });
+    norm += n;
+  }
+  return { info, norm };
+}
+const NP = new Map();
+let NOTE_IDX = {};
+function buildNoteIdx(){
+  NOTE_IDX = {}; NP.clear();
+  for (const n of NOTES){
+    const np = noteNorm(n.text, n.lang); if (!np) continue;
+    NP.set(n.id, np);
+    const ix = NOTE_IDX[n.lang] || (NOTE_IDX[n.lang] = { word:new Map(), aff:[], all:[] });
+    ix.all.push({ note:n, np });
+    if (n.type === 'word'){ const a = ix.word.get(np) || []; a.push(n); ix.word.set(np, a); }
+    else ix.aff.push({ note:n, np });
+  }
+}
+// sub = true: language without spaces, every note is a substring search over the whole sentence
+function matchRanges(norm, ix, sub){
+  const out = [];
+  if (sub){
+    for (const a of ix.all){ let i = norm.indexOf(a.np); while (i >= 0){ out.push({ s:i, e:i + a.np.length, note:a.note }); i = norm.indexOf(a.np, i + a.np.length); } }
+    return out;
+  }
+  const w = ix.word.get(norm); if (w) for (const n of w) out.push({ s:0, e:norm.length, note:n });
+  for (const a of ix.aff){
+    const np = a.np, t = a.note.type;
+    if (t === 'prefix'){ if (norm.startsWith(np)) out.push({ s:0, e:np.length, note:a.note }); }
+    else if (t === 'suffix'){ if (norm.endsWith(np)) out.push({ s:norm.length - np.length, e:norm.length, note:a.note }); }
+    else { const i = norm.indexOf(np); if (i >= 0) out.push({ s:i, e:i + np.length, note:a.note }); }
+  }
+  return out;
+}
+function hlRun(seg, lang, ix, sub){
+  const al = alignText(seg, lang);
+  if (!al.norm) return esc(seg);
+  const hits = matchRanges(al.norm, ix, sub);
+  if (!hits.length) return esc(seg);
+  const per = al.info.map(()=>null);
+  al.info.forEach((ci, k)=>{
+    const len = ci.n.length; if (!len) return;
+    for (const h of hits) if (ci.s < h.e && ci.s + len > h.s) (per[k] || (per[k] = new Set())).add(h.note.id);
+  });
+  for (let k=1; k<per.length; k++) if (!per[k] && al.info[k].mark && per[k-1]) per[k] = per[k-1];   // diacritics follow their letter
+  let out = '', buf = '', cur = null, curKey = '';
+  const flush = ()=>{ if (buf){ out += cur ? `<span class="nt" data-n="${[...cur].join(' ')}">${esc(buf)}</span>` : esc(buf); buf = ''; } };
+  al.info.forEach((ci, k)=>{
+    const key = per[k] ? [...per[k]].sort().join(' ') : '';
+    if (key !== curKey){ flush(); curKey = key; cur = per[k] ? new Set(per[k]) : null; }
+    buf += ci.c;
+  });
+  flush(); return out;
+}
+// foreign text as HTML; words/affixes that have a user note are wrapped in <span class="nt">
+function flHTML(text, lang){
+  text = String(text == null ? '' : text);
+  const ix = notesHL() && NOTE_IDX[lang];
+  if (!ix) return esc(text);
+  if (LG(lang).noSpace) return hlRun(text, lang, ix, true);
+  return text.split(/(\s+)/).map(p=>(!p || /^\s+$/.test(p)) ? esc(p) : hlRun(p, lang, ix, false)).join('');
+}
+function noteMatches(text, lang){
+  const ix = NOTE_IDX[lang]; if (!ix) return [];
+  const seen = new Map();
+  const run = (seg, sub)=>{
+    const n = noteNorm(seg, lang); if (!n) return;
+    for (const h of matchRanges(n, ix, sub)) if (!seen.has(h.note.id)) seen.set(h.note.id, h.note);
+  };
+  if (LG(lang).noSpace) run(text, true); else String(text).split(/\s+/).forEach(w=>{ if (w) run(w, false); });
+  return [...seen.values()];
+}
+function notesStripHTML(text, lang){
+  if (!notesList()) return '';
+  const ms = noteMatches(text, lang); if (!ms.length) return '';
+  return '<div class="ntstrip">' + ms.map(n=>`<div class="ntline"><b class="${flc(lang)}">${esc(n.text)}</b> <span class="ntype">${esc(typeLabel(n.type))}</span> ${n.note ? esc(n.note) : ''}${tagsHTML(n.tags)}</div>`).join('') + '</div>';
+}
+// tapping a highlight opens its note(s); chips/option buttons are left alone
+document.addEventListener('click', e=>{
+  const t = e.target.closest && e.target.closest('.nt');
+  if (!t || t.closest('button')) return;
+  e.stopPropagation(); e.preventDefault();
+  openNoteView(t.getAttribute('data-n').split(' '));
+}, true);
+
+/* ---------- words of a sentence ---------- */
+function segWords(text, lang){
+  try {
+    if (typeof Intl !== 'undefined' && Intl.Segmenter){
+      const code = lang === 'yue' ? 'zh' : lang;
+      const seg = SEGS[code] || (SEGS[code] = new Intl.Segmenter(code, { granularity:'word' }));
+      const out = []; for (const x of seg.segment(text)) if (x.isWordLike) out.push(x.segment);
+      if (out.length) return out;
+    }
+  } catch(e){}
+  return null;
+}
+function wordsOfSentence(s){   // display forms, used to pick the word of a note
+  if (LG(s.lang).noSpace) return segWords(s.target, s.lang) || Array.from(s.target.replace(/[\s\p{P}\p{S}]/gu, ''));
+  return displayFl(s).split(/\s+/).map(t=>t.replace(PUNCT, '')).filter(Boolean);   // as displayed (with tashkil)
+}
+
+/* ---------- completely unknown words (intro skip) ---------- */
+let SEEN_WORDS = {}, WORDC = new Map();
+function sentWords(s){
+  let w = WORDC.get(s.uid);
+  if (!w){ w = [...new Set(wordsOfSentence(s).map(x=>noteNorm(x, s.lang)).filter(Boolean))]; WORDC.set(s.uid, w); }
+  return w;
+}
+function addSeen(s){
+  const set = SEEN_WORDS[s.lang] || (SEEN_WORDS[s.lang] = new Set());
+  for (const w of sentWords(s)) set.add(w);
+}
+function rebuildSeen(){
+  SEEN_WORDS = {}; WORDC = new Map();
+  const last = lastMap();
+  for (const s of BY_UID.values()) if (INTRO_SEEN[s.uid] || last.has(s.uid)) addSeen(s);
+}
+function noteCovers(w, lang){
+  const ix = NOTE_IDX[lang]; if (!ix) return false;
+  if (LG(lang).noSpace){ for (const a of ix.all) if (w.includes(a.np)) return true; return false; }
+  if (ix.word.has(w)) return true;
+  for (const a of ix.aff){
+    const t = a.note.type;
+    if (t === 'prefix' ? w.startsWith(a.np) : t === 'suffix' ? w.endsWith(a.np) : w.includes(a.np)) return true;
+  }
+  return false;
+}
+// cheapest test first: seen before (O(1)) → word note (O(1)) → affix notes. One match is enough to make a word "known".
+function unknownCount(s, limit){
+  const seen = SEEN_WORDS[s.lang]; let n = 0;
+  for (const w of sentWords(s)){
+    if (seen && seen.has(w)) continue;
+    if (noteCovers(w, s.lang)) continue;
+    if (++n > limit) break;
+  }
+  return n;
+}
+function introThreshold(level){
+  const t = INTRO_T;
+  if (t.mode === 'manual'){ const v = t.manual[level]; return (v === undefined || v === null || v === '') ? t.other : +v; }
+  if (t.mode === 'formula') return Math.max(0, Math.min(+t.max, Math.floor(+t.a + +t.b * (level - 1))));
+  return +t.fixed;
+}
+function maxLevelAll(){ let m = 1; for (const c of Object.keys(EN_IDX)) m = Math.max(m, maxLevel(c)); return m; }
+
+/* ---------- note view / editor ---------- */
+function noteCtx(sent){
+  let g = null;
+  if (state.sess && state.sess.from === 'group'){ const cg = getGroup(state.gid); if (cg && cg.items.some(s=>s.uid === sent.uid)) g = cg; }
+  if (!g) g = LIB.groups.find(gr=>gr.items.some(s=>s.uid === sent.uid)) || null;
+  return { gid:g ? g.id : null, gname:g ? g.name : '', level:levelOfLen(sentLen(sent)), uid:sent.uid };
+}
+function saveNotes(){ saveLS(LS.notes, NOTES); buildNoteIdx(); }
+function findNote(lang, type, pat){
+  const np = noteNorm(pat, lang);
+  return NOTES.find(n=>n.lang === lang && n.type === type && noteNorm(n.text, lang) === np) || null;
+}
+function openNoteView(ids){
+  const list = ids.map(id=>NOTES.find(n=>n.id === id)).filter(Boolean);
+  if (!list.length) return;
+  openSheet((sh, close)=>{
+    sh.innerHTML = `<h3>Note${list.length > 1 ? 's' : ''}</h3><div id="nvList"></div><div class="sheet-actions"><button class="btn btn-ghost" id="nvC">Close</button></div>`;
+    const box = sh.querySelector('#nvList');
+    list.forEach(n=>{
+      const d = document.createElement('div'); d.className = 'nview';
+      d.innerHTML = `<div class="nv-top"><b class="${flc(n.lang)}">${esc(n.text)}</b> <span class="ntype">${esc(typeLabel(n.type))}</span>${tagsHTML(n.tags)}</div>
+        <div class="nv-note">${n.note ? esc(n.note) : '<i>(no text)</i>'}</div>
+        <div class="nv-meta">${esc(LG(n.lang).name)}${n.gname ? ' · ' + esc(n.gname) : ''}${n.level ? ' · Level ' + n.level : ''}</div>
+        <div class="nv-actions"><button class="btn btn-ghost btn-sm" data-e>Edit</button><button class="btn btn-redg btn-sm" data-d>Delete</button></div>`;
+      d.querySelector('[data-e]').onclick = ()=>{ close(); setTimeout(()=>openNoteEditor({ note:n }), 90); };
+      d.querySelector('[data-d]').onclick = ()=>{
+        if (!confirm('Delete this note?')) return;
+        NOTES = NOTES.filter(x=>x.id !== n.id); saveNotes(); close(); render(true); toast('Note deleted');
+      };
+      box.appendChild(d);
+    });
+    sh.querySelector('#nvC').onclick = close;
+  });
+}
+function openNoteEditor(o){
+  o = o || {};
+  const ex = o.note || null, sent = o.sent || null;
+  let lang = ex ? ex.lang : (sent ? sent.lang : (o.lang || ACTIVE[0] || 'ar'));
+  let type = ex ? ex.type : 'word', pattern = ex ? ex.text : '';
+  const tagSet = new Set(ex ? ex.tags || [] : []);
+  openSheet((sh, close)=>{
+    const codes = Object.keys(LANGS).sort((a,b)=>LANGS[a].name.localeCompare(LANGS[b].name));
+    sh.innerHTML = `<h3>${ex ? 'Edit note' : 'Add note'}</h3>
+      ${sent ? `<div class="hint">Tap a word. Then tap the first and last letter of the part you want (a prefix, a suffix, or the whole word).</div>
+        <div class="npick ${flc(lang)}" id="nWords"></div><div class="nletters ${flc(lang)}" id="nLetters" hidden></div>` : ''}
+      ${!sent && !ex ? `<div class="hint">Language</div><select class="field" id="nLang">${codes.map(c=>`<option value="${c}"${c===lang?' selected':''}>${esc(LANGS[c].name)} — ${esc(LANGS[c].native)}</option>`).join('')}</select>` : ''}
+      <div class="hint" style="margin-top:10px">Pattern</div>
+      <input class="field ${flc(lang)}" id="nPat" autocomplete="off" autocapitalize="off" spellcheck="false">
+      <div class="hint" style="margin-top:10px">Type</div>
+      <select class="field" id="nType">${NOTE_TYPES.map(t=>`<option value="${t.id}">${t.label}</option>`).join('')}</select>
+      <div class="hint" style="margin-top:10px">Note</div>
+      <textarea class="field" id="nTxt" rows="3" placeholder="What does it mean / how is it used?"></textarea>
+      <div class="hint" style="margin-top:10px">Tags</div>
+      <div id="nChips" class="nchips"></div>
+      <div style="display:flex;gap:8px;margin-top:8px"><input class="field" id="nTagIn" placeholder="new tag" autocomplete="off" autocapitalize="off"><button class="btn btn-ghost btn-sm" id="nTagAdd">Add</button></div>
+      <div class="sheet-actions">
+        <button class="btn btn-ghost" id="nC">Cancel</button>
+        ${ex ? '<button class="btn btn-redg" id="nDel">Delete</button>' : ''}
+        <button class="btn btn-green" id="nOk">Save</button>
+      </div>`;
+    const q = s=>sh.querySelector(s);
+    const patEl = q('#nPat'), typeEl = q('#nType'), txtEl = q('#nTxt');
+    patEl.value = pattern; typeEl.value = type; txtEl.value = ex ? (ex.note || '') : '';
+
+    const paintTags = ()=>{
+      const box = q('#nChips'); box.innerHTML = '';
+      const names = [...new Set([...tagSet, ...allTags(), ...PRESET_TAGS])];
+      names.forEach(t=>{
+        const b = document.createElement('button'); b.type = 'button'; b.className = 'tchip' + (tagSet.has(t) ? ' on' : ''); b.textContent = t;
+        b.onclick = ()=>{ if (tagSet.has(t)) tagSet.delete(t); else tagSet.add(t); paintTags(); };
+        box.appendChild(b);
+      });
+    };
+    paintTags();
+    const addTag = ()=>{ const v = q('#nTagIn').value.trim().toLowerCase(); if (v){ tagSet.add(v); q('#nTagIn').value = ''; paintTags(); } };
+    q('#nTagAdd').onclick = addTag;
+    q('#nTagIn').onkeydown = e=>{ if (e.key === 'Enter'){ e.preventDefault(); addTag(); } };
+
+    const loadExisting = ()=>{      // a note for this exact pattern already exists: continue it instead of duplicating
+      if (ex) return;
+      const f = findNote(lang, typeEl.value, patEl.value); if (!f) return;
+      txtEl.value = f.note || ''; tagSet.clear(); (f.tags || []).forEach(t=>tagSet.add(t)); paintTags();
+      toast('Existing note loaded');
+    };
+    if (q('#nLang')) q('#nLang').onchange = e=>{ lang = e.target.value; patEl.className = 'field ' + flc(lang); };
+
+    if (sent){
+      const wordsBox = q('#nWords'), letBox = q('#nLetters');
+      let sa = null, sb = null, lets = [];
+      const paintLetters = ()=>{
+        letBox.innerHTML = '';
+        lets.forEach((l, i)=>{
+          const b = document.createElement('button'); b.type = 'button';
+          const lo = sa === null ? -1 : Math.min(sa, sb), hi = sa === null ? -1 : Math.max(sa, sb);
+          b.className = 'nletter' + (i >= lo && i <= hi ? ' on' : ''); b.textContent = l;
+          b.onclick = ()=>{
+            if (sa === null || sa !== sb){ sa = sb = i; }
+            else if (i !== sa){ sb = i; }
+            const a = Math.min(sa, sb), z = Math.max(sa, sb);
+            patEl.value = lets.slice(a, z + 1).join('');
+            typeEl.value = (a === 0 && z === lets.length - 1) ? 'word' : a === 0 ? 'prefix' : z === lets.length - 1 ? 'suffix' : 'infix';
+            paintLetters(); loadExisting();
+          };
+          letBox.appendChild(b);
+        });
+      };
+      wordsOfSentence(sent).forEach(w=>{
+        const b = document.createElement('button'); b.type = 'button'; b.className = 'chip flat ' + flc(lang);
+        b.textContent = displayWord(w, lang);
+        b.onclick = ()=>{
+          lets = alignText(w, lang).info.filter(i=>i.n).map(i=>i.n);
+          sa = 0; sb = lets.length - 1;
+          patEl.value = lets.join(''); typeEl.value = 'word';
+          letBox.hidden = false; paintLetters(); loadExisting();
+        };
+        wordsBox.appendChild(b);
+      });
+    }
+
+    q('#nC').onclick = close;
+    if (q('#nDel')) q('#nDel').onclick = ()=>{
+      if (!confirm('Delete this note?')) return;
+      NOTES = NOTES.filter(x=>x.id !== ex.id); saveNotes(); close(); render(true); toast('Note deleted');
+    };
+    q('#nOk').onclick = ()=>{
+      const pat = patEl.value.trim();
+      if (!noteNorm(pat, lang)){ toast('Enter a pattern first'); return; }
+      const t = typeEl.value;
+      let n = ex || findNote(lang, t, pat);
+      if (n){ n.text = pat; n.type = t; n.note = txtEl.value.trim(); n.tags = [...tagSet]; }
+      else {
+        n = Object.assign({ id:nid(), lang, type:t, text:pat, note:txtEl.value.trim(), tags:[...tagSet], created:Date.now() }, sent ? noteCtx(sent) : {});
+        NOTES.push(n);
+      }
+      saveNotes(); close();
+      if (state.screen === 'notes') paintNotes && paintNotes();
+      render(true); toast('Note saved ✓');
+    };
+  });
+}
+
+/* ---------- notes page ---------- */
+let paintNotes = null;
+function renderNotes(){
+  const f = document.createElement('div'), nf = state.nf;
+  const uniq = a=>[...new Set(a)];
+  const langs = uniq(NOTES.map(n=>n.lang)), groups = uniq(NOTES.map(n=>n.gname).filter(Boolean)).sort();
+  const levels = uniq(NOTES.map(n=>n.level).filter(Boolean)).sort((a,b)=>a-b), tags = allTags();
+  const opt = (v, label, cur)=>`<option value="${esc(v)}"${String(cur) === String(v) ? ' selected' : ''}>${esc(label)}</option>`;
+  f.innerHTML = `<div class="topbar"><button class="iconbtn" id="backBtn">←</button>
+      <div style="font-weight:800;font-size:19px;flex:1">Notes <span class="lbadge" id="nCount"></span></div>
+      <button class="btn btn-green btn-sm" id="nNew">＋ New</button></div>
+    <div class="wrap statwrap">
+      <div class="nctl">
+        <label>Group by<select class="field" id="fBy">${[['lang','Language'],['group','Sentence group'],['level','Level'],['type','Type'],['tag','Tag']].map(x=>opt(x[0], x[1], nf.by)).join('')}</select></label>
+        <label>Language<select class="field" id="fLang">${opt('', 'All', nf.lang)}${langs.map(c=>opt(c, LG(c).name, nf.lang)).join('')}</select></label>
+        <label>Type<select class="field" id="fType">${opt('', 'All', nf.type)}${NOTE_TYPES.map(t=>opt(t.id, t.label, nf.type)).join('')}</select></label>
+        <label>Tag<select class="field" id="fTag">${opt('', 'All', nf.tag)}${tags.map(t=>opt(t, t, nf.tag)).join('')}</select></label>
+        <label>Group<select class="field" id="fGroup">${opt('', 'All', nf.group)}${groups.map(g=>opt(g, g, nf.group)).join('')}</select></label>
+        <label>Level<select class="field" id="fLevel">${opt('', 'All', nf.level)}${levels.map(l=>opt(l, 'Level ' + l, nf.level)).join('')}</select></label>
+      </div>
+      <input class="field" id="fQ" placeholder="Search pattern, note or tag" value="${esc(nf.q)}" style="margin:10px 0 4px">
+      <div id="nList"></div></div>`;
+  const q = s=>f.querySelector(s);
+  paintNotes = ()=>{
+    const list = NOTES.filter(n=>
+      (!nf.lang || n.lang === nf.lang) && (!nf.type || n.type === nf.type) && (!nf.tag || (n.tags || []).includes(nf.tag)) &&
+      (!nf.group || n.gname === nf.group) && (!nf.level || String(n.level) === String(nf.level)) &&
+      (!nf.q || (n.text + ' ' + (n.note || '') + ' ' + (n.tags || []).join(' ')).toLowerCase().includes(nf.q.toLowerCase())));
+    q('#nCount').textContent = list.length + (list.length === NOTES.length ? '' : ' / ' + NOTES.length);
+    const keyOf = {
+      lang:n=>[LG(n.lang).name], group:n=>[n.gname || '(no group)'],
+      level:n=>[n.level ? 'Level ' + n.level : '(no level)'], type:n=>[typeLabel(n.type)],
+      tag:n=>(n.tags && n.tags.length) ? n.tags : ['(no tag)'],
+    }[nf.by];
+    const sec = new Map();
+    list.forEach(n=>keyOf(n).forEach(k=>{ if (!sec.has(k)) sec.set(k, []); sec.get(k).push(n); }));
+    const keys = [...sec.keys()].sort((a,b)=>nf.by === 'level' ? (parseInt(a.replace(/\D/g,'')) || 99) - (parseInt(b.replace(/\D/g,'')) || 99) : a.localeCompare(b));
+    const box = q('#nList'); box.innerHTML = '';
+    if (!list.length){ box.innerHTML = `<div class="empty">${NOTES.length ? 'No notes match these filters.' : 'No notes yet.<br>Tap ✎ during an exercise, or ＋ New.'}</div>`; return; }
+    keys.forEach(k=>{
+      const h = document.createElement('div'); h.className = 'sectionhead'; h.textContent = k + ' · ' + sec.get(k).length; box.appendChild(h);
+      sec.get(k).sort((a,b)=>(a.lang.localeCompare(b.lang)) || ((a.level || 99) - (b.level || 99)) || a.text.localeCompare(b.text)).forEach(n=>{
+        const r = document.createElement('div'); r.className = 'nrow';
+        r.innerHTML = `<div class="npat ${flc(n.lang)}">${esc(n.text)}</div>
+          <div class="body"><div class="nmeta"><span class="ntype">${esc(typeLabel(n.type))}</span> ${esc(LG(n.lang).name)}${n.gname ? ' · ' + esc(n.gname) : ''}${n.level ? ' · L' + n.level : ''}</div>
+          <div class="ntext">${n.note ? esc(n.note) : '<i>(no text)</i>'}</div>${(n.tags || []).length ? `<div>${tagsHTML(n.tags)}</div>` : ''}</div>`;
+        r.onclick = ()=>openNoteEditor({ note:n });
+        box.appendChild(r);
+      });
+    });
+  };
+  paintNotes();
+  const bind = (id, key)=>{ q(id).onchange = e=>{ nf[key] = e.target.value; paintNotes(); }; };
+  bind('#fBy', 'by'); bind('#fLang', 'lang'); bind('#fType', 'type'); bind('#fTag', 'tag'); bind('#fGroup', 'group'); bind('#fLevel', 'level');
+  q('#fQ').oninput = e=>{ nf.q = e.target.value; paintNotes(); };
+  q('#backBtn').onclick = ()=>{ state.screen = 'home'; render(); };
+  q('#nNew').onclick = ()=>openNoteEditor({ lang:nf.lang || ACTIVE[0] });
+  return f;
+}
+
+/* ---------- themes ---------- */
+const THEMES = [
+  { id:'classic',  name:'Classic',   desc:'The original look',                          sw:['#ffffff','#f7f7f7','#58cc02','#3c3c3c'] },
+  { id:'paper',    name:'Paper',     desc:'Warm paper, serif type, ink rules',          sw:['#f5efe3','#fbf7ee','#8c2f1b','#2a2118'] },
+  { id:'terminal', name:'Terminal',  desc:'Black screen, monospace, green phosphor',    sw:['#0a0f0a','#101810','#3dff7a','#b6ffcb'] },
+  { id:'aurora',   name:'Aurora',    desc:'Dark gradient, frosted glass cards',         sw:['#1b1740','#2a2563','#8b7bff','#eef0ff'] },
+  { id:'brutal',   name:'Brutalist', desc:'Hard outlines, flat colour, big shadows',    sw:['#fff3b0','#ffffff','#ff4f81','#111111'] },
+  { id:'zen',      name:'Zen',       desc:'Soft sand and sage, calm and airy',          sw:['#f1ece1','#faf7f0','#6f9275','#3b3a33'] },
+];
+function applyTheme(id){
+  if (!THEMES.some(t=>t.id === id)) id = 'classic';
+  THEME = id;
+  document.documentElement.setAttribute('data-theme', id);
+  const mt = document.querySelector('meta[name="theme-color"]');
+  if (mt) mt.setAttribute('content', THEMES.find(t=>t.id === id).sw[0]);
+}
+
+/* ---------- settings sections ---------- */
+function appearanceEl(){
+  const d = document.createElement('div');
+  d.innerHTML = '<div class="sectionhead" style="margin-top:8px">Appearance</div><div class="themegrid"></div>';
+  const g = d.querySelector('.themegrid');
+  THEMES.forEach(t=>{
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'themecard' + (t.id === THEME ? ' on' : '');
+    b.innerHTML = `<span class="tsw">${t.sw.map(c=>`<i style="background:${c}"></i>`).join('')}</span><b>${esc(t.name)}</b><small>${esc(t.desc)}</small>`;
+    b.onclick = ()=>{ applyTheme(t.id); saveLS(LS.theme, t.id); g.querySelectorAll('.themecard').forEach(x=>x.classList.remove('on')); b.classList.add('on'); };
+    g.appendChild(b);
+  });
+  return d;
+}
+function repeatSettingsEl(){
+  const d = document.createElement('div');
+  d.innerHTML = '<div class="sectionhead">Repetition</div><div class="hint">A sentence never comes straight back. Cards that must pass between two appearances of the same sentence:</div>';
+  const sel = document.createElement('select'); sel.className = 'field'; sel.style.width = '120px';
+  for (let i = 1; i <= 8; i++) sel.innerHTML += `<option value="${i}"${i === gapN() ? ' selected' : ''}>${i}</option>`;
+  sel.onchange = ()=>{ GAP_N = parseInt(sel.value, 10); saveLS(LS.gap, GAP_N); };
+  d.appendChild(sel);
+  const h2 = document.createElement('div'); h2.className = 'hint'; h2.style.marginTop = '14px';
+  h2.textContent = 'After a new sentence\'s introduction card, ask about that sentence:';
+  d.appendChild(h2);
+  const s2 = document.createElement('select'); s2.className = 'field'; s2.id = 'introGapSel'; s2.style.width = '220px';
+  s2.innerHTML = '<option value="0">Right after the card</option>' + [1, 2, 3, 4, 5].map(i=>`<option value="${i}">After ${i} other card${i > 1 ? 's' : ''}</option>`).join('');
+  s2.value = String(INTRO_GAP || 0);
+  s2.onchange = ()=>{ INTRO_GAP = parseInt(s2.value, 10) || 0; saveLS(LS.introGap, INTRO_GAP); };
+  d.appendChild(s2);
+  return d;
+}
+function gradingSettingsEl(){
+  const d = document.createElement('div');
+  d.innerHTML = '<div class="sectionhead">Grading</div>';
+  const opts = [
+    { id:'self', t:'Self-rating', s:'You press right or wrong after seeing the answer (Anki style).' },
+    { id:'auto', t:'Automatic', s:'The app decides if the answer is right, then you press Continue.' },
+  ];
+  opts.forEach(o=>{
+    const r = document.createElement('div'); r.className = 'rowcb';
+    r.innerHTML = `<span class="cb${GRADE_MODE === o.id ? ' on' : ''}">✓</span><div class="body"><div class="en">${o.t}</div><div class="hint" style="margin:2px 0 0">${o.s}</div></div>`;
+    r.onclick = ()=>{ GRADE_MODE = o.id; saveLS(LS.grade, GRADE_MODE); d.querySelectorAll('.rowcb').forEach((x, i)=>x.querySelector('.cb').classList.toggle('on', opts[i].id === GRADE_MODE)); };
+    d.appendChild(r);
+  });
+  return d;
+}
+function notesSettingsEl(){
+  const d = document.createElement('div');
+  d.innerHTML = '<div class="sectionhead">Notes</div>';
+  const r = document.createElement('div'); r.className = 'rowcb';
+  r.innerHTML = `<span class="cb${HL_ON ? ' on' : ''}">✓</span><div class="body"><div class="en">Highlight words that have a note</div><div class="hint" style="margin:2px 0 0">Tap a highlight to read the note. Turn off to hide all highlights and the notes button in lessons.</div></div>`;
+  r.onclick = ()=>{ HL_ON = !HL_ON; saveLS(LS.hl, HL_ON); r.querySelector('.cb').classList.toggle('on', HL_ON); };
+  d.appendChild(r);
+  return d;
+}
+function introSettingsEl(){
+  const d = document.createElement('div'), t = INTRO_T;
+  d.innerHTML = `<div class="sectionhead">Introduction card</div>
+    <div class="hint">A new sentence skips its introduction card and goes straight to questions when it has at most this many completely unknown words. A word is known if it has a note (word, prefix, suffix or infix) or appeared in an earlier sentence.</div>
+    <select class="field" id="itMode">
+      <option value="fixed">Same for every level</option>
+      <option value="formula">By formula</option>
+      <option value="manual">Per level (manual)</option>
+    </select>
+    <div id="itBody" style="margin-top:10px"></div>
+    <div class="hint" id="itPrev" style="margin-top:10px"></div>`;
+  const q = s=>d.querySelector(s), body = q('#itBody');
+  const save = ()=>{ saveLS(LS.introT, INTRO_T); prev(); };
+  const num = (v, o)=>`<input class="field" type="number" step="${o.step || 1}" min="${o.min == null ? 0 : o.min}" value="${v === undefined || v === null ? '' : v}" ${o.id ? 'id="' + o.id + '"' : ''} ${o.ph ? 'placeholder="' + o.ph + '"' : ''} style="width:100%">`;
+  const prev = ()=>{
+    const n = Math.min(maxLevelAll(), 10);
+    q('#itPrev').textContent = 'Allowed unknown words by level: ' + Array.from({ length:n }, (_, i)=>(i+1) + '→' + introThreshold(i+1)).join('  ·  ') + (maxLevelAll() > n ? ' …' : '');
+  };
+  const paint = ()=>{
+    q('#itMode').value = t.mode;
+    if (t.mode === 'fixed'){
+      body.innerHTML = `<div class="hint">Unknown words allowed (all levels)</div>${num(t.fixed, { id:'itFixed' })}`;
+      q('#itFixed').oninput = e=>{ t.fixed = Math.max(0, parseInt(e.target.value, 10) || 0); save(); };
+    } else if (t.mode === 'formula'){
+      body.innerHTML = `<div class="hint">allowed(level) = floor( start + increase × (level − 1) ), never above the cap</div>
+        <div class="nctl"><label>Start (level 1)${num(t.a, { id:'itA', step:0.5 })}</label><label>Increase per level${num(t.b, { id:'itB', step:0.25 })}</label><label>Cap${num(t.max, { id:'itMax' })}</label></div>`;
+      q('#itA').oninput = e=>{ t.a = Math.max(0, parseFloat(e.target.value) || 0); save(); };
+      q('#itB').oninput = e=>{ t.b = Math.max(0, parseFloat(e.target.value) || 0); save(); };
+      q('#itMax').oninput = e=>{ t.max = Math.max(0, parseInt(e.target.value, 10) || 0); save(); };
+    } else {
+      const n = Math.min(maxLevelAll(), 12);
+      body.innerHTML = `<div class="hint">Leave a level empty to use “all other levels”.</div>
+        <div class="nctl">${Array.from({ length:n }, (_, i)=>`<label>Level ${i+1}${num(t.manual[i+1], { id:'itL' + (i+1), ph:String(t.other) })}</label>`).join('')}<label>All other levels${num(t.other, { id:'itOther' })}</label></div>`;
+      for (let i=1; i<=n; i++) q('#itL' + i).oninput = e=>{ const v = e.target.value; if (v === '') delete t.manual[i]; else t.manual[i] = Math.max(0, parseInt(v, 10) || 0); save(); };
+      q('#itOther').oninput = e=>{ t.other = Math.max(0, parseInt(e.target.value, 10) || 0); save(); };
+    }
+    prev();
+  };
+  q('#itMode').onchange = e=>{ t.mode = e.target.value; saveLS(LS.introT, INTRO_T); paint(); };
+  paint();
+  return d;
+}
+/* ====================================================================
+   DEBUG TOOL — Settings → Developer → "Debug tool".
+   Shows how the system manages the sentences and why each card appeared.
+   ==================================================================== */
+let DEBUG_ON = loadLS(LS.debug, false);
+let DBG_LOG = [];        // newest last, capped at 300
+let DBG_CARD = null;     // facts about the card on screen: { intro, pick, type }
+let TYPE_WHY = null;     // how the exercise type of the current card was chosen
+
+const DBG_KIND = {
+  new:   'new sentence of the current level pass',
+  rev:   'review of a sentence met before (mistakes first, then known ones)',
+  retry: 'retry of a wrong answer (same exercise type as the mistake)',
+  free:  'free practice (shuffled round)',
+};
+function dbg(kind, msg, data){
+  if (!DEBUG_ON) return;
+  DBG_LOG.push({ t:Date.now(), n:(state.sess ? state.session : 0), kind, msg, data:data === undefined ? null : data });
+  if (DBG_LOG.length > 300) DBG_LOG.shift();
+}
+function short(s, n){ s = String(s || ''); return s.length > n ? s.slice(0, n) + '…' : s; }
+function cardKind(c){ return c.kind || (c.forced ? 'retry' : 'free'); }
+
+// Why the introduction card is shown or skipped (pure: no side effects, unlike needsIntro)
+function introInfo(sent){
+  if (TYPE_ON.intro === false) return { show:false, why:'intro cards are turned off in Settings' };
+  if (INTRO_SEEN[sent.uid]) return { show:false, why:'already introduced earlier' };
+  const level = levelOfLen(sentLen(sent)), thr = introThreshold(level);
+  const seen = SEEN_WORDS[sent.lang], unknown = [], known = [];
+  for (const w of sentWords(sent)){
+    if (seen && seen.has(w)) known.push(w + ' (seen before)');
+    else if (noteCovers(w, sent.lang)) known.push(w + ' (note)');
+    else unknown.push(w);
+  }
+  const show = unknown.length > thr;
+  return { show, level, thr, unknown, known,
+    why: show ? unknown.length + ' completely unknown word(s) > threshold ' + thr + ' → intro card shown'
+              : unknown.length + ' completely unknown word(s) ≤ threshold ' + thr + ' → intro card skipped' };
+}
+
+/* ---------- panel under the exercise ---------- */
+function dbgPanel(){
+  const box = document.createElement('div'); box.className = 'dbgpanel';
+  const s = state.sess, c = state.cur, ex = state.ex;
+  if (!s || !c || !ex) return box;
+  const P = DBG_CARD || {}, I = P.intro, T = P.type || TYPE_WHY, pk = P.pick, k = cardKind(c), sent = c.sent;
+  const head = 'card #' + (state.session + 1) + ' · ' + k + ' · ' + ex.type + (I ? ' · intro ' + (I.show ? 'shown' : 'skipped') : '');
+  const bar = document.createElement('div'); bar.className = 'dbgbar';
+  bar.innerHTML = `<span>🐞 ${esc(head)}</span><span>${state.dbgOpen ? '▾' : '▸'}</span>`;
+  bar.onclick = ()=>{ state.dbgOpen = !state.dbgOpen; render(true); };
+  box.appendChild(bar);
+  if (!state.dbgOpen) return box;
+
+  const rows = [];
+  const tries = ATTEMPTS.filter(a=>a.id === sent.uid), wrong = tries.filter(a=>!a.correct).length;
+  const groups = LIB.groups.filter(g=>g.items.some(x=>x.uid === sent.uid)).map(g=>g.name);
+  rows.push(['Sentence', short(sent.target, 40) + ' · ' + short(sent.english, 40)]);
+  rows.push(['Facts', LG(sent.lang).name + ' · ' + sentLen(sent) + ' words → level ' + levelOfLen(sentLen(sent)) + ' · group: ' + (groups.join(', ') || '—') +
+    ' · history: ' + (tries.length ? tries.length + ' tries, ' + wrong + ' wrong, last ' + (tries[tries.length-1].correct ? 'right' : 'wrong') : 'never answered')]);
+  rows.push(['Why this card', DBG_KIND[k] + (c.forced ? ' [' + c.forced + ']' : '')]);
+  if (pk){
+    rows.push(['Pick', 'queue had ' + pk.queueBefore + ' card(s); took #' + (pk.i + 1) +
+      (pk.i ? ' (skipped ' + pk.i + ' shown too recently, gap ' + pk.n + ')' : '') +
+      (pk.refilled ? '; queue refilled because every queued card was too recent' : '') +
+      (pk.unavoidable ? '; repetition unavoidable (pool too small)' : '') +
+      '; recent: ' + pk.recent.map(u=>short((BY_UID.get(u) || {}).target, 8)).join(' | ')]);
+  }
+  if (s.mode === 'level'){
+    const v = lv(s.lang), ch = curChunk(s.lang);
+    rows.push(['Level', 'Level ' + v.level + SUBS[v.sub] + ' · chunk ' + (v.chunk + 1) + '/' + chunkCount(s.lang, v.level) +
+      ' · pass ' + (ch.length - levelPending(s.lang).length) + '/' + ch.length + ' done']);
+  } else rows.push(['Session', 'free "' + s.label + '" · round ' + s.round + ' · ' + s.pool.length + ' sentences']);
+  if (T) rows.push(['Exercise', (T.chosen || ex.type) + ' ← ' + T.base + (T.set ? ' [' + T.set.join(', ') + ']' : '') + (T.note ? ' · ' + T.note : '') + (T.fallback ? ' · fallback: ' + T.fallback : '')]);
+  if (I){
+    rows.push(['Intro', I.why]);
+    if (I.unknown) rows.push(['Words', 'unknown: ' + (I.unknown.slice(0, 8).join(' ') || '—') + ' · known: ' + (I.known.slice(0, 8).join(', ') || '—')]);
+  }
+  rows.push(['Settings', 'gap ' + gapN() + ' · intro→question ' + (INTRO_GAP ? 'after ' + INTRO_GAP + ' card(s)' : 'right away') + ' · grading ' + GRADE_MODE +
+    ' · notes ' + (HL_ON ? NOTES_VIEW : 'off')]);
+  const n = Math.min(gapN(), poolSize(s) - 1), rec = (s.recent || []).slice(-Math.max(n, 0));
+  const q = s.queue.slice(0, 8).map((x, i)=>(i + 1) + '. ' + cardKind(x) + (x.forced ? ' [' + x.forced + ']' : '') + ' ' + short(x.sent.target, 22) + (rec.indexOf(x.sent.uid) >= 0 ? '  ⛔ too recent' : '')).join('\n');
+  rows.push(['Queue (' + s.queue.length + ')', q || '(empty — will refill)']);
+  rows.forEach(r=>{
+    const d = document.createElement('div'); d.className = 'dbgrow';
+    d.innerHTML = '<b>' + esc(r[0]) + '</b><span>' + esc(r[1]) + '</span>';
+    box.appendChild(d);
+  });
+  const act = document.createElement('div'); act.className = 'dbgact';
+  act.innerHTML = '<button class="btn btn-ghost btn-sm" id="dbgLog">Open log</button>';
+  act.querySelector('#dbgLog').onclick = openDebugLog;
+  box.appendChild(act);
+  return box;
+}
+
+/* ---------- full log (sheet) ---------- */
+function dbgText(){
+  const pad = n=>String(n).padStart(2, '0');
+  return DBG_LOG.map(e=>{
+    const d = new Date(e.t);
+    return '[' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds()) + '] #' + e.n + ' ' + e.kind + ': ' + e.msg + (e.data ? ' ' + JSON.stringify(e.data) : '');
+  }).join('\n');
+}
+function dbgSnapshot(){
+  const s = state.sess, out = [];
+  out.push('grading ' + GRADE_MODE + ' · gap ' + gapN() + ' · intro→question ' + (INTRO_GAP ? 'after ' + INTRO_GAP : 'right away') + ' · notes ' + (HL_ON ? NOTES_VIEW : 'off'));
+  out.push('library: ' + LIB.groups.length + ' groups · ' + BY_UID.size + ' sentences · answered ' + ATTEMPTS.length + ' · intros seen ' + Object.keys(INTRO_SEEN).length + ' · notes ' + NOTES.length);
+  if (s){
+    out.push('session: ' + s.mode + (s.mode === 'level' ? ' (' + LG(s.lang).name + ')' : ' "' + s.label + '"') + ' · answered ' + state.session + ' · queue ' + s.queue.length + ' · round ' + s.round);
+    if (s.mode === 'level'){ const v = lv(s.lang); out.push('level ' + v.level + SUBS[v.sub] + ' · chunk ' + (v.chunk + 1) + '/' + chunkCount(s.lang, v.level) + ' · pending ' + levelPending(s.lang).length); }
+  } else out.push('no session running');
+  return out.join('\n');
+}
+function openDebugLog(){
+  openSheet((sh, close)=>{
+    sh.innerHTML = `<h3>Debug log (${DBG_LOG.length})</h3>
+      <div class="hint">Newest first. Tap Copy and send it to me when something looks wrong.</div>
+      <pre class="dbgsnap">${esc(dbgSnapshot())}</pre><div id="dbgList"></div>
+      <div class="sheet-actions"><button class="btn btn-ghost" id="dbgCopy">Copy</button><button class="btn btn-ghost" id="dbgClr">Clear</button><button class="btn btn-green" id="dbgX">Close</button></div>`;
+    const list = sh.querySelector('#dbgList'), pad = n=>String(n).padStart(2, '0');
+    DBG_LOG.slice().reverse().forEach(e=>{
+      const d = document.createElement('div'); d.className = 'dbgent';
+      const t = new Date(e.t);
+      d.innerHTML = `<div><span class="dbgk dbgk-${esc(e.kind)}">${esc(e.kind)}</span> <small>${pad(t.getHours())}:${pad(t.getMinutes())}:${pad(t.getSeconds())} · #${e.n}</small></div><div>${esc(e.msg)}</div>` +
+        (e.data ? `<details><summary>details</summary><pre>${esc(JSON.stringify(e.data, null, 1))}</pre></details>` : '');
+      list.appendChild(d);
+    });
+    if (!DBG_LOG.length) list.innerHTML = '<div class="empty">Nothing logged yet. Start a lesson.</div>';
+    sh.querySelector('#dbgCopy').onclick = ()=>copyText(dbgSnapshot() + '\n\n' + dbgText()).then(ok=>toast(ok ? 'Log copied' : 'Copy failed'));
+    sh.querySelector('#dbgClr').onclick = ()=>{ DBG_LOG = []; close(); toast('Log cleared'); };
+    sh.querySelector('#dbgX').onclick = close;
+  });
+}
+
+/* ---------- Settings → Developer ---------- */
+function debugSettingsEl(){
+  const d = document.createElement('div');
+  d.innerHTML = '<div class="sectionhead">Developer</div>';
+  const r = document.createElement('div'); r.className = 'rowcb';
+  r.innerHTML = `<span class="cb${DEBUG_ON ? ' on' : ''}">✓</span><div class="body"><div class="en">Debug tool</div><div class="hint" style="margin:2px 0 0">Shows, during lessons, how sentences are chosen and why: queue, level, exercise type, intro decision, repetition gap.</div></div>`;
+  r.onclick = ()=>{ DEBUG_ON = !DEBUG_ON; saveLS(LS.debug, DEBUG_ON); if (DEBUG_ON) dbg('debug', 'debug tool turned on'); r.querySelector('.cb').classList.toggle('on', DEBUG_ON); };
+  d.appendChild(r);
+  const b = document.createElement('button'); b.className = 'btn btn-ghost btn-sm'; b.textContent = 'Open log';
+  b.onclick = openDebugLog; d.appendChild(b);
+  return d;
+}
 /* ==================== RENDER ==================== */
 const app = document.getElementById('app');
 function render(keep){
   if (!keep) window.scrollTo(0,0);
   if (state.screen !== 'home') state.ddOpen = false;
   app.innerHTML = '';
-  const m = { home:renderHome, lesson:renderLesson, group:renderGroup, stats:renderStats, flags:renderFlags, addlang:renderAddLang, settings:renderSettings, store:renderStore };
+  const m = { home:renderHome, lesson:renderLesson, group:renderGroup, stats:renderStats, flags:renderFlags, addlang:renderAddLang, settings:renderSettings, store:renderStore, notes:renderNotes };
   app.appendChild((m[state.screen] || renderHome)());
   syncHistory();
 }
 /* Phone back button: moves between screens instead of closing the app */
 function wantDepth(){
   if (state.screen === 'home') return 0;
-  if (state.screen === 'addlang') return 2;
+  if (state.screen === 'store') return 2;
   if (state.screen === 'lesson') return (state.sess && (state.sess.from === 'group' || state.sess.from === 'flags')) ? 2 : 1;
   return 1;
 }
@@ -1793,7 +2781,7 @@ window.addEventListener('popstate', ()=>{
   if (histDepth > 0){
     histDepth--;
     if (state.screen === 'lesson') exitSession();
-    else if (state.screen === 'addlang'){ state.screen = 'store'; render(); }
+    else if (state.screen === 'store'){ state.screen = 'addlang'; render(); }
     else { state.screen = 'home'; render(); }
   }
 });
@@ -1806,18 +2794,19 @@ document.addEventListener('click', e=>{
 }, true);
 
 function kcls(lang){ return lang === 'en' ? '' : flc(lang); }
+function knHTML(s){ const k = kn(s); return k.lang === 'en' ? esc(knText(s)) : flHTML(knText(s), k.lang); }
 function knText(s){ const k = kn(s); return k.sent ? displayFl(k.sent) : k.text; }
 function sideHTML(s, note){
   const sd = sideOf(s); if (!sd) return '';
   if (sd.miss) return note ? `<div class="nomatch">No ${esc(LG(sd.miss).name)} translation in library</div>` : '';
-  return `<div class="sidetr ${kcls(sd.lang)}">${esc(sd.sent ? displayFl(sd.sent) : sd.text)}</div>`;
+  return `<div class="sidetr ${kcls(sd.lang)}">${sd.sent ? flHTML(displayFl(sd.sent), sd.lang) : esc(sd.text)}</div>`;
 }
 function fbNote(s){ return kn(s).fb ? `<div class="nomatch">No ${esc(LG(KNOWN).name)} translation in library — showing English</div>` : ''; }
 function knBlock(s, size, note){
   const k = kn(s);
-  return `<div class="${kcls(k.lang)}" style="font-size:${size}px;font-weight:800;line-height:1.4">${esc(knText(s))}</div>` + sideHTML(s, note) + (note ? fbNote(s) : '');
+  return `<div class="${kcls(k.lang)}" style="font-size:${size}px;font-weight:800;line-height:1.4">${knHTML(s)}</div>` + sideHTML(s, note) + (note ? fbNote(s) : '');
 }
-function knInline(s){ return `<div class="en ${kcls(kn(s).lang)}">${esc(knText(s))}</div>${sideHTML(s, false)}`; }
+function knInline(s){ return `<div class="en ${kcls(kn(s).lang)}">${knHTML(s)}</div>${sideHTML(s, false)}`; }
 function levelCardHTML(c){
   const L = LG(c), st = normalizeLevel(c), v = lv(c);
   if (st === 'complete'){
@@ -1893,6 +2882,7 @@ function renderHome(){
         <button class="btn btn-ghost btn-sm" id="revBtn">🔁 Review mistakes</button>
         <button class="btn btn-ghost btn-sm" id="flagBtn">🚩 Flagged (${flagCount})</button>
         <button class="btn btn-ghost btn-sm" id="statBtn">📊 My answers</button>
+        <button class="btn btn-ghost btn-sm" id="notesBtn">📝 Notes (${NOTES.length})</button>
         <button class="btn btn-ghost btn-sm" id="setBtn">⚙ Settings</button>
         ${hasAr ? `<button class="btn btn-amber btn-sm${SHOW_TASHKIL?' on':''}" id="tashBtn">َ Tashkīl ${SHOW_TASHKIL?'on':'off'}</button>` : ''}
       </div>
@@ -1918,9 +2908,11 @@ function renderHome(){
 
   const list = f.querySelector('#decklist');
   if (!groups.length){
-    list.innerHTML = `<div class="empty">No languages yet.<br><br><button class="btn btn-green" id="getLang">Choose a language</button>
+    list.innerHTML = `<div class="empty">No languages yet.<br><br><button class="btn btn-green" id="getLang">Add a language</button>
+      <br><br><button class="btn btn-ghost btn-sm" id="getReady">Get a ready-made language</button>
       <br><br><button class="btn btn-ghost btn-sm" id="restoreBtn">Restore the 500 Arabic sentences</button></div>`;
-    list.querySelector('#getLang').onclick = openStore;
+    list.querySelector('#getLang').onclick = openScrape;
+    list.querySelector('#getReady').onclick = openStore;
     list.querySelector('#restoreBtn').onclick = ()=>{
       const g = oneGroup(mkItems(parseRaw(RAW), 'ar'), 'ar'); g[0].pack = { id:'arabic', rev:'embedded' };
       LIB.groups.push(...g); ACTIVE = ['ar']; saveLS(LS.langs, ACTIVE); afterLibChange();
@@ -1962,7 +2954,7 @@ function renderHome(){
       saveLS(LS.langs, ACTIVE); state.sel.clear(); render(true);
     };
   });
-  f.querySelector('#ddAdd').onclick = openStore;
+  f.querySelector('#ddAdd').onclick = openScrape;
 
   f.querySelector('#loadBtn').onclick = ()=>document.getElementById('fileInput').click();
   f.querySelector('#allBtn').onclick = ()=>startSession(items, 'Practice all', 'home');
@@ -1977,6 +2969,7 @@ function renderHome(){
   f.querySelector('#flagBtn').onclick = ()=>{ state.screen = 'flags'; render(); };
   f.querySelector('#statBtn').onclick = ()=>{ state.screen = 'stats'; render(); };
   f.querySelector('#setBtn').onclick = ()=>{ state.screen = 'settings'; render(); };
+  f.querySelector('#notesBtn').onclick = ()=>{ state.screen = 'notes'; render(); };
   f.querySelectorAll('[data-lv]').forEach(b=>{ b.onclick = ()=>startLevel(b.getAttribute('data-lv')); });
   const tb = f.querySelector('#tashBtn');
   if (tb) tb.onclick = ()=>{ SHOW_TASHKIL = !SHOW_TASHKIL; saveTashkil(); render(true); toast(SHOW_TASHKIL ? 'Tashkīl on' : 'Tashkīl off'); };
@@ -2047,7 +3040,7 @@ function renderGroup(){
     r.innerHTML = `<span class="cb${on?' on':''}">✓</span>
       <div class="body">
         ${knInline(s)}
-        <div class="${flc(g.lang)}" style="font-size:17px;color:var(--ink2);margin-top:2px">${esc(displayFl(s))}</div>
+        <div class="${flc(g.lang)}" style="font-size:17px;color:var(--ink2);margin-top:2px">${flHTML(displayFl(s), g.lang)}</div>
         ${s.transliteration ? `<div class="translit">${esc(s.transliteration)}</div>` : ''}
       </div>`;
     r.onclick = ()=>{ if (on) ss.delete(s.uid); else ss.add(s.uid); render(true); };
@@ -2117,11 +3110,30 @@ function renderLesson(){
     else { FLAGS[ex.sent.uid] = Date.now(); state.flagged = true; toast('Flagged 🚩'); }
     saveFlags(); flag.classList.toggle('on', state.flagged);
   };
-  head.appendChild(flag);
+  const tools = document.createElement('div'); tools.className = 'qtools';
+  const addN = document.createElement('button'); addN.className = 'flagbtn notebtn'; addN.title = 'Add a note'; addN.textContent = '✎';
+  addN.onclick = ()=>openNoteEditor({ sent:ex.sent });
+  const NV_NEXT = { off:'hl', hl:'list', list:'off' };
+  const NV_TIP = { off:'Notes hidden', hl:'Highlights only', list:'Highlights + notes list' };
+  let showN = null;
+  if (HL_ON){                                   // when the highlight system is off in Settings, the button would do nothing: hide it
+    showN = document.createElement('button');
+    showN.className = 'flagbtn notebtn nv-' + NOTES_VIEW; showN.textContent = '👁';
+    showN.title = NV_TIP[NOTES_VIEW] + ' — tap for: ' + NV_TIP[NV_NEXT[NOTES_VIEW]];
+    showN.onclick = ()=>{ NOTES_VIEW = NV_NEXT[NOTES_VIEW]; saveLS(LS.notesShow, NOTES_VIEW); toast(NV_TIP[NOTES_VIEW]); render(true); };
+  }
+  const gradeB = document.createElement('button');
+  gradeB.className = 'flagbtn notebtn gradebtn' + (autoGrade() ? ' on' : '');
+  gradeB.title = 'Grading: ' + (autoGrade() ? 'automatic (the app decides)' : 'self (you decide)') + ' — tap to switch';
+  gradeB.textContent = autoGrade() ? 'Auto' : 'Self';
+  gradeB.onclick = ()=>{ GRADE_MODE = autoGrade() ? 'self' : 'auto'; saveLS(LS.grade, GRADE_MODE); toast(autoGrade() ? 'Automatic grading' : 'Self-rating'); render(true); };
+  tools.appendChild(addN); if (showN) tools.appendChild(showN); tools.appendChild(gradeB); tools.appendChild(flag);
+  head.appendChild(tools);
   wrap.appendChild(head);
 
   if (ex.type === 'intro'){
     wrap.appendChild(buildIntro());
+    if (DEBUG_ON) wrap.appendChild(dbgPanel());
     f.appendChild(wrap); f.appendChild(buildFooter());
     setTimeout(()=>{ const q = f.querySelector('#quitBtn'); if (q) q.onclick = exitSession; }, 0);
     return f;
@@ -2130,8 +3142,9 @@ function renderLesson(){
     const p = document.createElement('div');
     p.style.margin = '0 0 18px';
     if (ex.promptLang === 'fl'){
-      let html = `<div style="font-size:26px;font-weight:800" class="${flc(ex.lang)}">${esc(displayFl(ex.sent))}</div>`;
+      let html = `<div style="font-size:26px;font-weight:800" class="${flc(ex.lang)}">${flHTML(displayFl(ex.sent), ex.lang)}</div>`;
       if (ex.sent.transliteration) html += `<div class="translit">${esc(ex.sent.transliteration)}</div>`;
+      html += notesStripHTML(ex.sent.target, ex.lang);
       p.innerHTML = html;
     } else {
       p.innerHTML = knBlock(ex.sent, 26, true);
@@ -2144,6 +3157,7 @@ function renderLesson(){
   else wrap.appendChild(buildChoiceUI());
 
   if (state.feedback) wrap.appendChild(buildCompare());
+  if (DEBUG_ON) wrap.appendChild(dbgPanel());
 
   f.appendChild(wrap);
   f.appendChild(buildFooter());
@@ -2165,7 +3179,7 @@ function buildBankUI(){
     state.answer.forEach((tok, i)=>{
       const c = document.createElement('button');
       c.className = 'chip flat ' + cls;
-      c.textContent = displayWord(tok, aLang);
+      c.innerHTML = flHTML(displayWord(tok, aLang), aLang);
       if (!state.feedback){
         c.onclick = ()=>{
           for (let bi=0; bi<ex.bank.length; bi++){
@@ -2184,7 +3198,7 @@ function buildBankUI(){
   ex.bank.forEach((tok, i)=>{
     const c = document.createElement('button');
     c.className = 'chip ' + cls + (state.usedBank[i]?' used':'');
-    c.textContent = displayWord(tok, aLang);
+    c.innerHTML = flHTML(displayWord(tok, aLang), aLang);
     c.onclick = ()=>{ state.usedBank[i] = true; state.answer.push(tok); render(true); };
     bank.appendChild(c);
   });
@@ -2216,15 +3230,13 @@ function buildChoiceUI(){
     const b = document.createElement('button');
     b.className = 'choice' + (aLang === 'en' ? '' : ' ' + flc(aLang));
     const os = ex.answerLang === 'en' && ex.optSent ? ex.optSent[opt] : null;
-    b.innerHTML = `<div>${esc(displayFlFromText(opt, aLang))}</div>${os ? sideHTML(os, false) : ''}`;
+    b.innerHTML = `<div>${flHTML(displayFlFromText(opt, aLang), aLang)}</div>${os ? sideHTML(os, false) : ''}`;
     if (state.answer === opt) b.classList.add('sel');
     if (state.feedback){
       b.disabled = true;
-      if (isMatch(ex.type)){
-        b.classList.remove('sel');
-        if (opt === ex.correct) b.classList.add('right');
-        else if (opt === state.answer) b.classList.add('wrong');
-      }
+      b.classList.remove('sel');
+      if (opt === ex.correct) b.classList.add('right');
+      else if (opt === state.answer) b.classList.add(autoGrade() ? 'wrong' : 'sel');
     }
     else b.onclick = ()=>{ state.answer = opt; render(true); };
     box.appendChild(b);
@@ -2243,12 +3255,12 @@ function buildMatchCompare(){
   const box = document.createElement('div'); box.className = 'compare';
   const given = state.answer || '', gFl = ex.answerLang === 'fl';
   const aLang = gFl ? lang : ex.kLang;
-  let html = `<div class="cmp-row ${ok?'good':''}"><div class="cmp-label">Correct</div>
-    <div class="cmp-text ${flc(lang)}">${esc(displayFl(sent))}</div>
-    ${sent.transliteration ? `<div class="translit">${esc(sent.transliteration)}</div>` : ''}
+  let html = `<div class="cmp-row ${autoGrade() && ok ? 'good' : ''}"><div class="cmp-label">${autoGrade() ? 'Correct' : 'Answer'}</div>
+    <div class="cmp-text ${flc(lang)}">${flHTML(displayFl(sent), lang)}</div>
+    ${sent.transliteration ? `<div class="translit">${esc(sent.transliteration)}</div>` : ''}${notesStripHTML(sent.target, lang)}
     <div class="cmp-text ${kcls(kn(sent).lang)}">${esc(knText(sent))}</div>${sideHTML(sent, true)}${fbNote(sent)}</div>`;
-  if (!ok) html += `<div class="cmp-row bad"><div class="cmp-label">Your answer</div>
-    <div class="cmp-text ${kcls(aLang)}">${esc(displayFlFromText(given, aLang))}</div></div>`;
+  if (!autoGrade() || !ok) html += `<div class="cmp-row ${autoGrade() ? 'bad' : ''}"><div class="cmp-label">Your answer</div>
+    <div class="cmp-text ${kcls(aLang)}">${flHTML(displayFlFromText(given, aLang), aLang)}</div></div>`;
   if (ex.hint && HINTS_ON) html += hintHTML(ex.hint);
   box.innerHTML = html; return box;
 }
@@ -2258,11 +3270,11 @@ function buildIntro(){
   const aw = s.target.split(/\s+/).filter(Boolean), tw = (s.transliteration||'').split(/\s+/).filter(Boolean);
   let body;
   if (tw.length && tw.length === aw.length){
-    body = `<div class="iwrap${L.rtl?' rtl':''}">${aw.map((w,i)=>`<div class="iw"><div class="w ${flc(ex.lang)}">${esc(displayWord(w, ex.lang))}</div><div class="translit">${esc(tw[i])}</div></div>`).join('')}</div>`;
+    body = `<div class="iwrap${L.rtl?' rtl':''}">${aw.map((w,i)=>`<div class="iw"><div class="w ${flc(ex.lang)}">${flHTML(displayWord(w, ex.lang), ex.lang)}</div><div class="translit">${esc(tw[i])}</div></div>`).join('')}</div>`;
   } else {
-    body = `<div class="iwrap${L.rtl?' rtl':''}"><div class="iw"><div class="w ${flc(ex.lang)}">${esc(displayFl(s))}</div>${s.transliteration ? `<div class="translit">${esc(s.transliteration)}</div>` : ''}</div></div>`;
+    body = `<div class="iwrap${L.rtl?' rtl':''}"><div class="iw"><div class="w ${flc(ex.lang)}">${flHTML(displayFl(s), ex.lang)}</div>${s.transliteration ? `<div class="translit">${esc(s.transliteration)}</div>` : ''}</div></div>`;
   }
-  box.innerHTML = `<div class="introtag">New · you will see it once</div>${body}<div class="intro-en">${knBlock(s, 21, true)}</div>`;
+  box.innerHTML = `<div class="introtag">New · you will see it once</div>${body}${notesStripHTML(s.target, ex.lang)}<div class="intro-en">${knBlock(s, 21, true)}</div>`;
   return box;
 }
 function buildCompare(){
@@ -2277,14 +3289,15 @@ function buildCompare(){
 
   let expectedHtml;
   if (isFl){
-    expectedHtml = `<div class="cmp-text ${cls}">${esc(displayFl(ex.sent))}</div>`;
+    expectedHtml = `<div class="cmp-text ${cls}">${flHTML(displayFl(ex.sent), ex.lang)}</div>`;
     if (ex.sent.transliteration) expectedHtml += `<div class="translit">${esc(ex.sent.transliteration)}</div>`;
+    expectedHtml += notesStripHTML(ex.sent.target, ex.lang);
   } else {
-    expectedHtml = `<div class="cmp-text ${cls}">${esc(displayFlFromText(ex.correct, aLang))}</div>${sideHTML(ex.sent, true)}${fbNote(ex.sent)}`;
+    expectedHtml = `<div class="cmp-text ${cls}">${flHTML(displayFlFromText(ex.correct, aLang), aLang)}</div>${sideHTML(ex.sent, true)}${fbNote(ex.sent)}`;
   }
   let givenHtml;
   if (given){
-    givenHtml = `<div class="cmp-text ${cls}">${esc(displayFlFromText(given, aLang))}</div>`;
+    givenHtml = `<div class="cmp-text ${cls}">${flHTML(displayFlFromText(given, aLang), aLang)}</div>`;
   } else {
     givenHtml = `<div class="cmp-text ${cls} ${given?'':'empty'}">${given?esc(given):'(empty)'}</div>`;
   }
@@ -2293,7 +3306,7 @@ function buildCompare(){
       <div class="cmp-label">Expected</div>
       ${expectedHtml}
     </div>
-    <div class="cmp-row ${state.feedback.correct?'good':'bad'}">
+    <div class="cmp-row ${autoGrade() ? (state.feedback.correct ? 'good' : 'bad') : ''}">
       <div class="cmp-label">Your answer</div>
       ${givenHtml}
     </div>`;
@@ -2316,24 +3329,19 @@ function buildFooter(){
   if (state.ex.type === 'intro'){
     inner.innerHTML = `<button class="btn btn-green" id="gotBtn" style="width:100%">Got it</button>`;
     setTimeout(()=>{ inner.querySelector('#gotBtn').onclick = introDone; }, 0);
-  } else if (state.feedback && isMatch(state.ex.type)){
+  } else if (state.feedback && autoGrade()){
     const ok = state.feedback.correct;
     inner.innerHTML = `<div class="rate-title">${ok ? '<b style="color:var(--green-t)">✓ Correct</b>' : '<b style="color:var(--red-t)">✗ Not quite</b>'}</div>
       <button class="btn ${ok?'btn-green':'btn-red'}" id="contBtn" style="width:100%">Continue</button>`;
     setTimeout(()=>{ inner.querySelector('#contBtn').onclick = ()=>rate(state.feedback.correct); }, 0);
   } else if (state.feedback){
-    const suggested = state.feedback.correct;
     inner.innerHTML = `
-      <div class="rate-title">
-        ${suggested
-          ? `Looks correct — <b style="color:var(--green-t)">rate it</b>`
-          : `Doesn't match — <b style="color:var(--red-t)">rate yourself</b>`}
-      </div>
+      <div class="rate-title">Compare with the answer, then <b>rate yourself</b></div>
       <div class="rate-row">
         <button class="btn btn-red" id="wrongBtn">✗ I was wrong</button>
         <button class="btn btn-green" id="rightBtn">✓ I was right</button>
       </div>
-      <div class="footer-hint">The suggestion is only a hint. Trust yourself.</div>`;
+      <div class="footer-hint">You decide — be honest.</div>`;
     setTimeout(()=>{
       inner.querySelector('#wrongBtn').onclick = ()=>rate(false);
       inner.querySelector('#rightBtn').onclick = ()=>rate(true);
@@ -2389,6 +3397,7 @@ function rate(userSaysCorrect){
     autoSuggested: state.feedback.correct,
   });
   if (ATTEMPTS.length > 4000) ATTEMPTS = ATTEMPTS.slice(-4000);
+  dbg('answer', (userSaysCorrect ? 'right' : 'wrong') + ' · ' + ex.type + ' · ' + short(ex.sent.target, 20) + ' (app thought: ' + (state.feedback.correct ? 'right' : 'wrong') + ', grading ' + GRADE_MODE + ')');
   saveAttempts();
 
   STATS.total = (STATS.total||0) + 1;
@@ -2401,11 +3410,14 @@ function rate(userSaysCorrect){
     state.correctSession++;
   } else {
     state.combo = 0;
-    s.queue.splice(Math.min(s.queue.length, 3), 0, { sent:ex.sent, forced:ex.type });
+    const at = Math.min(s.queue.length, Math.max(3, gapN() + 1));
+    s.queue.splice(at, 0, { sent:ex.sent, forced:ex.type });
+    dbg('retry', 'wrong → "' + short(ex.sent.target, 20) + '" comes back as ' + ex.type + ' after ' + at + ' card(s)', { uid:ex.sent.uid, at });
   }
   if (s.mode === 'level' && state.cur && state.cur.kind === 'new'){
     lv(s.lang).done[ex.sent.uid] = 1; saveLS(LS.levels, LEVELS);
-    if (advanceIfDone(s.lang)) fillLevelQueue();
+    dbg('level', 'new sentence counted for the pass: ' + (ex.sent.uid) + ' → ' + (curChunk(s.lang).length - levelPending(s.lang).length) + '/' + curChunk(s.lang).length);
+    if (advanceIfDone(s.lang)){ const v = lv(s.lang); dbg('level', 'pass finished → now level ' + v.level + SUBS[v.sub] + ' chunk ' + (v.chunk + 1)); fillLevelQueue(); }
   }
   touchStreak();
   saveStats();
@@ -2450,7 +3462,7 @@ function renderStats(){
           <div class="dot no"></div>
           <div class="body">
             <div class="en ${kcls(kn(s).lang)}">${esc(knText(s))}${fl}</div>
-            <div class="${flc(s.lang)}" style="font-size:17px;color:var(--ink2);margin-top:2px">${esc(displayFl(s))}</div>
+            <div class="${flc(s.lang)}" style="font-size:17px;color:var(--ink2);margin-top:2px">${flHTML(displayFl(s), s.lang)}</div>
             ${s.transliteration ? `<div class="translit">${esc(s.transliteration)}</div>` : ''}
           </div>
           <div class="meta">${h.wrong}/${h.tries}<br>wrong</div>
@@ -2507,7 +3519,7 @@ function renderFlags(){
           <div class="dot flag"></div>
           <div class="body">
             ${knInline(s)}
-            <div class="${flc(s.lang)}" style="font-size:17px;color:var(--ink2);margin-top:2px">${esc(displayFl(s))}</div>
+            <div class="${flc(s.lang)}" style="font-size:17px;color:var(--ink2);margin-top:2px">${flHTML(displayFl(s), s.lang)}</div>
             ${s.transliteration ? `<div class="translit">${esc(s.transliteration)}</div>` : ''}
           </div>
           <button class="iconbtn" data-remove="${esc(id)}" title="Remove flag">✕</button>
@@ -2545,6 +3557,7 @@ async function listDir(repo, dir){
   const j = await r.json();
   return Array.isArray(j) ? j.filter(x=>x.type === 'file') : [];
 }
+function openScrape(){ state.al.tr = !!LG(state.al.lang).translit; state.screen = 'addlang'; render(); }
 function openStore(){ state.screen = 'store'; render(); loadCatalog(); }
 async function loadCatalog(){
   const st = state.store; st.status = 'loading';
@@ -2616,15 +3629,10 @@ async function installPack(p){
 function renderStore(){
   const f = document.createElement('div'), st = state.store;
   f.innerHTML = `<div class="topbar"><button class="iconbtn" id="backBtn">←</button>
-    <div style="font-weight:800;font-size:19px;flex:1">Languages</div></div>
+    <div style="font-weight:800;font-size:19px;flex:1">Ready-made languages</div></div>
     <div class="wrap statwrap">
       <div class="hint" style="margin-top:6px">Tap <b>Get</b> to add a language. It is saved on this device and works offline.</div>
-      <div id="packs"></div>
-      <div class="sectionhead">Your own</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="btn btn-ghost btn-sm" id="stImp">📂 Import a file</button>
-        <button class="btn btn-ghost btn-sm" id="stAdv">Add from a website (advanced)</button>
-      </div></div>`;
+      <div id="packs"></div></div>`;
   const box = f.querySelector('#packs');
   if (st.status === 'loading' || st.status === 'idle') box.innerHTML = '<div class="empty">Loading…</div>';
   else if (st.status === 'error'){
@@ -2649,9 +3657,7 @@ function renderStore(){
       box.appendChild(el);
     });
   }
-  f.querySelector('#backBtn').onclick = ()=>{ state.screen = 'home'; render(); };
-  f.querySelector('#stImp').onclick = ()=>document.getElementById('fileInput').click();
-  f.querySelector('#stAdv').onclick = ()=>{ state.al.tr = !!LG(state.al.lang).translit; state.screen = 'addlang'; render(); };
+  f.querySelector('#backBtn').onclick = ()=>{ state.screen = 'addlang'; render(); };
   return f;
 }
 function openLangPicker(g){
@@ -2792,7 +3798,7 @@ function renderSettings(){
   });
   const fg = document.createElement('button');
   fg.className = 'btn btn-ghost btn-sm'; fg.textContent = 'Forget seen introductions';
-  fg.onclick = ()=>{ INTRO_SEEN = {}; saveLS(LS.intro, INTRO_SEEN); toast('Introductions will show again'); };
+  fg.onclick = ()=>{ INTRO_SEEN = {}; saveLS(LS.intro, INTRO_SEEN); rebuildSeen(); toast('Introductions will show again'); };
   dbg.appendChild(fg);
   const dt = document.createElement('div');
   dt.innerHTML = `<div class="sectionhead">Data</div>
@@ -2800,6 +3806,8 @@ function renderSettings(){
     <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-blue btn-sm" id="expData">⬇ Export my data</button><button class="btn btn-ghost btn-sm" id="impData">⬆ Import data</button></div>`;
   dt.querySelector('#expData').onclick = exportData;
   dt.querySelector('#impData').onclick = ()=>document.getElementById('dataInput').click();
+  wrap.insertBefore(appearanceEl(), wrap.firstChild);
+  wrap.appendChild(gradingSettingsEl()); wrap.appendChild(repeatSettingsEl()); wrap.appendChild(notesSettingsEl()); wrap.appendChild(introSettingsEl()); wrap.appendChild(debugSettingsEl());
   wrap.appendChild(dbg); wrap.appendChild(dt);
   f.querySelector('#backBtn').onclick = ()=>{ state.screen = 'home'; render(); };
   return f;
@@ -2827,7 +3835,7 @@ function renderAddLang(){
   f.innerHTML = `
     <div class="topbar">
       <button class="iconbtn" id="backBtn">←</button>
-      <div style="font-weight:800;font-size:19px;flex:1">Add language</div>
+      <div style="font-weight:800;font-size:19px;flex:1">Scrape</div>
     </div>
     <div class="wrap statwrap">
       <div class="sectionhead" style="margin-top:8px">Language</div>
@@ -2839,12 +3847,14 @@ function renderAddLang(){
         <button class="btn btn-blue btn-sm" id="alCopy">Copy code</button>
         <button class="btn btn-ghost btn-sm" id="alImport">📂 Import file</button>
       </div>
-      <div class="hint">The code copies a CSV to your clipboard. Save it as a .csv file, then tap Import.</div>
+      <div class="hint">Open the page of one language's sentences, paste the code in the browser console and run it. It copies a CSV to the clipboard: save it as a .txt file, then tap Import.</div>
+      <div class="sectionhead">Ready-made</div>
+      <button class="btn btn-ghost btn-sm" id="alGet">Browse ready-made languages (Get)</button>
     </div>`;
   const code = f.querySelector('#alCode');
   const sync = ()=>{ code.textContent = genCode(al.lang, al.tr); };
   sync();
-  f.querySelector('#backBtn').onclick = ()=>{ state.screen = 'store'; render(); };
+  f.querySelector('#backBtn').onclick = ()=>{ state.screen = 'home'; render(); };
   f.querySelector('#alLang').onchange = e=>{
     al.lang = e.target.value; al.tr = !!LG(al.lang).translit;
     f.querySelector('#alTr').checked = al.tr; sync();
@@ -2852,6 +3862,7 @@ function renderAddLang(){
   f.querySelector('#alTr').onchange = e=>{ al.tr = e.target.checked; sync(); };
   f.querySelector('#alCopy').onclick = ()=>copyText(code.textContent).then(ok=>toast(ok ? 'Code copied ✓' : 'Copy failed'));
   f.querySelector('#alImport').onclick = ()=>document.getElementById('fileInput').click();
+  f.querySelector('#alGet').onclick = openStore;
   return f;
 }
 
@@ -2959,6 +3970,7 @@ function toast(msg){
 }
 
 function boot(){
+  applyTheme(THEME);
   backupOnce();
   try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch(e){}
   if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol))
@@ -2988,6 +4000,7 @@ function boot(){
       saveLS(LS.intro, INTRO_SEEN);
     }
   } catch(e){}
+  buildNoteIdx(); rebuildSeen();
   if (STATS.lastDay && STATS.lastDay !== todayStr()){
     const y = new Date(Date.now()-864e5).toISOString().slice(0,10);
     if (STATS.lastDay !== y) STATS.streak = 0;
