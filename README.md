@@ -1,4 +1,3 @@
-
 التحقق :
 واضف نظام مراجعة مثل Anki خاصة قوائم اعدادات deck options
  
@@ -17,12 +16,12 @@ V2.4 :
 3 note type (word after preffix renders as suffix and wont show due to that)
 note netting
 4 تحط الملاحظات باللغة الثانوية او اي لغة اثناء التمرين
-5 custom css : add a way to add override css (the user picks from the presets and can then add css to extra customize - colors placement and all - make it so that the requirements are clear and that they could be copied so the user make an llm make the css)
+5 custom css : add a way to add override css (the user picks from the presets and can then add css to extra customize - colors placement and all - make it so that the requirements are clear and that they could be copied so the user makes an llm make the css)
+6 اتوقع حاليا نظام الأنكي لو خرجت عند جملة معينة ثم عدت يظهر queue جديد ولا اعود حيث توقفت (Anki لا يعمل هكذا) عدلها
+7 explore UI/UX options for the "add a language" page : get as the main but accessable scraper 
 
 V2.5 :
 ١ الكلمات الي اعرفها من خارج التطبيق امل منها وما يعرف التطبيق اني اعرفها عشان يختصر : اختبار اختياري لتحديد المعروفات وتسجيلها تلقائيا في الملاحظات مع وسم مناسب؟
 ٢ ترجمة الوسوم (التطبيق تلقائيا يرتبها في جدول مقارنة مثلا الانجليزي عمود والعربي عمود وفي سطر : كلمة | word والمستخدم يقدر يعدل عليه) ( المستخدم يقدر يعرض الوسوم بأي لغة يحب --» يسمح بتبادل الاستقراء اللغوي لمحبي علم الالسن بمختلف اللغات وتجميع المصطلحات ومقارنتها) ( اجعل الجدول فيه مرونة : مثلا في الإنجليزي you توافق انتَ وانتِ للمذكر والمؤنث بالعربي طبعا هذه ليست وسوم لكن اريد خاصية توصيل الخلايا في الجدول بشكل اعقد من "السطر الواحد له معنى واحد" واكثر تعبيرا عن الحقيقة)
-٣ auto backuo
-
-V2.6 :
-audio & phonology
+٣ مقدمة للمستخدمين الجدد (تحفظ لاحقا انه قد اتم المقدمة ولكن تحتوي المقدمة على عرض زرار في الإعدادات يعيد عرضها) (إما مقدمة او ازرار وخيارات واسئلة لإعداد التطبيق : لغة المستخدم واللغات التي يتعلمها وكذا)
+٤ خيار ترجمة UI التطبيق للغة الأساسية للمستخدم
