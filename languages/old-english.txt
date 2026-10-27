@@ -1,0 +1,2 @@
+﻿id,english,transliteration,old_english
+"0","I wake up early.","","I wake up early"
