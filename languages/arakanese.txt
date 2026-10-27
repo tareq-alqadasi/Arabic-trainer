@@ -1,0 +1,12 @@
+﻿id,english,transliteration,arakanese
+"455","The sun is shining.","ni θa nẽɪ̯ɴ re","နီ သာ နိန် ရေ"
+"456","It is raining.","mo55 rwa nẽɪ̯ɴ re","မိုး ရွာ နိန် ရေ"
+"457","It is very cold today.","ʔe ne51 təwa51 t͡ʃãɴ55 re","အေနေ့ တဝ ချမ်း ရေ"
+"458","The sky is blue.","kãʊ̯ɴ55 kɔ̃ɴ pra re","ကောင်းကင် ပြာ ရေ"
+"459","The wind is strong.","li ʔa55 prɔ̃ɴ55 re","လီ အား ပြင်း ရေ"
+"460","There are many trees in the forest.","","တောအုပ် ထဲမှာ သစ်ပင်တိ အများကြီး ဟိ ရေ"
+"461","The river flows to the sea.","","မြစ် ဇွော် ပင်လယ် ကို စီးရေ"
+"463","The flowers bloom in spring.","","နွီဦး မှာ ပန်းတိ ပွင့် ရေ"
+"464","The leaves fall in autumn.","","ဆောင်းဦး မှာ သစ်ရွက်တိ ကြွီရေ"
+"465","It rained all day yesterday.","","ညက တနိန့်လုံး မိုးရွာ ရေ"
+"474","It is not raining.","","မိုး မရွာ နိန်"

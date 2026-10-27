@@ -1,4 +1,4 @@
-id,english,transliteration,hungarian
+﻿id,english,transliteration,hungarian
 "0","I wake up early.","","Korán kelek."
 "1","You wake up late.","","Későn ébredsz."
 "2","He wakes up at six.","","Hatkor ébred."
