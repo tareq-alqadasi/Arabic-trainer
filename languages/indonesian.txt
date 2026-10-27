@@ -1,4 +1,4 @@
-id,english,transliteration,indonesian
+﻿id,english,transliteration,indonesian
 "0","I wake up early.","","Saya bangun pagi."
 "1","You wake up late.","","Kamu bangun terlambat."
 "2","He wakes up at six.","","Dia bangun jam enam."
