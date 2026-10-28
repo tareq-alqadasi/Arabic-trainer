@@ -442,6 +442,8 @@ html[data-theme="zen"] .sheet{border-radius:28px 28px 0 0}
 html[data-theme="zen"] .answerzone{border-bottom:1px dashed var(--line2)}
 html[data-theme="zen"] .selbar{border-top:0;box-shadow:0 -10px 30px rgba(80,70,40,.08)}
 .undobtn{font-size:22px;font-weight:800;margin-left:6px}
+.undobtn:disabled{opacity:.3;cursor:default}
+.undobtn:disabled:hover{color:var(--ink3)}
 html[dir=rtl] .choice,html[dir=rtl] .titlebtn,html[dir=rtl] .attemptrow .meta{text-align:start}
 html[dir=rtl] :is(.fl:not(.rtl),.translit,.cmp-text:not(.rtl),.chip,.choice:not(.rtl),.typein,.code,.cssbox,.sidetr,.en,.intro-en){unicode-bidi:plaintext}
 html[dir=rtl] .nt{unicode-bidi:isolate}
@@ -1475,6 +1477,11 @@ function afterLibChange(opt){
   const o = typeof opt === 'string' ? { label:opt } : (opt || {});
   if (!o.skipUndo) libUndoPush(o.label || 'Library change');          // the shadow still holds the library as it was before this change
   saveLib(); sanitizeActive(); rebuild(); libShadowRefresh();
+  const curChanged = relinkSession();
+  if (curChanged && state.screen === 'lesson' && state.ex && state.ex.type !== 'intro'){
+    const e = buildExercise(state.cur.sent, lang_pool(state.cur.sent.lang), state.ex.type);
+    if (e){ state.ex = e; prepareAnswer(); }
+  } else if (curChanged && state.ex && state.ex.type === 'intro' && state.cur) state.ex.sent = state.cur.sent;
   state.sel.clear(); state.ssel.clear();
   if (state.screen === 'group' && !getGroup(state.gid)) state.screen = 'home';
   render(true);
@@ -3413,13 +3420,13 @@ function renderDeckOpts(){
    UNDO (one stack for everything) + TRANSLATION OVERRIDES (editor).
    Undo entries: { label, fn, kind }  kind 'answer' = a lesson answer, 'lib' = library change, 'edit' = anything else.
    ==================================================================== */
-const UNDO = [], REDO = [];
+const UNDO = [], REDO = [], UNDO_MAX = 5000;
 let UNDOING = false, REDOING = false;
 function undoPush(label, fn, kind){
   if (UNDOING) return;
   if (!REDOING) REDO.length = 0;                       // a new action ends the redo history
   UNDO.push({ label, fn, kind:kind || 'edit' });
-  if (UNDO.length > 30) UNDO.shift();
+  if (UNDO.length > UNDO_MAX) UNDO.shift();             // very large (5000), no practical limit
 }
 function undoDropAnswers(){ for (let i = UNDO.length - 1; i >= 0; i--) if (UNDO[i].kind === 'answer') UNDO.splice(i, 1); for (let i = REDO.length - 1; i >= 0; i--) if (REDO[i].kind === 'answer') REDO.splice(i, 1); }
 // everything the non-answer undo entries can touch, so that a redo can put it back
@@ -3460,18 +3467,14 @@ function redoPop(){
 }
 // the ↶ ↷ buttons sit in the top bar of every screen (lessons included) while there is something to undo / redo
 function decorateUndo(){
-  if (!UNDO.length && !REDO.length) return;
   const tb = app.querySelector('.topbar'); if (!tb) return;
-  if (UNDO.length){
+  [['undoBtn', '↶', UNDO, undoPop, 'Undo'], ['redoBtn', '↷', REDO, redoPop, 'Redo']].forEach(([id, ch, st, fn, nm])=>{
     const b = document.createElement('button');
-    b.className = 'iconbtn undobtn'; b.id = 'undoBtn'; b.textContent = '↶';
-    b.title = 'Undo: ' + UNDO[UNDO.length - 1].label; b.onclick = undoPop; tb.appendChild(b);
-  }
-  if (REDO.length){
-    const b = document.createElement('button');
-    b.className = 'iconbtn undobtn'; b.id = 'redoBtn'; b.textContent = '↷';
-    b.title = 'Redo: ' + REDO[REDO.length - 1].label; b.onclick = redoPop; tb.appendChild(b);
-  }
+    b.className = 'iconbtn undobtn'; b.id = id; b.textContent = ch;
+    if (st.length){ b.title = nm + ': ' + st[st.length - 1].label; b.onclick = fn; }
+    else { b.disabled = true; b.title = 'Nothing to ' + nm.toLowerCase(); }
+    tb.appendChild(b);
+  });
 }
 
 /* ---------- library: a structural shadow of the library as it was before the next change ---------- */
@@ -3514,6 +3517,7 @@ function undoRestoreAnswer(sn){
     if (sn.srs.card) st.cards[sn.srs.uid] = JSON.parse(sn.srs.card); else delete st.cards[sn.srs.uid];
     st.day = JSON.parse(sn.srs.day); srsSave();
   }
+  relinkSession();
   state.cur = sn.cur; state.ex = sn.ex; prepareAnswer(); state.flagged = sn.flagged;   // back to the same question, unanswered
   sessPersist(Object.assign({}, state.cur, { typ:state.ex.type !== 'intro' ? state.ex.type : '' }));
   render();
@@ -3534,6 +3538,17 @@ function transSlots(s){
   if (SIDE && SIDE !== kl && SIDE !== s.lang) slots.push({ lang:SIDE, role:'side', lib:libOf(SIDE) });
   return slots;
 }
+// stale sentence objects (after a library edit / undo) are pointed at the current ones
+function relinkSession(){
+  const se = state.sess; if (!se) return false;
+  const m = x=>(x && x.uid && BY_UID.get(x.uid)) || x;
+  let ch = false;
+  if (state.cur && state.cur.sent){ const n = m(state.cur.sent); if (n !== state.cur.sent){ state.cur.sent = n; ch = true; } }
+  if (Array.isArray(se.queue)) se.queue.forEach(q=>{ if (q && q.sent) q.sent = m(q.sent); });
+  if (Array.isArray(se.pool)) se.pool = se.pool.map(m);
+  if (se.byLang) for (const k of Object.keys(se.byLang)) se.byLang[k] = se.byLang[k].map(m);
+  return ch;
+}
 function refreshAfterOvr(uid){
   if (state.screen === 'lesson' && state.cur && state.cur.sent.uid === uid && state.ex && state.ex.type !== 'intro'){
     const e = buildExercise(state.cur.sent, lang_pool(state.cur.sent.lang), state.ex.type);   // texts, options and the correct answer are rebuilt
@@ -3553,34 +3568,63 @@ function ovrApply(s, mutate, label){
   }, 'edit');
   return changed;
 }
+// library edit of one sentence: target text, transliteration and the shared English (main) text
+function editSentenceText(s, v){
+  const oldEn = enKey(s.english), nowEn = v.english !== s.english;
+  let ch = false;
+  for (const g of LIB.groups) g.items = g.items.map(it=>{
+    let n = it;
+    if (it.uid === s.uid && (it.target !== v.target || (it.transliteration || '') !== v.transliteration)){
+      n = Object.assign({}, n, { target:v.target, transliteration:v.transliteration });
+    }
+    if (nowEn && enKey(it.english) === oldEn) n = Object.assign({}, n, { english:v.english });   // every language version keeps its link
+    if (n !== it) ch = true;
+    return n;
+  });
+  if (ch) afterLibChange({ label:'Edit sentence · ' + short(s.target, 18) });
+  return ch;
+}
 function openTransEditor(s){
-  const slots = transSlots(s);
+  const slots = transSlots(s).filter(sl=>sl.lang !== 'en');     // English is the main text, edited below
+  const L = LG(s.lang), hasTr = !!s.transliteration || !!L.translit;
   openSheet((sh, close)=>{
-    sh.innerHTML = `<h3>Edit translation</h3>
-      <div class="hint">Only for this sentence, while you practise ${esc(LG(s.lang).name)}. The library text is not changed.</div>
-      <div class="${flc(s.lang)}" style="font-size:20px;font-weight:800;margin-bottom:10px">${esc(s.target)}</div><div id="trSlots"></div>
-      <div class="sheet-actions"><button class="btn btn-ghost" id="trC">Cancel</button><button class="btn btn-ghost" id="trR">Use library text</button><button class="btn btn-green" id="trOk">Save</button></div>`;
+    const enCur = ovrOf(s, 'en') !== null ? ovrOf(s, 'en') : s.english;
+    sh.innerHTML = `<h3>Edit sentence</h3>
+      <div class=\"hint\">Library text: changes the sentence itself (progress is kept). Translations below: only for this sentence.</div>
+      <div class=\"hint\" style=\"margin:8px 0 4px\">${esc(L.name)} (target)</div>
+      <textarea class=\"field ${flc(s.lang)}\" id=\"edTg\" dir=\"auto\" rows=\"2\"></textarea>
+      ${hasTr ? `<div class=\"hint\" style=\"margin:8px 0 4px\">Transliteration</div><textarea class=\"field\" id=\"edTr\" dir=\"ltr\" rows=\"2\"></textarea>` : ''}
+      <div class=\"hint\" style=\"margin:8px 0 4px\">English (main · shared by all language versions)</div>
+      <textarea class=\"field\" id=\"edEn\" dir=\"auto\" rows=\"2\"></textarea>
+      <div id=\"trSlots\" style=\"margin-top:6px\"></div>
+      <div class=\"sheet-actions\"><button class=\"btn btn-ghost\" id=\"trC\">Cancel</button><button class=\"btn btn-ghost\" id=\"trR\">Use library text</button><button class=\"btn btn-green\" id=\"trOk\">Save</button></div>`;
+    const edTg = sh.querySelector('#edTg'), edTr = sh.querySelector('#edTr'), edEn = sh.querySelector('#edEn');
+    edTg.value = s.target; if (edTr) edTr.value = s.transliteration || ''; edEn.value = enCur;
     const box = sh.querySelector('#trSlots'), tas = [];
     slots.forEach(sl=>{
       const cur = ovrOf(s, sl.lang), d = document.createElement('div'); d.style.marginBottom = '10px';
-      d.innerHTML = `<div class="hint" style="margin-bottom:4px">${esc(langName(sl.lang))} (${sl.role === 'side' ? 'side translation' : 'shown'})${cur !== null ? ' · edited' : ''}${sl.lib ? '' : ' · none in the library, write one'}</div>
-        <textarea class="field ${sl.lang === 'en' ? '' : flc(sl.lang)}" dir="auto" rows="2"></textarea>`;
+      d.innerHTML = `<div class=\"hint\" style=\"margin-bottom:4px\">${esc(langName(sl.lang))} (${sl.role === 'side' ? 'side translation' : 'shown'})${cur !== null ? ' · edited' : ''}${sl.lib ? '' : ' · none in the library, write one'}</div>
+        <textarea class=\"field ${flc(sl.lang)}\" dir=\"auto\" rows=\"2\"></textarea>`;
       const ta = d.querySelector('textarea'); ta.value = cur !== null ? cur : sl.lib; tas.push(ta);
       box.appendChild(d);
     });
     sh.querySelector('#trC').onclick = close;
     sh.querySelector('#trR').onclick = ()=>{
-      const ch = ovrApply(s, o=>slots.forEach(sl=>{ delete o[sl.lang]; }), 'Translation');
+      const ch = ovrApply(s, o=>{ slots.forEach(sl=>{ delete o[sl.lang]; }); delete o.en; }, 'Translation');
       close(); refreshAfterOvr(s.uid); toast(ch ? 'Library text restored' : 'Nothing was edited');
     };
     sh.querySelector('#trOk').onclick = ()=>{
-      const ch = ovrApply(s, o=>slots.forEach((sl, i)=>{
-        const v = tas[i].value.trim();
-        if (!v || v === sl.lib) delete o[sl.lang]; else o[sl.lang] = v;
-      }), 'Translation');
-      close(); refreshAfterOvr(s.uid); toast(ch ? 'Translation updated' : 'No change');
+      const tg = edTg.value.trim(), tr = edTr ? edTr.value.trim() : (s.transliteration || ''), en = edEn.value.trim();
+      if (!tg){ toast('The sentence cannot be empty'); return; }
+      const ch1 = ovrApply(s, o=>{
+        slots.forEach((sl, i)=>{ const v = tas[i].value.trim(); if (!v || v === sl.lib) delete o[sl.lang]; else o[sl.lang] = v; });
+        delete o.en;                                           // English is now edited in the library itself
+      }, 'Translation');
+      const ch2 = editSentenceText(s, { target:tg, transliteration:tr, english:en || s.english });
+      close(); if (!ch2) refreshAfterOvr(s.uid);
+      toast(ch1 || ch2 ? 'Sentence updated' : 'No change');
     };
-    setTimeout(()=>{ if (tas[0]) tas[0].focus(); }, 30);
+    setTimeout(()=>{ edTg.focus(); }, 30);
   });
 }
 
@@ -3722,7 +3766,7 @@ function renderHome(){
         <button class="btn btn-ghost btn-sm" id="flagBtn">🚩 Flagged (${flagCount})</button>
         <button class="btn btn-ghost btn-sm" id="statBtn">📊 My answers</button>
         <button class="btn btn-ghost btn-sm" id="notesBtn">📝 Notes (${NOTES.filter(n=>!n.auto).length})</button>
-        <button class="btn btn-ghost btn-sm" id="kwBtn">✅ Known words</button>
+        ${BETA.known ? '<button class="btn btn-ghost btn-sm" id="kwBtn">✅ Known words</button>' : ''}
         ${BETA.gloss ? '<button class="btn btn-ghost btn-sm" id="glBtn">📖 Glossary</button>' : ''}
         <button class="btn btn-ghost btn-sm" id="setBtn">⚙ Settings</button>
         ${hasAr ? `<button class="btn btn-amber btn-sm${SHOW_TASHKIL?' on':''}" id="tashBtn">َ Tashkīl ${SHOW_TASHKIL?'on':'off'}</button>` : ''}
@@ -3811,7 +3855,7 @@ function renderHome(){
   f.querySelector('#statBtn').onclick = ()=>{ state.screen = 'stats'; render(); };
   f.querySelector('#setBtn').onclick = ()=>{ state.screen = 'settings'; render(); };
   f.querySelector('#notesBtn').onclick = ()=>{ state.screen = 'notes'; render(); };
-  f.querySelector('#kwBtn').onclick = ()=>{ state.kwBack = 'home'; state.screen = 'known'; render(); };
+  if (f.querySelector('#kwBtn')) f.querySelector('#kwBtn').onclick = ()=>{ state.kwBack = 'home'; state.screen = 'known'; render(); };
   if (f.querySelector('#glBtn')) f.querySelector('#glBtn').onclick = ()=>{ state.screen = 'gloss'; render(); };
   f.querySelectorAll('[data-lv]').forEach(b=>{ b.onclick = ()=>startLevel(b.getAttribute('data-lv')); });
   const tb = f.querySelector('#tashBtn');
@@ -3956,7 +4000,7 @@ function renderLesson(){
     saveFlags(); flag.classList.toggle('on', state.flagged);
   };
   const tools = document.createElement('div'); tools.className = 'qtools';
-  const trB = document.createElement('button'); trB.className = 'flagbtn notebtn'; trB.title = 'Edit the translation shown (only for this sentence)'; trB.textContent = '🔤';
+  const trB = document.createElement('button'); trB.className = 'flagbtn notebtn'; trB.title = 'Edit this sentence (target, transliteration, English, translations)'; trB.textContent = '🔤';
   trB.onclick = ()=>openTransEditor(state.cur.sent);
   const addN = document.createElement('button'); addN.className = 'flagbtn notebtn'; addN.title = 'Add a note'; addN.textContent = '✎';
   addN.onclick = ()=>openNoteEditor({ sent:ex.sent });
@@ -4675,7 +4719,7 @@ function renderSettings(){
   dt.querySelector('#expData').onclick = exportData;
   dt.querySelector('#impData').onclick = ()=>document.getElementById('dataInput').click();
   wrap.insertBefore(appearanceEl(), wrap.firstChild); wrap.insertBefore(customCssEl(), wrap.children[1]); 
-  wrap.appendChild(gradingSettingsEl()); wrap.appendChild(repeatSettingsEl()); wrap.appendChild(resumeSettingsEl()); wrap.appendChild(ankiSettingsEl()); wrap.appendChild(notesSettingsEl()); wrap.appendChild(uiSettingsEl()); wrap.appendChild(betaSettingsEl()); wrap.appendChild(introSettingsEl()); wrap.appendChild(debugSettingsEl());
+  wrap.appendChild(gradingSettingsEl()); wrap.appendChild(repeatSettingsEl()); wrap.appendChild(resumeSettingsEl()); wrap.appendChild(notesSettingsEl()); wrap.appendChild(uiSettingsEl()); wrap.appendChild(betaSettingsEl()); wrap.appendChild(introSettingsEl()); wrap.appendChild(debugSettingsEl());
   wrap.appendChild(dbg); wrap.appendChild(dt);
   f.querySelector('#backBtn').onclick = ()=>{ state.screen = 'home'; render(); };
   return f;
@@ -4841,7 +4885,8 @@ let UI_LANG = loadLS(LS.ui, 'en');
 let UI_PACKS = loadLS(LS.uiPacks, {});           // packs the user imported: { code: { name, strings:{ English text: translation } } }
 let ONB_DONE = loadLS(LS.onb, false);
 Object.assign(LS, { beta:'arTrainer:beta' });
-let BETA = Object.assign({ gloss:false, intro:false }, loadLS(LS.beta, {}));   // advanced / beta features, off by default
+let BETA = Object.assign({ gloss:false, intro:false, anki:!!ANKI_ON, known:false }, loadLS(LS.beta, {}));
+if (!BETA.anki && ANKI_ON){ ANKI_ON = false; saveLS(LS.anki, false); }   // Anki review exists only while its beta switch is on   // advanced / beta features, off by default
 let TAG_LANG = loadLS(LS.tagLang, '');           // language the tags are displayed in ('' = as written)
 /* ---------- interface translation: exact-text lookup applied to the DOM (numbers become {n}) ---------- */
 function uiStrings(){ const p = UI_PACKS[UI_LANG]; return UI_LANG === 'en' || !p ? null : (p.strings || {}); }
@@ -4995,24 +5040,30 @@ function uiSettingsEl(){
 }
 function betaSettingsEl(){
   const d = document.createElement('div');
-  d.innerHTML = `<div class="sectionhead">Known words</div>
-    <div class="hint">Tell the app which words you already know from outside, so it does not explain them again.</div>
-    <button class="btn btn-ghost btn-sm" id="kwOpen">✅ Known-words test</button>
-    <div class="sectionhead">Advanced (beta)</div>
+  d.innerHTML = `<div class="sectionhead">Advanced (beta)</div>
     <div class="hint">Unfinished features. They are off until you turn them on.</div><div id="bRows"></div><div id="bMore"></div>`;
   const rows = d.querySelector('#bRows');
-  [['gloss', 'Glossary', 'A table of ideas × languages (tags in your language, masculine/feminine forms, links between forms).'], ['intro', 'Introduction', 'The first-start questions for new users, and a button to run them again.']].forEach(([k, t, s])=>{
+  [['anki', 'Review system (Anki style)', 'Finished sentences come back on a schedule (Again / Good) with daily limits per deck.'],
+   ['known', 'Known-words test', 'Tell the app which words you already know, so it does not explain them again.'],
+   ['gloss', 'Glossary', 'A table of ideas × languages (tags in your language, masculine/feminine forms, links between forms).'],
+   ['intro', 'Introduction', 'The first-start questions for new users, and a button to run them again.']].forEach(([k, t, s])=>{
     const r = document.createElement('div'); r.className = 'rowcb';
     r.innerHTML = `<span class="cb${BETA[k] ? ' on' : ''}">✓</span><div class="body"><div class="en">${t}</div><div class="hint" style="margin:2px 0 0">${s}</div></div>`;
-    r.onclick = ()=>{ BETA[k] = !BETA[k]; saveLS(LS.beta, BETA); GL_IDX = null; render(true); };
+    r.onclick = ()=>{
+      BETA[k] = !BETA[k]; saveLS(LS.beta, BETA); GL_IDX = null;
+      if (k === 'anki' && !BETA.anki){ ANKI_ON = false; saveLS(LS.anki, false); }
+      render(true);
+    };
     rows.appendChild(r);
   });
   const more = d.querySelector('#bMore');
+  if (BETA.anki) more.appendChild(ankiSettingsEl());
+  if (BETA.known) more.insertAdjacentHTML('beforeend', `<div class="sectionhead">Known words</div><button class="btn btn-ghost btn-sm" id="kwOpen">✅ Known-words test</button>`);
   if (BETA.gloss){
-    more.innerHTML += `<div class="hint" style="margin-top:10px">Show note tags (noun, verb…) in this language. Fill the translations in the Glossary table.</div><select class="field" id="tgSel"></select><div style="margin-top:8px"><button class="btn btn-ghost btn-sm" id="glOpen">📖 Open the glossary</button></div>`;
+    more.insertAdjacentHTML('beforeend', `<div class="hint" style="margin-top:10px">Show note tags (noun, verb…) in this language. Fill the translations in the Glossary table.</div><select class="field" id="tgSel"></select><div style="margin-top:8px"><button class="btn btn-ghost btn-sm" id="glOpen">📖 Open the glossary</button></div>`);
   }
-  if (BETA.intro) more.innerHTML += `<div style="margin-top:10px"><button class="btn btn-ghost btn-sm" id="onbAgain">▶ Show the introduction</button></div>`;
-  d.querySelector('#kwOpen').onclick = ()=>{ state.kwBack = 'settings'; state.screen = 'known'; render(); };
+  if (BETA.intro) more.insertAdjacentHTML('beforeend', `<div style="margin-top:10px"><button class="btn btn-ghost btn-sm" id="onbAgain">▶ Show the introduction</button></div>`);
+  const kw = more.querySelector('#kwOpen'); if (kw) kw.onclick = ()=>{ state.kwBack = 'settings'; state.screen = 'known'; render(); };
   const tg = more.querySelector('#tgSel');
   if (tg){
     tg.innerHTML = '<option value="">As written (English)</option>' + glLangs().filter(c=>c !== 'en').map(c=>`<option value="${c}">${esc(LG(c).name)}</option>`).join('');
@@ -5277,6 +5328,7 @@ function finishOnboarding(){
   if (SIDE === KNOWN) SIDE = ''; saveLS(LS.known, KNOWN); saveLS(LS.side, SIDE);
   GRADE_MODE = ob.grade; saveLS(LS.grade, GRADE_MODE);
   ANKI_ON = ob.anki; saveLS(LS.anki, ANKI_ON);
+  if (ob.anki) BETA.anki = true; if (ob.kw) BETA.known = true; saveLS(LS.beta, BETA);
   applyTheme(ob.theme); saveLS(LS.theme, ob.theme);
   ONB_DONE = true; saveLS(LS.onb, true);
   state.ob = null;
