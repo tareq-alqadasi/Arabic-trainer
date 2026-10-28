@@ -15,4 +15,7 @@ V2.5 :
 ٤ خيار ترجمة UI التطبيق للغة الأساسية للمستخدم
 error: with rtl UI the sentence building follows the UI it should follow it own language (ltr in this case)
 
-V2.6 : (pronunciation)
+V2.6 : 
+عرض اللغات وتقسيمها اللغوي في المكتبة (عدد المستويات وحجمها : مثل الهرم السكاني) 
+(pronunciation)
+ملاحظات البلاغة واساليب البيان (لا تتبع كلمات وحروف معينة لكن تراكيب انواع الكلم)
