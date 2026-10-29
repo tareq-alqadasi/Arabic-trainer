@@ -443,6 +443,32 @@ html[data-theme="zen"] .answerzone{border-bottom:1px dashed var(--line2)}
 html[data-theme="zen"] .selbar{border-top:0;box-shadow:0 -10px 30px rgba(80,70,40,.08)}
 .undobtn{font-size:22px;font-weight:800;margin-left:6px}
 .undobtn:disabled{opacity:.3;cursor:default}
+.themewrap{position:relative;display:flex}.themewrap .themecard{flex:1}
+.tdel{position:absolute;top:4px;inset-inline-end:4px;border:0;background:transparent;color:var(--ink3);font-size:14px;font-weight:800;cursor:pointer;padding:4px 6px}
+.tabs{display:flex;gap:6px;margin:12px 0}
+.tabbtn{flex:1;border:2px solid var(--line);background:var(--bg);color:var(--ink2);border-radius:var(--r);padding:9px 6px;font:inherit;font-weight:800;font-size:13px;cursor:pointer}
+.tabbtn.on{border-color:var(--accent);color:var(--ink);background:var(--bg2)}
+.pyrhead{display:flex;flex-direction:column;margin:18px 0 6px}.pyrhead b{font-size:17px}.pyrhead span{font-size:12px;color:var(--ink2)}
+.pyr{direction:ltr}
+.pyrow{display:grid;grid-template-columns:1fr 70px 1fr;align-items:center;gap:4px;margin:2px 0;border-radius:6px}
+.pyrow.cur{background:var(--bg2);outline:2px solid var(--accent)}
+.pyrow .pl{display:flex;justify-content:flex-end}.pyrow .pr{display:flex}
+.pyrow i{display:block;height:18px;min-width:0}
+.pyrow .pl i{background:var(--green);border-radius:4px 0 0 4px}
+.pyrow .pr i.w{background:var(--red)}.pyrow .pr i.f{background:var(--line2);border-radius:0 4px 4px 0}
+.pyrow .pc{text-align:center;line-height:1.1}.pyrow .pc b{display:block;font-size:14px}.pyrow .pc small{font-size:10px;color:var(--ink2)}
+.pylegend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--ink2);margin:6px 0}
+.pylegend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-inline-end:4px}
+.ibar{display:grid;grid-template-columns:92px 1fr 74px;align-items:center;gap:8px;margin:4px 0;font-size:12px}
+.ibar .it{height:14px;background:var(--line);border-radius:4px;overflow:hidden}.ibar .it i{display:block;height:100%;background:var(--accent)}
+.ibar .it i.g{background:var(--green)}.ibar .it i.m{background:var(--amber)}.ibar .it i.b{background:var(--red)}
+.ibar .ir{text-align:end;color:var(--ink2)}
+.days{display:flex;align-items:flex-end;gap:3px;height:70px;direction:ltr}
+.days div{flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:100%}
+.days i{display:block;background:var(--accent);border-radius:3px 3px 0 0;min-height:2px}
+.instbl{width:100%;border-collapse:collapse;font-size:12px}.instbl th,.instbl td{padding:6px 5px;border-bottom:1px solid var(--line);text-align:end;white-space:nowrap}
+.instbl th:first-child,.instbl td:first-child{text-align:start;font-weight:800}.instbl th{color:var(--ink2);font-weight:700}
+.lchips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
 .undobtn:disabled:hover{color:var(--ink3)}
 html[dir=rtl] .choice,html[dir=rtl] .titlebtn,html[dir=rtl] .attemptrow .meta{text-align:start}
 html[dir=rtl] :is(.fl:not(.rtl),.translit,.cmp-text:not(.rtl),.chip,.choice:not(.rtl),.typein,.code,.cssbox,.sidetr,.en,.intro-en){unicode-bidi:plaintext}
@@ -2720,6 +2746,14 @@ const THEMES = [
   { id:'zen',      name:'Zen',       desc:'Soft sand and sage, calm and airy',          sw:['#f1ece1','#faf7f0','#6f9275','#3b3a33'] },
 ];
 let CUSTOM_CSS = loadLS(LS.css, '');
+Object.assign(LS, { cssThemes:'arTrainer:cssThemes' });
+let CSS_THEMES = loadLS(LS.cssThemes, []);          // saved looks: { id, name, base (built-in theme), css }
+function saveCssThemes(){ saveLS(LS.cssThemes, CSS_THEMES); }
+function cssSwatch(t){                                // preview colours: the theme's own CSS variables, else its base theme
+  const b = (THEMES.find(x=>x.id === t.base) || THEMES[0]).sw.slice();
+  const pick = v=>{ const m = t.css.match(new RegExp('--' + v + '\\s*:\\s*(#[0-9a-fA-F]{3,8}|rgba?\\([^)]*\\))')); return m ? m[1] : null; };
+  return [pick('bg') || b[0], pick('card') || pick('bg2') || b[1], pick('accent') || b[2], pick('ink') || b[3]];
+}
 function applyCustomCss(){
   let el = document.getElementById('userCss');
   if (!el){ el = document.createElement('style'); el.id = 'userCss'; document.head.appendChild(el); }
@@ -2743,6 +2777,15 @@ function appearanceEl(){
     b.innerHTML = `<span class="tsw">${t.sw.map(c=>`<i style="background:${c}"></i>`).join('')}</span><b>${esc(t.name)}</b><small>${esc(t.desc)}</small>`;
     b.onclick = ()=>{ applyTheme(t.id); saveLS(LS.theme, t.id); g.querySelectorAll('.themecard').forEach(x=>x.classList.remove('on')); b.classList.add('on'); };
     g.appendChild(b);
+  });
+  CSS_THEMES.forEach(t=>{
+    const w = document.createElement('div'); w.className = 'themewrap';
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'themecard' + (t.base === THEME && t.css === CUSTOM_CSS ? ' on' : '');
+    b.innerHTML = `<span class="tsw">${cssSwatch(t).map(c=>`<i style="background:${esc(c)}"></i>`).join('')}</span><b>${esc(t.name)}</b><small>Saved · ${esc((THEMES.find(x=>x.id === t.base) || THEMES[0]).name)} + CSS</small>`;
+    b.onclick = ()=>{ applyTheme(t.base); saveLS(LS.theme, t.base); CUSTOM_CSS = t.css; saveLS(LS.css, CUSTOM_CSS); applyCustomCss(); render(true); };
+    const x = document.createElement('button'); x.type = 'button'; x.className = 'tdel'; x.textContent = '✕'; x.title = 'Delete this saved theme';
+    x.onclick = e=>{ e.stopPropagation(); if (!confirm('Delete the saved theme “' + t.name + '”?')) return; CSS_THEMES = CSS_THEMES.filter(y=>y.id !== t.id); saveCssThemes(); render(true); };
+    w.appendChild(b); w.appendChild(x); g.appendChild(w);
   });
   return d;
 }
@@ -2789,6 +2832,7 @@ function customCssEl(){
     <textarea class="field cssbox" id="cssTa" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder="/* e.g.  html{ --accent:#e11d48 !important; } */"></textarea>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
       <button class="btn btn-green btn-sm" id="cssApply">Apply</button>
+      <button class="btn btn-blue btn-sm" id="cssSave">💾 Save as theme</button>
       <button class="btn btn-ghost btn-sm" id="cssBrief">📋 Copy brief for an AI</button>
       <button class="btn btn-ghost btn-sm" id="cssCopy">Copy my CSS</button>
       <button class="btn btn-redg btn-sm" id="cssReset">Remove</button>
@@ -2805,6 +2849,17 @@ function customCssEl(){
     const css = stripFence(ta.value); ta.value = css;
     const err = check(css); if (err){ msg.textContent = '⚠ ' + err + ' — not applied.'; return; }
     CUSTOM_CSS = css; saveLS(LS.css, CUSTOM_CSS); applyCustomCss(); msg.textContent = css.trim() ? 'Applied ✓' : 'Empty — nothing applied.';
+  };
+  d.querySelector('#cssSave').onclick = ()=>{
+    const css = stripFence(ta.value).trim(); ta.value = css;
+    if (!css){ msg.textContent = 'Write some CSS first.'; return; }
+    const err = check(css); if (err){ msg.textContent = '⚠ ' + err + ' — not saved.'; return; }
+    const name = (prompt('Name for this theme?', 'My theme ' + (CSS_THEMES.length + 1)) || '').trim(); if (!name) return;
+    const i = CSS_THEMES.findIndex(t=>t.name.toLowerCase() === name.toLowerCase());
+    if (i >= 0 && !confirm('Replace the saved theme “' + name + '”?')) return;
+    const t = { id:i >= 0 ? CSS_THEMES[i].id : 'u' + Date.now().toString(36), name, base:THEME, css };
+    if (i >= 0) CSS_THEMES[i] = t; else CSS_THEMES.push(t);
+    saveCssThemes(); CUSTOM_CSS = css; saveLS(LS.css, css); applyCustomCss(); render(true); toast('Theme saved');
   };
   d.querySelector('#cssBrief').onclick = ()=>copyText(CSS_BRIEF()).then(ok=>toast(ok ? 'Brief copied — paste it into an AI chat' : 'Copy failed'));
   d.querySelector('#cssCopy').onclick = ()=>copyText(ta.value).then(ok=>toast(ok ? 'CSS copied' : 'Copy failed'));
@@ -3628,13 +3683,147 @@ function openTransEditor(s){
   });
 }
 
+
+/* ==================== INSIGHTS: library pyramid + learning data ==================== */
+const INS_GAP = 10 * 60e3;                              // a pause longer than this ends a session
+function insLangs(){ return [...new Set(LIB.groups.map(g=>g.lang))]; }
+function pyrRows(lang){
+  const last = lastMap(), by = {}; let mx = 1;
+  for (const s of langSentences(lang)){
+    const L = levelOfLen(sentLen(s)); mx = Math.max(mx, L);
+    const o = by[L] || (by[L] = { n:0, known:0, wrong:0, fresh:0 });
+    o.n++; if (!last.has(s.uid)) o.fresh++; else if (last.get(s.uid)) o.known++; else o.wrong++;
+  }
+  const rows = []; for (let L = mx; L >= 1; L--) rows.push(Object.assign({ L, n:0, known:0, wrong:0, fresh:0 }, by[L] || {}));
+  return rows;
+}
+function pyrHTML(){
+  const langs = insLangs(); if (!langs.length) return '<div class="hint">The library is empty.</div>';
+  const all = langs.map(c=>({ c, rows:pyrRows(c) }));
+  const half = r=>Math.max(r.known, r.wrong + r.fresh);
+  const gmax = Math.max(1, ...all.flatMap(x=>x.rows.map(half)));
+  let out = `<div class="rowcb" id="pyShared"><span class="cb${state.insShared ? ' on' : ''}">✓</span><div class="body"><div class="en">Same scale for all languages</div></div></div>
+    <div class="pylegend"><span><i style="background:var(--green)"></i>known (last answer right)</span><span><i style="background:var(--red)"></i>last answer wrong</span><span><i style="background:var(--line2)"></i>not seen yet</span></div>`;
+  for (const { c, rows } of all){
+    const sc = state.insShared ? gmax : Math.max(1, ...rows.map(half));
+    const tot = rows.reduce((a, r)=>a + r.n, 0), kn = rows.reduce((a, r)=>a + r.known, 0);
+    const levels = rows.filter(r=>r.n).length, chunks = rows.reduce((a, r)=>a + (r.n ? chunkLayout(r.n).cnt : 0), 0);
+    let curL = 0; try { if (normalizeLevel(c) !== 'complete') curL = lv(c).level; } catch(e){}
+    out += `<div class="pyrhead"><b>${esc(LG(c).name)}</b><span>${tot} sentences · ${levels} levels · ${chunks} chunks · ${tot ? Math.round(kn / tot * 100) : 0}% known</span></div><div class="pyr">` +
+      rows.map(r=>{
+        const ly = r.n ? chunkLayout(r.n) : { cnt:0, size:0 };
+        return `<div class="pyrow${r.L === curL ? ' cur' : ''}" title="${r.known} known · ${r.wrong} wrong · ${r.fresh} new · ${ly.cnt} chunks of ~${ly.size}">
+          <div class="pl"><i style="width:${r.known / sc * 100}%"></i></div>
+          <div class="pc"><b>${r.n}</b><small>L${r.L} · ${levelWords(r.L)}w${r.n ? ' · ' + ly.cnt + '×' + ly.size : ''}</small></div>
+          <div class="pr"><i class="w" style="width:${r.wrong / sc * 100}%"></i><i class="f" style="width:${r.fresh / sc * 100}%"></i></div></div>`;
+      }).join('') + '</div>';
+  }
+  return out + '<div class="hint" style="margin-top:10px">Centre: sentences in the level · level · words per sentence · chunks × sentences per chunk. The framed row is where you are now.</div>';
+}
+
+const attLang = a=>(BY_UID.get(a.id) || {}).lang || a.lang;
+const attLevel = a=>{ const s = BY_UID.get(a.id); return s ? levelOfLen(sentLen(s)) : 0; };
+const medianOf = v=>{ if (!v.length) return 0; const x = v.slice().sort((a, b)=>a - b), m = x.length >> 1; return x.length % 2 ? x[m] : (x[m - 1] + x[m]) / 2; };
+const dayKey = t=>new Date(t).toLocaleDateString('en-CA');
+function langStats(atts){
+  const n = atts.length; if (!n) return null;
+  const seen = new Set(); let first = 0, firstOk = 0, ok = 0, run = 0, maxRun = 0, wrun = 0, maxW = 0;
+  const days = new Set(), byU = {};
+  atts.forEach(a=>{
+    if (a.correct){ ok++; run++; wrun = 0; maxRun = Math.max(maxRun, run); } else { run = 0; wrun++; maxW = Math.max(maxW, wrun); }
+    if (!seen.has(a.id)){ seen.add(a.id); first++; if (a.correct) firstOk++; }
+    days.add(dayKey(a.t));
+    (byU[a.id] || (byU[a.id] = [])).push(a.correct);
+  });
+  const sess = []; let cur = [atts[0]];
+  for (let i = 1; i < n; i++){ if (atts[i].t - atts[i - 1].t > INS_GAP){ sess.push(cur); cur = []; } cur.push(atts[i]); }
+  sess.push(cur);
+  const dts = []; sess.forEach(se=>{ for (let i = 1; i < se.length; i++){ const d = (se[i].t - se[i - 1].t) / 1000; if (d <= 120) dts.push(d); } });
+  const endedWrong = sess.filter(se=>!se[se.length - 1].correct).length;
+  let aOk = 0, aOkN = 0, aW = 0, aWN = 0;               // does a right answer stick? next answer to the same sentence
+  Object.values(byU).forEach(v=>{ for (let i = 1; i < v.length; i++){ if (v[i - 1]){ aOkN++; if (v[i]) aOk++; } else { aWN++; if (v[i]) aW++; } } });
+  return { n, acc:ok / n, firstAcc:first ? firstOk / first : 0, sentences:first, medSec:medianOf(dts), days:days.size, sessions:sess.length,
+    perSession:n / sess.length, minPerSession:sess.reduce((a, se)=>a + (se[se.length - 1].t - se[0].t) / 6e4, 0) / sess.length,
+    endedWrong:endedWrong / sess.length, maxRun, maxWrongRun:maxW, afterRight:aOkN ? aOk / aOkN : null, afterWrong:aWN ? aW / aWN : null, perDay:n / days.size };
+}
+const pc = x=>x == null ? '–' : Math.round(x * 100) + '%';
+const accCls = x=>x >= .8 ? 'g' : x >= .6 ? 'm' : 'b';
+function ibar(label, acc, n, extra){ return `<div class="ibar"><span>${esc(label)}</span><div class="it"><i class="${accCls(acc)}" style="width:${Math.round(acc * 100)}%"></i></div><span class="ir">${pc(acc)} · ${n}${extra || ''}</span></div>`; }
+function groupAcc(atts, keyFn){
+  const m = new Map();
+  atts.forEach(a=>{ const k = keyFn(a); const o = m.get(k) || { n:0, ok:0 }; o.n++; if (a.correct) o.ok++; m.set(k, o); });
+  return [...m.entries()].map(([k, o])=>({ k, n:o.n, acc:o.ok / o.n }));
+}
+function insData(){
+  const by = {}; ATTEMPTS.forEach(a=>{ const l = attLang(a); if (l) (by[l] || (by[l] = [])).push(a); });
+  Object.values(by).forEach(v=>v.sort((a, b)=>a.t - b.t));
+  return by;
+}
+function dataHTML(){
+  const by = insData(), langs = Object.keys(by).sort((a, b)=>by[b].length - by[a].length);
+  if (!langs.length) return '<div class="hint">No answers yet. Practise a little, then come back.</div>';
+  if (!by[state.insLang]) state.insLang = langs[0];
+  const st = {}; langs.forEach(c=>st[c] = langStats(by[c]));
+  let out = `<div class="hint">Based on your last ${ATTEMPTS.length} answers (the app keeps at most 4000). “Session” = answers with no pause longer than 10 minutes.</div>
+    <div class="sectionhead">Languages side by side</div><div style="overflow-x:auto"><table class="instbl"><tr><th>Language</th><th>Answers</th><th>Right</th><th>1st try</th><th>Sec/card</th><th>Days</th><th>Cards/sess.</th><th>End on ✗</th><th>Best run</th></tr>` +
+    langs.map(c=>{ const x = st[c]; return `<tr><td>${esc(LG(c).name)}</td><td>${x.n}</td><td>${pc(x.acc)}</td><td>${pc(x.firstAcc)}</td><td>${x.medSec.toFixed(1)}</td><td>${x.days}</td><td>${x.perSession.toFixed(1)}</td><td>${pc(x.endedWrong)}</td><td>${x.maxRun}</td></tr>`; }).join('') +
+    `</table></div><div class="hint" style="margin-top:6px">1st try = right the first time a sentence appears. End on ✗ = sessions whose last answer was wrong (a quit-on-failure signal). Best run = most right answers in a row.</div>
+    <div class="sectionhead">One language in detail</div><div class="lchips">` +
+    langs.map(c=>`<button class="tabbtn${c === state.insLang ? ' on' : ''}" data-l="${c}" style="flex:none;padding:7px 12px">${esc(LG(c).name)}</button>`).join('') + '</div>';
+  const c = state.insLang, A = by[c], x = st[c];
+  out += `<div class="hint">By exercise type</div>` + groupAcc(A, a=>a.type).sort((p, q)=>q.n - p.n).map(g=>ibar(g.k || '?', g.acc, g.n)).join('');
+  out += `<div class="hint" style="margin-top:12px">By level (sentence length) — where does it get hard?</div>` +
+    groupAcc(A.filter(a=>attLevel(a)), attLevel).sort((p, q)=>p.k - q.k).map(g=>ibar('L' + g.k + ' · ' + levelWords(g.k) + 'w', g.acc, g.n)).join('');
+  const today = new Date(), dayRows = [];
+  for (let i = 13; i >= 0; i--){ const k = dayKey(today.getTime() - i * 864e5); dayRows.push({ k, n:0, ok:0 }); }
+  A.forEach(a=>{ const r = dayRows.find(d=>d.k === dayKey(a.t)); if (r){ r.n++; if (a.correct) r.ok++; } });
+  const mxd = Math.max(1, ...dayRows.map(d=>d.n));
+  out += `<div class="hint" style="margin-top:12px">Answers per day, last 14 days</div><div class="days">` +
+    dayRows.map(d=>`<div title="${d.k}: ${d.n} answers, ${d.n ? Math.round(d.ok / d.n * 100) : 0}% right"><i class="${d.n ? accCls(d.ok / d.n) : ''}" style="height:${d.n / mxd * 100}%;${d.n ? '' : 'background:var(--line)'}"></i></div>`).join('') + '</div>';
+  out += `<div class="hint" style="margin-top:12px">Loop health</div>
+    <div class="ibar"><span>Next answer after a right one</span><div class="it"><i class="${accCls(x.afterRight || 0)}" style="width:${Math.round((x.afterRight || 0) * 100)}%"></i></div><span class="ir">${pc(x.afterRight)}</span></div>
+    <div class="ibar"><span>Next answer after a wrong one</span><div class="it"><i class="${accCls(x.afterWrong || 0)}" style="width:${Math.round((x.afterWrong || 0) * 100)}%"></i></div><span class="ir">${pc(x.afterWrong)}</span></div>
+    <div class="hint">${x.sessions} sessions · ${x.perSession.toFixed(1)} cards and ${x.minPerSession.toFixed(1)} min each · ${x.perDay.toFixed(0)} answers per active day · longest wrong streak ${x.maxWrongRun}</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px"><button class="btn btn-blue btn-sm" id="insBrief">📋 Copy data brief for an AI</button><button class="btn btn-ghost btn-sm" id="insCsv">Copy answers as CSV</button></div>`;
+  return out;
+}
+function insBrief(){
+  const by = insData(), per = {};
+  for (const c of insLangs()){
+    const rows = pyrRows(c), A = by[c] || [], x = langStats(A);
+    per[c] = { name:LG(c).name,
+      library:rows.filter(r=>r.n).map(r=>({ level:r.L, words:levelWords(r.L), sentences:r.n, chunks:chunkLayout(r.n).cnt, known:r.known, wrong:r.wrong, unseen:r.fresh })),
+      answers:A.length, stats:x ? { accuracy:+x.acc.toFixed(3), firstTryAccuracy:+x.firstAcc.toFixed(3), medianSecondsPerCard:+x.medSec.toFixed(1), activeDays:x.days, sessions:x.sessions,
+        cardsPerSession:+x.perSession.toFixed(1), minutesPerSession:+x.minPerSession.toFixed(1), sessionsEndedOnWrong:+x.endedWrong.toFixed(3), longestRightRun:x.maxRun, longestWrongRun:x.maxWrongRun,
+        nextRightAfterRight:x.afterRight, nextRightAfterWrong:x.afterWrong } : null,
+      byType:groupAcc(A, a=>a.type).map(g=>({ type:g.k, n:g.n, acc:+g.acc.toFixed(3) })),
+      byLevel:groupAcc(A.filter(a=>attLevel(a)), attLevel).sort((p, q)=>p.k - q.k).map(g=>({ level:g.k, n:g.n, acc:+g.acc.toFixed(3) })) };
+  }
+  const meta = { xpPerRight:'10 + min(5, combo)', totalXp:STATS.xp || 0, streakDays:STATS.streak || 0, chunkTarget:CHUNK_TARGET, levelCycle:'a → b → c per chunk', repeatGap:gapN(), spacedReviewOn:!!ANKI_ON, grading:GRADE_MODE };
+  return `I am tuning a language-learning app: its game loop, how I interact with each language, and the reward system (goal: addictive but real learning). Languages behave differently, so compare them. Below is real data from my own use (JSON). Please: 1) say what is different between the languages and why it matters; 2) point out where the loop loses me (level steps too steep, exercise types that are too hard or too easy, sessions that end on a wrong answer, slow cards); 3) propose concrete changes to levels/chunk size, exercise mix, session length and rewards, each with the number it should move; 4) tell me which extra data I should record to decide better.\n\n` + JSON.stringify({ rewards:meta, languages:per }, null, 1);
+}
+function renderInsights(){
+  const f = document.createElement('div'), tab = state.insTab || 'pyr';
+  f.innerHTML = `<div class="topbar"><button class="iconbtn" id="backBtn">←</button><div style="font-weight:800;font-size:19px;flex:1">Languages &amp; data</div></div>
+    <div class="wrap"><div class="tabs"><button class="tabbtn${tab === 'pyr' ? ' on' : ''}" data-t="pyr">🏛 Library pyramid</button><button class="tabbtn${tab === 'data' ? ' on' : ''}" data-t="data">📈 Learning data</button></div><div id="insBody"></div></div>`;
+  f.querySelector('#backBtn').onclick = ()=>{ state.screen = 'home'; render(); };
+  f.querySelectorAll('.tabs [data-t]').forEach(b=>{ b.onclick = ()=>{ state.insTab = b.getAttribute('data-t'); render(true); }; });
+  const body = f.querySelector('#insBody');
+  body.innerHTML = tab === 'pyr' ? pyrHTML() : dataHTML();
+  const sh = body.querySelector('#pyShared'); if (sh) sh.onclick = ()=>{ state.insShared = !state.insShared; render(true); };
+  body.querySelectorAll('[data-l]').forEach(b=>{ b.onclick = ()=>{ state.insLang = b.getAttribute('data-l'); render(true); }; });
+  const br = body.querySelector('#insBrief'); if (br) br.onclick = ()=>copyText(insBrief()).then(ok=>toast(ok ? 'Data brief copied — paste it into an AI chat' : 'Copy failed'));
+  const cv = body.querySelector('#insCsv'); if (cv) cv.onclick = ()=>copyText('time,language,type,level,sentence_id,correct\n' + ATTEMPTS.map(a=>[new Date(a.t).toISOString(), attLang(a), a.type, attLevel(a), a.id, a.correct ? 1 : 0].join(',')).join('\n')).then(ok=>toast(ok ? 'CSV copied' : 'Copy failed'));
+  return f;
+}
+
 /* ==================== RENDER ==================== */
 const app = document.getElementById('app');
 function render(keep){
   if (!keep) window.scrollTo(0,0);
   if (state.screen !== 'home') state.ddOpen = false;
   app.innerHTML = '';
-  const m = { home:renderHome, lesson:renderLesson, group:renderGroup, stats:renderStats, flags:renderFlags, addlang:renderAddLang, settings:renderSettings, store:renderStore, notes:renderNotes, deckopts:renderDeckOpts, onboard:renderOnboard, known:renderKnown, gloss:renderGloss };
+  const m = { home:renderHome, lesson:renderLesson, group:renderGroup, stats:renderStats, flags:renderFlags, addlang:renderAddLang, settings:renderSettings, store:renderStore, notes:renderNotes, deckopts:renderDeckOpts, onboard:renderOnboard, known:renderKnown, gloss:renderGloss, insights:renderInsights };
   app.appendChild((m[state.screen] || renderHome)());
   ACTIVE_SHADOW = ACTIVE.slice();
   decorateUndo();
@@ -3765,6 +3954,7 @@ function renderHome(){
         <button class="btn btn-ghost btn-sm" id="revBtn">🔁 Review mistakes</button>
         <button class="btn btn-ghost btn-sm" id="flagBtn">🚩 Flagged (${flagCount})</button>
         <button class="btn btn-ghost btn-sm" id="statBtn">📊 My answers</button>
+        <button class="btn btn-ghost btn-sm" id="insBtn">🔭 Languages &amp; data</button>
         <button class="btn btn-ghost btn-sm" id="notesBtn">📝 Notes (${NOTES.filter(n=>!n.auto).length})</button>
         ${BETA.known ? '<button class="btn btn-ghost btn-sm" id="kwBtn">✅ Known words</button>' : ''}
         ${BETA.gloss ? '<button class="btn btn-ghost btn-sm" id="glBtn">📖 Glossary</button>' : ''}
@@ -3853,6 +4043,7 @@ function renderHome(){
   };
   f.querySelector('#flagBtn').onclick = ()=>{ state.screen = 'flags'; render(); };
   f.querySelector('#statBtn').onclick = ()=>{ state.screen = 'stats'; render(); };
+  f.querySelector('#insBtn').onclick = ()=>{ state.screen = 'insights'; render(); };
   f.querySelector('#setBtn').onclick = ()=>{ state.screen = 'settings'; render(); };
   f.querySelector('#notesBtn').onclick = ()=>{ state.screen = 'notes'; render(); };
   if (f.querySelector('#kwBtn')) f.querySelector('#kwBtn').onclick = ()=>{ state.kwBack = 'home'; state.screen = 'known'; render(); };
