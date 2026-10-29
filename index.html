@@ -31,6 +31,15 @@ button{font-family:inherit}
 .progress{flex:1;height:16px;background:var(--line);border-radius:8px;overflow:hidden}
 .progress>i{display:block;height:100%;background:var(--green);border-radius:8px;transition:width .35s;box-shadow:inset 0 4px 0 rgba(255,255,255,.25)}
 .pill{font-weight:800;font-size:14px;white-space:nowrap}
+.pill.bump{animation:funbump .45s ease}
+.pill.flame{color:var(--amber-t);margin-inline-start:6px}
+@keyframes funbump{0%{transform:scale(1)}40%{transform:scale(1.35)}100%{transform:scale(1)}}
+.funpop{position:fixed;left:50%;bottom:130px;transform:translateX(-50%);z-index:90;font-weight:900;font-size:22px;color:var(--green-d);background:var(--card,var(--bg));border:2px solid var(--green);border-radius:999px;padding:6px 16px;pointer-events:none;animation:funup 1.1s ease-out forwards}
+.funpop.big{font-size:26px;color:var(--amber-t);border-color:var(--amber)}
+@keyframes funup{0%{opacity:0;transform:translate(-50%,10px) scale(.7)}20%{opacity:1;transform:translate(-50%,0) scale(1.1)}100%{opacity:0;transform:translate(-50%,-60px) scale(1)}}
+.funconf{position:fixed;top:-12px;z-index:90;pointer-events:none;font-size:20px;animation:funfall 1.6s ease-in forwards}
+@keyframes funfall{to{transform:translateY(105vh) rotate(540deg);opacity:.2}}
+@media (prefers-reduced-motion:reduce){.funpop,.funconf,.pill.bump{animation:none;display:none}}
 .btn{border:none;border-radius:var(--r);padding:13px 18px;font-weight:800;font-size:14px;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;transition:.1s;box-shadow:0 4px 0 rgba(0,0,0,.18);user-select:none}
 .btn:active:not(:disabled){transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.18)}
 .btn:disabled{opacity:.4;cursor:not-allowed}
@@ -193,6 +202,10 @@ button{font-family:inherit}
 .notebtn{width:38px;height:38px;font-size:17px}
 .flagbtn.notebtn.on{background:var(--blue);border-color:var(--blue);color:#fff}
 .nt{background:var(--hl);border-radius:4px;box-shadow:0 1px 0 var(--hl-line);cursor:pointer}
+.nt.nts{background:transparent;box-shadow:none;border-bottom:2px dashed var(--hl-line)}
+.ntpat{font-weight:800;color:var(--ink3);margin-inline-end:6px;direction:ltr;unicode-bidi:isolate}
+.sprev{font-size:13px;font-weight:700;margin:6px 0;min-height:18px}.sprev.ok{color:var(--green-t)}.sprev.no{color:var(--red-t)}
+.sslots{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
 button .nt{cursor:inherit}
 .ntstrip{margin-top:10px;display:flex;flex-direction:column;gap:6px}
 .ntline{font-size:14px;line-height:1.5;color:var(--ink2);font-weight:600;white-space:pre-wrap;border-left:3px solid var(--hl-line);padding-left:10px}
@@ -1823,8 +1836,8 @@ function advanceIfDone(lang){
   }
   const st = normalizeLevel(lang); saveLS(LS.levels, LEVELS);
   if (st === 'complete') toast('All levels completed');
-  else if (v.level !== before) toast('Level ' + v.level + ' unlocked');
-  else if (v.sub === 0) toast('Chunk done ✓ · next ' + (v.chunk+1) + '/' + chunkCount(lang, v.level));
+  else if (v.level !== before){ toast('Level ' + v.level + ' unlocked'); funBurst(); }
+  else if (v.sub === 0){ toast('Chunk done ✓ · next ' + (v.chunk+1) + '/' + chunkCount(lang, v.level)); funBurst(); }
   return true;
 }
 function fillLevelQueue(){
@@ -2260,12 +2273,28 @@ const notesList = ()=>HL_ON && NOTES_VIEW === 'list';
 const INTRO_T_DEF = { mode:'fixed', fixed:1, a:1, b:0.5, max:6, manual:{}, other:1 };
 let INTRO_T = Object.assign({}, INTRO_T_DEF, loadLS(LS.introT, {}));
 let THEME = loadLS(LS.theme, 'classic');
+Object.assign(LS, { fun:'arTrainer:fun' });
+let FUN_ON = loadLS(LS.fun, false);                 // Duolingo-style celebrations during practice (off = plain numbers only)
+function funPop(text, big){
+  if (!FUN_ON) return;
+  const e = document.createElement('div'); e.className = 'funpop' + (big ? ' big' : ''); e.textContent = text;
+  document.body.appendChild(e); setTimeout(()=>e.remove(), 1150);
+}
+function funBurst(){
+  if (!FUN_ON) return;
+  const em = ['🎉', '⭐', '✨', '🟢', '🔶'];
+  for (let i = 0; i < 18; i++){
+    const e = document.createElement('div'); e.className = 'funconf'; e.textContent = em[i % em.length];
+    e.style.left = (4 + Math.random() * 92) + 'vw'; e.style.animationDelay = (Math.random() * .4) + 's';
+    document.body.appendChild(e); setTimeout(()=>e.remove(), 2200);
+  }
+}
 let ANKI_ON = loadLS(LS.anki, false);               // Anki-style spaced review on top of the levels (off = the app works exactly as before)
 let INTRO_GAP = loadLS(LS.introGap, 0);          // 0 = ask about a sentence right after its intro card · 1–5 = after that many other cards
 let GAP_N = loadLS(LS.gap, 1);                   // cards that must pass before the same sentence may come again (1–8)
 let GRADE_MODE = loadLS(LS.grade, 'self');       // 'self' = you rate every answer (Anki style) · 'auto' = the app decides
 const autoGrade = ()=>GRADE_MODE === 'auto';
-state.nf = { by:'lang', lang:'', type:'', tag:'', group:'', level:'', q:'', auto:false };
+state.nf = { by:'lang', lang:'', type:'', tag:'', group:'', level:'', q:'', auto:false, kind:'' };
 
 const NOTE_TYPES = [
   { id:'word',   label:'Word' },
@@ -2301,6 +2330,10 @@ function alignText(text, lang){
 }
 const NP = new Map();
 let NOTE_IDX = {};
+let STRUCT_IDX = {};                        // construction (rhetoric) notes by language
+const STRUCT_CACHE = new Map();
+const EMPTY_IX = { word:new Map(), aff:[], all:[], multi:[] };
+const STYLE_TAGS = ['emphasis', 'softening', 'command', 'question', 'exclamation', 'comparison', 'negation', 'contrast', 'repetition', 'condition', 'politeness'];
 /* A note is a PATTERN. “…” stands for the part of the word that changes:
    plain  = the whole word · ال… = starts with · …ات = ends with · …كتب… = contains · ي…ون = starts with ي AND ends with ون (any number of parts, in order).
    Older notes (saved with a separate type) keep working: their type is turned into the same pattern. */
@@ -2341,8 +2374,9 @@ function multiRanges(norm, parts){
   return norm.length > tot ? out : null;             // something must remain between the parts
 }
 function buildNoteIdx(){
-  NOTE_IDX = {}; NP.clear();
+  NOTE_IDX = {}; NP.clear(); STRUCT_IDX = {}; STRUCT_CACHE.clear();
   for (const n of NOTES){
+    if (n.type === 'struct'){ const sl = parseStruct(n.text, n.lang); if (sl) (STRUCT_IDX[n.lang] || (STRUCT_IDX[n.lang] = [])).push({ note:n, slots:sl }); continue; }
     const sp = patSpec(n.text, n.lang, n.type); if (!sp) continue;
     NP.set(n.id, sp.np);
     const ix = NOTE_IDX[n.lang] || (NOTE_IDX[n.lang] = { word:new Map(), aff:[], all:[], multi:[] });
@@ -2376,19 +2410,102 @@ function matchRanges(norm, ix, sub){
   for (const m of ix.multi){ const r = multiRanges(norm, m.parts); if (r) for (const x of r) out.push({ s:x.s, e:x.e, note:m.note }); }
   return out;
 }
-function hlRun(seg, lang, ix, sub){
+
+/* ---------- constructions: notes about the SHAPE of a phrase, not about particular words ----------
+   X X = the same word twice (醒醒) · X Y X Y · X 不 X (A-not-A) · … = a blank that repeats like X · * = any word · [verb] = a word whose note is tagged verb · other text = exactly that word */
+function structTokens(text, lang){
+  const t = Array.from(String(text == null ? '' : text).normalize('NFC')), out = [];
+  if (LG(lang).noSpace){
+    t.forEach((c, i)=>{ const n = nnChar(c, lang); if (n) out.push({ n, s:i, e:i + 1, c }); });
+    return out;
+  }
+  const sep = /[\s\-\u2010\u2011\u2013\u2014\u200c]/;
+  let i = 0;
+  while (i < t.length){
+    if (sep.test(t[i])){ i++; continue; }
+    let j = i; while (j < t.length && !sep.test(t[j])) j++;
+    const w = t.slice(i, j).join(''), n = noteNorm(w, lang);
+    if (n) out.push({ n, s:i, e:j, c:w });
+    i = j;
+  }
+  return out;
+}
+function parseStruct(raw, lang){
+  raw = String(raw == null ? '' : raw).trim(); if (!raw) return null;
+  const ns = LG(lang).noSpace, slots = [];
+  const special = x=>{
+    if (x === '…' || x === '...') return { k:'var', v:'…' };
+    if (x === '*') return { k:'any' };
+    if (/^[XYZ]$/.test(x)) return { k:'var', v:x };
+    const m = x.match(/^\[([^\]\s]+)\]$/); if (m) return { k:'tag', tag:m[1].toLowerCase() };
+    return null;
+  };
+  for (const part of raw.split(/\s+/)){
+    const sp = special(part);
+    if (sp){ slots.push(sp); continue; }
+    if (ns){
+      for (const m of part.matchAll(/\[[^\]\s]+\]|\.\.\.|…|\*|[XYZ]|\S/gu)){
+        const sp2 = special(m[0]);
+        if (sp2) slots.push(sp2); else { const n = nnChar(m[0], lang); if (n) slots.push({ k:'lit', n }); }
+      }
+    } else { const n = noteNorm(part, lang); if (n) slots.push({ k:'lit', n }); }
+  }
+  return slots.length ? slots : null;
+}
+const structKey = sl=>sl.map(x=>x.k === 'lit' ? x.n : x.k === 'var' ? x.v : x.k === 'any' ? '*' : '[' + x.tag + ']').join(' ');
+function structFind(slots, toks, lang){
+  const MAXS = LG(lang).noSpace ? 3 : 1, res = [], ix = NOTE_IDX[lang]; let steps = 0;
+  const join = (i, j)=>{ let o = ''; for (let k = i; k < j; k++) o += toks[k].n; return o; };
+  const tagOk = (w, tag)=>{ const a = ix && ix.word.get(w); return !!a && a.some(n=>(n.tags || []).some(t=>String(t).toLowerCase() === tag)); };
+  const rec = (si, ti, bind)=>{
+    if (++steps > 5000) return null;
+    if (si === slots.length) return ti;
+    const sl = slots[si];
+    if (sl.k === 'lit') return (ti < toks.length && toks[ti].n === sl.n) ? rec(si + 1, ti + 1, bind) : null;
+    for (let len = 1; len <= MAXS && ti + len <= toks.length; len++){
+      const w = join(ti, ti + len);
+      if (sl.k === 'var' && bind[sl.v] !== undefined && bind[sl.v] !== w) continue;
+      if (sl.k === 'tag' && !tagOk(w, sl.tag)) continue;
+      const nb = (sl.k === 'var' && bind[sl.v] === undefined) ? Object.assign({}, bind, { [sl.v]:w }) : bind;
+      const r = rec(si + 1, ti + len, nb); if (r !== null) return r;
+    }
+    return null;
+  };
+  for (let i = 0; i < toks.length && res.length < 6; i++){
+    steps = 0; const e = rec(0, i, {});
+    if (e !== null && e > i){ res.push({ i, e }); i = e - 1; }
+  }
+  return res.map(r=>({ s:toks[r.i].s, e:toks[r.e - 1].e }));
+}
+function structMatches(text, lang){        // [{s, e, text, note}] — offsets in characters of the NFC text
+  const list = STRUCT_IDX[lang]; if (!list || !list.length) return [];
+  text = String(text == null ? '' : text).normalize('NFC');
+  const key = lang + '|' + text, hit = STRUCT_CACHE.get(key); if (hit) return hit;
+  const arr = Array.from(text), toks = structTokens(text, lang), r = [];
+  if (toks.length >= 2) for (const e of list) for (const m of structFind(e.slots, toks, lang)) r.push({ s:m.s, e:m.e, text:arr.slice(m.s, m.e).join(''), note:e.note });
+  if (STRUCT_CACHE.size > 800) STRUCT_CACHE.clear();
+  STRUCT_CACHE.set(key, r); return r;
+}
+function findStructNote(lang, pat){
+  const sl = parseStruct(pat, lang); if (!sl) return null; const key = structKey(sl);
+  return NOTES.find(n=>{ if (n.type !== 'struct' || n.lang !== lang) return false; const x = parseStruct(n.text, n.lang); return x && structKey(x) === key; }) || null;
+}
+function hlRun(seg, lang, ix, sub, base, sr){
   const al = alignText(seg, lang);
   if (!al.norm) return esc(seg);
   const hits = matchRanges(al.norm, ix, sub).filter(h=>!h.note.auto);
-  if (!hits.length) return esc(seg);
+  const sx = sr && sr.length ? sr : null;
+  if (!hits.length && !sx) return esc(seg);
   const per = al.info.map(()=>null);
   al.info.forEach((ci, k)=>{
     const len = ci.n.length; if (!len) return;
     for (const h of hits) if (ci.s < h.e && ci.s + len > h.s) (per[k] || (per[k] = new Set())).add(h.note.id);
   });
+  if (sx) al.info.forEach((ci, k)=>{ if (!ci.n.length) return; const pos = (base || 0) + k; for (const r of sx) if (pos >= r.s && pos < r.e) (per[k] || (per[k] = new Set())).add(r.note.id); });
+  const sids = sx ? new Set(sx.map(r=>r.note.id)) : null;
   for (let k=1; k<per.length; k++) if (!per[k] && al.info[k].mark && per[k-1]) per[k] = per[k-1];   // diacritics follow their letter
   let out = '', buf = '', cur = null, curKey = '';
-  const flush = ()=>{ if (buf){ out += cur ? `<span class="nt" data-n="${[...cur].join(' ')}">${esc(buf)}</span>` : esc(buf); buf = ''; } };
+  const flush = ()=>{ if (buf){ out += cur ? `<span class="nt${sids && [...cur].every(id=>sids.has(id)) ? ' nts' : ''}" data-n="${[...cur].join(' ')}">${esc(buf)}</span>` : esc(buf); buf = ''; } };
   al.info.forEach((ci, k)=>{
     const key = per[k] ? [...per[k]].sort().join(' ') : '';
     if (key !== curKey){ flush(); curKey = key; cur = per[k] ? new Set(per[k]) : null; }
@@ -2399,10 +2516,14 @@ function hlRun(seg, lang, ix, sub){
 // foreign text as HTML; words/affixes that have a user note are wrapped in <span class="nt">
 function flHTML(text, lang){
   text = String(text == null ? '' : text);
-  const ix = notesHL() && NOTE_IDX[lang];
+  if (!notesHL()) return esc(text);
+  text = text.normalize('NFC');
+  const sr = structMatches(text, lang);
+  const ix = NOTE_IDX[lang] || (sr.length ? EMPTY_IX : null);
   if (!ix) return esc(text);
-  if (LG(lang).noSpace) return hlRun(text, lang, ix, true);
-  return text.split(/(\s+)/).map(p=>(!p || /^\s+$/.test(p)) ? esc(p) : hlRun(p, lang, ix, false)).join('');
+  if (LG(lang).noSpace) return hlRun(text, lang, ix, true, 0, sr);
+  let off = 0;
+  return text.split(/(\s+)/).map(p=>{ const o = off; off += Array.from(p).length; return (!p || /^\s+$/.test(p)) ? esc(p) : hlRun(p, lang, ix, false, o, sr); }).join('');
 }
 function noteMatches(text, lang){
   const ix = NOTE_IDX[lang]; if (!ix) return [];
@@ -2416,8 +2537,11 @@ function noteMatches(text, lang){
 }
 function notesStripHTML(text, lang){
   if (!notesList()) return '';
-  const ms = noteMatches(text, lang); if (!ms.length) return '';
-  return '<div class="ntstrip">' + ms.map(n=>`<div class="ntline"><b class="${flc(lang)}">${esc(notePat(n))}</b> ${n.note ? esc(n.note) : ''}${tagsHTML(n.tags)}</div>`).join('') + '</div>';
+  const ms = noteMatches(text, lang), sm = new Map();
+  structMatches(text, lang).forEach(m=>{ const e = sm.get(m.note.id) || { note:m.note, t:[] }; if (!e.t.includes(m.text)) e.t.push(m.text); sm.set(m.note.id, e); });
+  if (!ms.length && !sm.size) return '';
+  return '<div class="ntstrip">' + ms.map(n=>`<div class="ntline"><b class="${flc(lang)}">${esc(notePat(n))}</b> ${n.note ? esc(n.note) : ''}${tagsHTML(n.tags)}</div>`).join('') +
+    [...sm.values()].map(e=>`<div class="ntline"><b class="${flc(lang)}">${esc(e.t.join(' · '))}</b> <span class="ntpat">${esc(e.note.text)}</span>${e.note.note ? esc(e.note.note) : ''}${tagsHTML(e.note.tags)}</div>`).join('') + '</div>';
 }
 // tapping a highlight opens its note(s); chips/option buttons are left alone
 document.addEventListener('click', e=>{
@@ -2508,7 +2632,7 @@ function saveNotes(){
 }
 function findNote(lang, pat){
   const sp = patSpec(pat, lang, null); if (!sp) return null;
-  return NOTES.find(n=>{ if (n.lang !== lang) return false; const s = patSpec(n.text, n.lang, n.type); return s && s.key === sp.key; }) || null;
+  return NOTES.find(n=>{ if (n.lang !== lang || n.type === 'struct') return false; const s = patSpec(n.text, n.lang, n.type); return s && s.key === sp.key; }) || null;
 }
 function openNoteView(ids){
   const list = ids.map(id=>NOTES.find(n=>n.id === id)).filter(Boolean);
@@ -2518,7 +2642,7 @@ function openNoteView(ids){
     const box = sh.querySelector('#nvList');
     list.forEach(n=>{
       const d = document.createElement('div'); d.className = 'nview';
-      d.innerHTML = `<div class="nv-top"><b class="${flc(n.lang)}">${esc(notePat(n))}</b> ${tagsHTML(n.tags)}</div>
+      d.innerHTML = `<div class="nv-top"><b class="${flc(n.lang)}">${esc(notePat(n))}</b> ${n.type === 'struct' ? '<span class="ntag">construction</span>' : ''}${tagsHTML(n.tags)}</div>
         <div class="nv-note">${n.note ? esc(n.note) : '<i>(no text)</i>'}</div>
         <div class="nv-meta">${esc(LG(n.lang).name)}${n.gname ? ' · ' + esc(n.gname) : ''}${n.level ? ' · Level ' + n.level : ''}</div>
         <div class="nv-actions"><button class="btn btn-ghost btn-sm" data-e>Edit</button><button class="btn btn-redg btn-sm" data-d>Delete</button></div>`;
@@ -2540,14 +2664,22 @@ function openNoteEditor(o){
   openSheet((sh, close)=>{
     const codes = Object.keys(LANGS).sort((a,b)=>LANGS[a].name.localeCompare(LANGS[b].name));
     sh.innerHTML = `<h3>${ex ? 'Edit note' : 'Add note'}</h3>
-      ${sent ? `<div id="nSrcBox" hidden><div class="hint">Take the word from</div><select class="field" id="nSrc"></select></div>
+      ${ex ? '' : `<div class="tabs" id="nKindTabs"><button type="button" class="tabbtn" data-k="word">Word / affix</button><button type="button" class="tabbtn" data-k="struct">Construction (style)</button></div>`}
+      <div id="nWordSec">${sent ? `<div id="nSrcBox" hidden><div class="hint">Take the word from</div><select class="field" id="nSrc"></select></div>
         <div class="hint" style="margin-top:8px">Tap a word. Then tap the first and last letter of the part you want. Need two parts of the same word (like both ends of ي-غادر-ون)? Press “＋ another part”.</div>
         <div class="npick ${flc(lang)}" id="nWords"></div><div class="nletters ${flc(lang)}" id="nLetters" hidden></div>
-        <div id="nPartBtn" style="display:flex;gap:8px;margin:0 0 10px" hidden><button type="button" class="btn btn-ghost btn-sm" id="nMore">＋ another part</button><button type="button" class="btn btn-ghost btn-sm" id="nClr">Clear</button></div>` : ''}
+        <div id="nPartBtn" style="display:flex;gap:8px;margin:0 0 10px" hidden><button type="button" class="btn btn-ghost btn-sm" id="nMore">＋ another part</button><button type="button" class="btn btn-ghost btn-sm" id="nClr">Clear</button></div>` : ''}</div>
+      <div id="nStructSec" hidden>
+        <div class="hint">Describe the SHAPE of the phrase, not its words. Tap the first and last word of the part; repeated words become X automatically. Tap a chip below to change its role.</div>
+        ${sent ? '<div class="npick" id="sTok"></div><div class="sslots" id="sSlots"></div>' : ''}
+        <div class="sslots" id="sQuick"></div>
+      </div>
       ${!sent && !ex ? `<div class="hint">Language</div><select class="field" id="nLang"><option value="en"${lang==='en'?' selected':''}>English</option>${codes.map(c=>`<option value="${c}"${c===lang?' selected':''}>${esc(LANGS[c].name)} — ${esc(LANGS[c].native)}</option>`).join('')}</select>` : ''}
       <div class="hint" style="margin-top:10px">Pattern</div>
       <input class="field ${flc(lang)}" id="nPat" autocomplete="off" autocapitalize="off" spellcheck="false">
-      <div class="hint" style="margin-top:6px">Write … for the part of the word that changes: <b>ال…</b> starts with · <b>…ات</b> ends with · <b>…كتب…</b> contains · <b>ي…ون</b> both ends. No … = the whole word.</div>
+      <div class="sprev" id="sPrev" hidden></div>
+      <div class="hint" id="nHintS" style="margin-top:6px" hidden><b>X X</b> = the same word twice (醒醒) · <b>X Y X Y</b> · <b>X 不 X</b> · <b>*</b> = any word · <b>[verb]</b> = a word whose note is tagged verb · … works like X · any other text = exactly that word. Then write what the shape does (emphasis, softening…).</div>
+      <div class="hint" id="nHintW" style="margin-top:6px">Write … for the part of the word that changes: <b>ال…</b> starts with · <b>…ات</b> ends with · <b>…كتب…</b> contains · <b>ي…ون</b> both ends. No … = the whole word.</div>
       <div class="hint" style="margin-top:10px">Note</div>
       <textarea class="field" id="nTxt" rows="3" placeholder="What does it mean / how is it used?"></textarea>
       <div class="hint" style="margin-top:10px">Tags</div>
@@ -2558,13 +2690,14 @@ function openNoteEditor(o){
         ${ex ? '<button class="btn btn-redg" id="nDel">Delete</button>' : ''}
         <button class="btn btn-green" id="nOk">Save</button>
       </div>`;
+    let kind = ex && ex.type === 'struct' ? 'struct' : 'word';
     const q = s=>sh.querySelector(s);
     const patEl = q('#nPat'), txtEl = q('#nTxt');
     patEl.value = ex ? notePat(ex) : ''; txtEl.value = ex ? (ex.note || '') : '';
 
     const paintTags = ()=>{
       const box = q('#nChips'); box.innerHTML = '';
-      const names = [...new Set([...tagSet, ...allTags(), ...PRESET_TAGS])];
+      const names = [...new Set([...tagSet, ...(kind === 'struct' ? STYLE_TAGS : []), ...allTags(), ...PRESET_TAGS])];
       names.forEach(t=>{
         const b = document.createElement('button'); b.type = 'button'; b.className = 'tchip' + (tagSet.has(t) ? ' on' : ''); b.textContent = tagLabel(t);
         b.onclick = ()=>{ if (tagSet.has(t)) tagSet.delete(t); else tagSet.add(t); paintTags(); };
@@ -2578,21 +2711,22 @@ function openNoteEditor(o){
 
     const loadExisting = ()=>{      // a note for this exact pattern already exists: continue it instead of duplicating
       if (ex) return;
-      const f = findNote(lang, patEl.value); if (!f) return;
+      const f = kind === 'struct' ? findStructNote(lang, patEl.value) : findNote(lang, patEl.value); if (!f) return;
       txtEl.value = f.note || ''; tagSet.clear(); (f.tags || []).forEach(t=>tagSet.add(t)); paintTags();
       toast('Existing note loaded');
     };
-    if (q('#nLang')) q('#nLang').onchange = e=>{ lang = e.target.value; patEl.className = 'field ' + flc(lang); };
+    let sGetText = ()=>'', paintStruct = ()=>{}, preview = ()=>{};
+    if (q('#nLang')) q('#nLang').onchange = e=>{ lang = e.target.value; patEl.className = 'field ' + flc(lang); preview(); };
 
     if (sent){
       const wordsBox = q('#nWords'), letBox = q('#nLetters');
       let lets = [], ranges = [], cur = null;
       // texts of the card the word can come from: the sentence itself, the known side, the side translation
-      const sources = [{ lang:sent.lang, label:LG(sent.lang).name + ' (the sentence)', words:()=>wordsOfSentence(sent) }];
+      const sources = [{ lang:sent.lang, label:LG(sent.lang).name + ' (the sentence)', words:()=>wordsOfSentence(sent), text:()=>sent.target }];
       const kk = kn(sent);
-      sources.push({ lang:kk.lang, label:LG(kk.lang).name + ' (shown translation)', words:()=>wordsOfText(knText(sent), kk.lang) });
+      sources.push({ lang:kk.lang, label:LG(kk.lang).name + ' (shown translation)', words:()=>wordsOfText(knText(sent), kk.lang), text:()=>knText(sent) });
       const sdd = sideOf(sent);
-      if (sdd && !sdd.miss && sdd.lang !== kk.lang) sources.push({ lang:sdd.lang, label:LG(sdd.lang).name + ' (side translation)', words:()=>wordsOfText(sdd.sent ? displayFl(sdd.sent) : sdd.text, sdd.lang) });
+      if (sdd && !sdd.miss && sdd.lang !== kk.lang) sources.push({ lang:sdd.lang, label:LG(sdd.lang).name + ' (side translation)', words:()=>wordsOfText(sdd.sent ? displayFl(sdd.sent) : sdd.text, sdd.lang), text:()=>sdd.sent ? displayFl(sdd.sent) : sdd.text });
       let srcI = Math.max(0, sources.findIndex(x=>x.lang === lang));
       const curR = ()=>cur ? [Math.min(cur[0], cur[1]), Math.max(cur[0], cur[1])] : null;
       const allR = ()=>{ const r = ranges.slice(); const c = curR(); if (c) r.push(c); return r.sort((a, b)=>a[0] - b[0]); };
@@ -2651,11 +2785,86 @@ function openNoteEditor(o){
         q('#nSrcBox').hidden = false;
         srcSel.innerHTML = sources.map((x, i)=>`<option value="${i}">${esc(x.label)}</option>`).join('');
         srcSel.value = String(srcI);
-        srcSel.onchange = ()=>{ srcI = +srcSel.value; lang = sources[srcI].lang; patEl.className = 'field ' + flc(lang); patEl.value = ''; paintWords(); };
+        srcSel.onchange = ()=>{ srcI = +srcSel.value; lang = sources[srcI].lang; patEl.className = 'field ' + flc(lang); patEl.value = ''; paintWords(); if (kind === 'struct'){ paintStruct(); preview(); } };
       }
       lang = sources[srcI].lang; patEl.className = 'field ' + flc(lang);
+      sGetText = ()=>sources[srcI].text();
       paintWords();
     }
+
+    // ----- construction mode: pick a run of words, repeated ones become X, tap a chip to change its role
+    let sSel = null, sPick = false, sMode = {}, sToks = [], pvT = 0;
+    const modeOf = i=>{
+      if (sMode[i]) return sMode[i];
+      const n = sToks[i].n; let c = 0; for (let k = sSel[0]; k <= sSel[1]; k++) if (sToks[k].n === n) c++;
+      return c > 1 ? 'var' : 'lit';
+    };
+    const roles = ()=>{
+      const vars = {}, nm = ['X', 'Y', 'Z']; let vi = 0, out = [];
+      for (let i = sSel[0]; i <= sSel[1]; i++){
+        const t = sToks[i], m = modeOf(i);
+        if (m === 'any') out.push({ i, m, label:'*' });
+        else if (m === 'var'){ if (!(t.n in vars)) vars[t.n] = nm[Math.min(vi++, 2)]; out.push({ i, m, label:vars[t.n] }); }
+        else out.push({ i, m, label:t.c.replace(PUNCT, '') || t.c });
+      }
+      return out;
+    };
+    paintStruct = ()=>{
+      const tokBox = q('#sTok'), slotBox = q('#sSlots'), quick = q('#sQuick'); if (!quick) return;
+      if (tokBox){
+        sToks = structTokens(sGetText(), lang);
+        tokBox.className = 'npick ' + flc(lang); tokBox.innerHTML = ''; slotBox.innerHTML = '';
+        sToks.forEach((t, i)=>{
+          const b = document.createElement('button'); b.type = 'button'; b.className = 'chip flat ' + flc(lang);
+          b.textContent = t.c.replace(PUNCT, '') || t.c;
+          if (sSel && i >= sSel[0] && i <= sSel[1]) b.style.background = 'var(--hl)';
+          b.onclick = ()=>{
+            if (!sPick){ sSel = [i, i]; sPick = true; } else { sSel = [Math.min(sSel[0], i), Math.max(sSel[0], i)]; sPick = false; }
+            sMode = {}; patEl.value = roles().map(r=>r.label).join(' '); paintStruct(); preview(); loadExisting();
+          };
+          tokBox.appendChild(b);
+        });
+        if (sSel && sSel[1] < sToks.length) roles().forEach(r=>{
+          const b = document.createElement('button'); b.type = 'button'; b.className = 'tchip on ' + flc(lang); b.textContent = r.label;
+          b.title = 'Tap to change: the word itself → any word (*) → repeating word (X)';
+          b.onclick = ()=>{ const o = ['lit', 'any', 'var']; sMode[r.i] = o[(o.indexOf(r.m) + 1) % 3]; patEl.value = roles().map(x=>x.label).join(' '); paintStruct(); preview(); loadExisting(); };
+          slotBox.appendChild(b);
+        });
+      }
+      quick.innerHTML = '';
+      ['X X', 'X Y X Y', 'X * X', '*', '[verb]'].forEach(t=>{
+        const b = document.createElement('button'); b.type = 'button'; b.className = 'tchip'; b.textContent = t;
+        b.onclick = ()=>{ patEl.value = (patEl.value.trim() + ' ' + t).trim(); preview(); };
+        quick.appendChild(b);
+      });
+    };
+    preview = ()=>{
+      clearTimeout(pvT);
+      pvT = setTimeout(()=>{
+        const box = q('#sPrev'); if (!box) return;
+        const sl = kind === 'struct' ? parseStruct(patEl.value, lang) : null;
+        if (!sl){ box.textContent = ''; box.className = 'sprev'; return; }
+        const bits = []; let ok = false;
+        if (sent){
+          const txt = sGetText().normalize('NFC'), ms = structFind(sl, structTokens(txt, lang), lang), arr = Array.from(txt);
+          ok = ms.length > 0; bits.push(ok ? '✓ here: ' + ms.map(m=>arr.slice(m.s, m.e).join('')).join(' · ') : '✗ not in this sentence');
+        }
+        let c = 0; for (const x of langSentences(lang)) if (structFind(sl, structTokens(x.target, lang), lang).length) c++;
+        bits.push(c + ' in the library');
+        box.textContent = bits.join('  ·  '); box.className = 'sprev ' + (sent ? (ok ? 'ok' : 'no') : '');
+      }, 160);
+    };
+    const applyKind = ()=>{
+      const st = kind === 'struct';
+      q('#nWordSec').hidden = st; q('#nStructSec').hidden = !st; q('#nHintS').hidden = !st; q('#nHintW').hidden = st; q('#sPrev').hidden = !st;
+      sh.querySelectorAll('#nKindTabs [data-k]').forEach(b=>b.classList.toggle('on', b.getAttribute('data-k') === kind));
+      patEl.placeholder = st ? 'X X' : '';
+      paintTags(); if (st){ paintStruct(); preview(); }
+    };
+    sh.querySelectorAll('#nKindTabs [data-k]').forEach(b=>{ b.onclick = ()=>{ kind = b.getAttribute('data-k'); applyKind(); }; });
+    patEl.oninput = ()=>{ if (kind === 'struct') preview(); };
+    patEl.onchange = ()=>{ if (kind === 'struct') loadExisting(); };
+    applyKind();
 
     q('#nC').onclick = close;
     if (q('#nDel')) q('#nDel').onclick = ()=>{
@@ -2663,6 +2872,17 @@ function openNoteEditor(o){
       NOTES = NOTES.filter(x=>x.id !== ex.id); saveNotes(); close(); render(true); toast('Note deleted');
     };
     q('#nOk').onclick = ()=>{
+      if (kind === 'struct'){
+        const pat = patEl.value.trim(), sl = parseStruct(pat, lang);
+        if (!sl || sl.length < 2){ toast('A construction needs at least 2 parts, like X X'); return; }
+        if (sl.every(x=>x.k === 'any')){ toast('Add a repeating word (X) or a fixed word'); return; }
+        let n = ex || findStructNote(lang, pat);
+        if (n){ n.text = pat; n.type = 'struct'; n.note = txtEl.value.trim(); n.tags = [...tagSet]; }
+        else { n = Object.assign({ id:nid(), lang, type:'struct', text:pat, note:txtEl.value.trim(), tags:[...tagSet], created:Date.now() }, sent ? noteCtx(sent) : {}); NOTES.push(n); }
+        saveNotes(); close();
+        if (state.screen === 'notes') paintNotes && paintNotes();
+        render(true); toast('Construction saved ✓'); return;
+      }
       const pat = patEl.value.trim(), sp = patSpec(pat, lang, null);
       if (!sp){ toast('Enter a pattern first'); return; }
       let n = ex || findNote(lang, pat);
@@ -2693,6 +2913,7 @@ function renderNotes(){
       <div class="nctl">
         <label>Group by<select class="field" id="fBy">${[['lang','Language'],['group','Sentence group'],['level','Level'],['tag','Tag']].map(x=>opt(x[0], x[1], nf.by)).join('')}</select></label>
         <label>Language<select class="field" id="fLang">${opt('', 'All', nf.lang)}${langs.map(c=>opt(c, LG(c).name, nf.lang)).join('')}</select></label>
+        <label>Kind<select class="field" id="fKind">${opt('', 'All', nf.kind)}${opt('word', 'Words & affixes', nf.kind)}${opt('struct', 'Constructions', nf.kind)}</select></label>
         <label>Tag<select class="field" id="fTag">${opt('', 'All', nf.tag)}${tags.map(t=>opt(t, t, nf.tag)).join('')}</select></label>
         <label>Group<select class="field" id="fGroup">${opt('', 'All', nf.group)}${groups.map(g=>opt(g, g, nf.group)).join('')}</select></label>
         <label>Level<select class="field" id="fLevel">${opt('', 'All', nf.level)}${levels.map(l=>opt(l, 'Level ' + l, nf.level)).join('')}</select></label>
@@ -2702,7 +2923,7 @@ function renderNotes(){
   const q = s=>f.querySelector(s);
   paintNotes = ()=>{
     const list = NOTES.filter(n=>
-      (nf.auto || !n.auto || nf.tag === 'known') && (!nf.lang || n.lang === nf.lang) && (!nf.tag || (n.tags || []).includes(nf.tag)) &&
+      (nf.auto || !n.auto || nf.tag === 'known') && (!nf.kind || (nf.kind === 'struct') === (n.type === 'struct')) && (!nf.lang || n.lang === nf.lang) && (!nf.tag || (n.tags || []).includes(nf.tag)) &&
       (!nf.group || n.gname === nf.group) && (!nf.level || String(n.level) === String(nf.level)) &&
       (!nf.q || (notePat(n) + ' ' + (n.note || '') + ' ' + (n.tags || []).join(' ')).toLowerCase().includes(nf.q.toLowerCase())));
     q('#nCount').textContent = list.length + (list.length === NOTES.length ? '' : ' / ' + NOTES.length);
@@ -2720,7 +2941,7 @@ function renderNotes(){
       const h = document.createElement('div'); h.className = 'sectionhead'; h.textContent = k + ' · ' + sec.get(k).length; box.appendChild(h);
       sec.get(k).sort((a,b)=>(a.lang.localeCompare(b.lang)) || ((a.level || 99) - (b.level || 99)) || a.text.localeCompare(b.text)).forEach(n=>{
         const r = document.createElement('div'); r.className = 'nrow';
-        r.innerHTML = `<div class="npat ${flc(n.lang)}">${esc(notePat(n))}</div>
+        r.innerHTML = `<div class="npat ${flc(n.lang)}">${n.type === 'struct' ? '🎭 ' : ''}${esc(notePat(n))}</div>
           <div class="body"><div class="nmeta">${esc(LG(n.lang).name)}${n.gname ? ' · ' + esc(n.gname) : ''}${n.level ? ' · L' + n.level : ''}</div>
           <div class="ntext">${n.note ? esc(n.note) : '<i>(no text)</i>'}</div>${(n.tags || []).length ? `<div>${tagsHTML(n.tags)}</div>` : ''}</div>`;
         r.onclick = ()=>openNoteEditor({ note:n });
@@ -2730,7 +2951,7 @@ function renderNotes(){
   };
   paintNotes();
   const bind = (id, key)=>{ q(id).onchange = e=>{ nf[key] = e.target.value; paintNotes(); }; };
-  bind('#fBy', 'by'); bind('#fLang', 'lang'); bind('#fTag', 'tag'); bind('#fGroup', 'group'); bind('#fLevel', 'level');
+  bind('#fBy', 'by'); bind('#fKind', 'kind'); bind('#fLang', 'lang'); bind('#fTag', 'tag'); bind('#fGroup', 'group'); bind('#fLevel', 'level');
   q('#fQ').oninput = e=>{ nf.q = e.target.value; paintNotes(); };
   q('#backBtn').onclick = ()=>{ state.screen = 'home'; render(); };
   q('#nNew').onclick = ()=>openNoteEditor({ lang:nf.lang || ACTIVE[0] });
@@ -2775,6 +2996,15 @@ function applyTheme(id){
 }
 
 /* ---------- settings sections ---------- */
+function funSettingsEl(){
+  const d = document.createElement('div');
+  d.innerHTML = '<div class="sectionhead">Practice style</div>';
+  const r = document.createElement('div'); r.className = 'rowcb';
+  r.innerHTML = `<span class="cb${FUN_ON ? ' on' : ''}">✓</span><div class="body"><div class="en">Duolingo style</div><div class="hint" style="margin:2px 0 0">Celebrations while you practise: “+XP” pop, combo flame, confetti when a chunk or level is done. Off = only plain numbers, no decoration.</div></div>`;
+  r.onclick = ()=>{ FUN_ON = !FUN_ON; saveLS(LS.fun, FUN_ON); render(true); };
+  d.appendChild(r);
+  return d;
+}
 function appearanceEl(){
   const d = document.createElement('div');
   d.innerHTML = '<div class="sectionhead" style="margin-top:8px">Appearance</div><div class="themegrid"></div>';
@@ -4173,7 +4403,9 @@ function renderLesson(){
   top.innerHTML = `
     <button class="iconbtn" id="quitBtn" title="Finish">✕</button>
     <div class="progress"><i style="width:${pct}%"></i></div>
-    <span class="pill">⭐ ${state.xp}</span>`;
+    ${FUN_ON && (state.combo || 0) >= 3 ? `<span class="pill flame">🔥 ${state.combo}</span>` : ''}
+    <span class="pill${FUN_ON && state.funBump ? ' bump' : ''}">⭐ ${state.xp}</span>`;
+  state.funBump = false;
   f.appendChild(top);
 
   const wrap = document.createElement('div');
@@ -4510,6 +4742,7 @@ function rate(userSaysCorrect){
     const bonus = Math.min(5, state.combo);
     state.xp += 10 + bonus; STATS.xp = (STATS.xp||0) + 10 + bonus;
     state.correctSession++;
+    if (FUN_ON){ state.funBump = true; if ([5, 10, 20, 30, 50].includes(state.combo)) funPop('🔥 ' + state.combo + ' in a row', true); else funPop('+' + (10 + bonus) + ' XP'); }
   } else {
     state.combo = 0;
     const at = Math.min(s.queue.length, Math.max(3, gapN() + 1));
@@ -4922,7 +5155,7 @@ function renderSettings(){
     <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-blue btn-sm" id="expData">⬇ Export my data</button><button class="btn btn-ghost btn-sm" id="impData">⬆ Import data</button></div>`;
   dt.querySelector('#expData').onclick = exportData;
   dt.querySelector('#impData').onclick = ()=>document.getElementById('dataInput').click();
-  wrap.insertBefore(appearanceEl(), wrap.firstChild); wrap.insertBefore(customCssEl(), wrap.children[1]); 
+  wrap.insertBefore(appearanceEl(), wrap.firstChild); wrap.insertBefore(customCssEl(), wrap.children[1]); wrap.insertBefore(funSettingsEl(), wrap.children[2]); 
   wrap.appendChild(gradingSettingsEl()); wrap.appendChild(repeatSettingsEl()); wrap.appendChild(resumeSettingsEl()); wrap.appendChild(notesSettingsEl()); wrap.appendChild(uiSettingsEl()); wrap.appendChild(betaSettingsEl()); wrap.appendChild(introSettingsEl()); wrap.appendChild(debugSettingsEl());
   wrap.appendChild(dbg); wrap.appendChild(dt);
   f.querySelector('#backBtn').onclick = ()=>{ state.screen = 'home'; render(); };
