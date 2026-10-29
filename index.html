@@ -444,6 +444,7 @@ html[data-theme="zen"] .selbar{border-top:0;box-shadow:0 -10px 30px rgba(80,70,4
 .undobtn{font-size:22px;font-weight:800;margin-left:6px}
 .undobtn:disabled{opacity:.3;cursor:default}
 .themewrap{position:relative;display:flex}.themewrap .themecard{flex:1}
+.tedit{inset-inline-end:26px}
 .tdel{position:absolute;top:4px;inset-inline-end:4px;border:0;background:transparent;color:var(--ink3);font-size:14px;font-weight:800;cursor:pointer;padding:4px 6px}
 .tabs{display:flex;gap:6px;margin:12px 0}
 .tabbtn{flex:1;border:2px solid var(--line);background:var(--bg);color:var(--ink2);border-radius:var(--r);padding:9px 6px;font:inherit;font-weight:800;font-size:13px;cursor:pointer}
@@ -2747,7 +2748,12 @@ const THEMES = [
 ];
 let CUSTOM_CSS = loadLS(LS.css, '');
 Object.assign(LS, { cssThemes:'arTrainer:cssThemes' });
-let CSS_THEMES = loadLS(LS.cssThemes, []);          // saved looks: { id, name, base (built-in theme), css }
+let CSS_THEMES = loadLS(LS.cssThemes, []);
+Object.assign(LS, { cssThemeOn:'arTrainer:cssThemeOn' });
+let CSS_ON = loadLS(LS.cssThemeOn, '');               // id of the saved theme in use ('' = none); its CSS is a layer apart from the text field
+(()=>{ const m = CUSTOM_CSS && CSS_THEMES.find(t=>t.css === CUSTOM_CSS);       // older versions put a saved theme into the text field
+  if (m){ CSS_ON = m.id; saveLS(LS.cssThemeOn, CSS_ON); CUSTOM_CSS = ''; saveLS(LS.css, ''); } })();
+function setCssOn(id){ CSS_ON = id || ''; saveLS(LS.cssThemeOn, CSS_ON); applyCustomCss(); }          // saved looks: { id, name, base (built-in theme), css }
 function saveCssThemes(){ saveLS(LS.cssThemes, CSS_THEMES); }
 function cssSwatch(t){                                // preview colours: the theme's own CSS variables, else its base theme
   const b = (THEMES.find(x=>x.id === t.base) || THEMES[0]).sw.slice();
@@ -2757,7 +2763,8 @@ function cssSwatch(t){                                // preview colours: the th
 function applyCustomCss(){
   let el = document.getElementById('userCss');
   if (!el){ el = document.createElement('style'); el.id = 'userCss'; document.head.appendChild(el); }
-  el.textContent = CUSTOM_CSS || '';
+  const t = CSS_ON && CSS_THEMES.find(x=>x.id === CSS_ON);
+  el.textContent = (t ? t.css + '\n' : '') + (CUSTOM_CSS || '');
 }
 function applyTheme(id){
   if (!THEMES.some(t=>t.id === id)) id = 'classic';
@@ -2775,17 +2782,23 @@ function appearanceEl(){
   THEMES.forEach(t=>{
     const b = document.createElement('button'); b.type = 'button'; b.className = 'themecard' + (t.id === THEME ? ' on' : '');
     b.innerHTML = `<span class="tsw">${t.sw.map(c=>`<i style="background:${c}"></i>`).join('')}</span><b>${esc(t.name)}</b><small>${esc(t.desc)}</small>`;
-    b.onclick = ()=>{ applyTheme(t.id); saveLS(LS.theme, t.id); g.querySelectorAll('.themecard').forEach(x=>x.classList.remove('on')); b.classList.add('on'); };
+    b.onclick = ()=>{ applyTheme(t.id); saveLS(LS.theme, t.id); setCssOn(''); g.querySelectorAll('.themecard').forEach(x=>x.classList.remove('on')); b.classList.add('on'); };
     g.appendChild(b);
   });
   CSS_THEMES.forEach(t=>{
     const w = document.createElement('div'); w.className = 'themewrap';
-    const b = document.createElement('button'); b.type = 'button'; b.className = 'themecard' + (t.base === THEME && t.css === CUSTOM_CSS ? ' on' : '');
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'themecard' + (t.id === CSS_ON ? ' on' : '');
     b.innerHTML = `<span class="tsw">${cssSwatch(t).map(c=>`<i style="background:${esc(c)}"></i>`).join('')}</span><b>${esc(t.name)}</b><small>Saved · ${esc((THEMES.find(x=>x.id === t.base) || THEMES[0]).name)} + CSS</small>`;
-    b.onclick = ()=>{ applyTheme(t.base); saveLS(LS.theme, t.base); CUSTOM_CSS = t.css; saveLS(LS.css, CUSTOM_CSS); applyCustomCss(); render(true); };
+    b.onclick = ()=>{ applyTheme(t.base); saveLS(LS.theme, t.base); setCssOn(t.id); render(true); };
+    const ed = document.createElement('button'); ed.type = 'button'; ed.className = 'tdel tedit'; ed.textContent = '✎'; ed.title = 'Rename this saved theme';
+    ed.onclick = e=>{
+      e.stopPropagation(); const nm = (prompt('Theme name', t.name) || '').trim(); if (!nm || nm === t.name) return;
+      if (CSS_THEMES.some(y=>y.id !== t.id && y.name.toLowerCase() === nm.toLowerCase())){ toast('That name is already used'); return; }
+      t.name = nm; saveCssThemes(); render(true);
+    };
     const x = document.createElement('button'); x.type = 'button'; x.className = 'tdel'; x.textContent = '✕'; x.title = 'Delete this saved theme';
-    x.onclick = e=>{ e.stopPropagation(); if (!confirm('Delete the saved theme “' + t.name + '”?')) return; CSS_THEMES = CSS_THEMES.filter(y=>y.id !== t.id); saveCssThemes(); render(true); };
-    w.appendChild(b); w.appendChild(x); g.appendChild(w);
+    x.onclick = e=>{ e.stopPropagation(); if (!confirm('Delete the saved theme “' + t.name + '”?')) return; CSS_THEMES = CSS_THEMES.filter(y=>y.id !== t.id); saveCssThemes(); if (CSS_ON === t.id) CSS_ON = ''; saveLS(LS.cssThemeOn, CSS_ON); applyCustomCss(); render(true); };
+    w.appendChild(b); w.appendChild(ed); w.appendChild(x); g.appendChild(w);
   });
   return d;
 }
@@ -2859,7 +2872,7 @@ function customCssEl(){
     if (i >= 0 && !confirm('Replace the saved theme “' + name + '”?')) return;
     const t = { id:i >= 0 ? CSS_THEMES[i].id : 'u' + Date.now().toString(36), name, base:THEME, css };
     if (i >= 0) CSS_THEMES[i] = t; else CSS_THEMES.push(t);
-    saveCssThemes(); CUSTOM_CSS = css; saveLS(LS.css, css); applyCustomCss(); render(true); toast('Theme saved');
+    saveCssThemes(); CUSTOM_CSS = ''; ta.value = ''; saveLS(LS.css, ''); setCssOn(t.id); render(true); toast('Theme saved — it now lives in the theme list');
   };
   d.querySelector('#cssBrief').onclick = ()=>copyText(CSS_BRIEF()).then(ok=>toast(ok ? 'Brief copied — paste it into an AI chat' : 'Copy failed'));
   d.querySelector('#cssCopy').onclick = ()=>copyText(ta.value).then(ok=>toast(ok ? 'CSS copied' : 'Copy failed'));
@@ -5520,7 +5533,7 @@ function finishOnboarding(){
   GRADE_MODE = ob.grade; saveLS(LS.grade, GRADE_MODE);
   ANKI_ON = ob.anki; saveLS(LS.anki, ANKI_ON);
   if (ob.anki) BETA.anki = true; if (ob.kw) BETA.known = true; saveLS(LS.beta, BETA);
-  applyTheme(ob.theme); saveLS(LS.theme, ob.theme);
+  applyTheme(ob.theme); saveLS(LS.theme, ob.theme); setCssOn('');
   ONB_DONE = true; saveLS(LS.onb, true);
   state.ob = null;
   if (missing.length){ state.store.q = LG(missing[0]).name; state.al.tab = 'store'; state.screen = 'addlang'; render(); if (state.store.status !== 'ok') loadCatalog(); toast('Get ' + missing.map(c=>LG(c).name).join(', ') + ' from “Ready-made”'); }
