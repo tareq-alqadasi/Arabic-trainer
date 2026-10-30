@@ -2,9 +2,8 @@
 واضف نظام مراجعة مثل Anki خاصة قوائم اعدادات deck options
 واضف toggle في الاعدادات لهذا النظام في حال احب المستخدم عدم استخدامه واستخدام الوضع الحالي كما هو
 sentence loop debugger
-+ undo/redo
 + beta
-+ add some interface languages
++ تعديلات الUI المقررة وما لحق بها
 + +fix and finish 2.5
   
 
