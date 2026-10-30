@@ -510,6 +510,51 @@ html[dir=rtl] .deck-meta{text-align:start}
 .langopt{text-align:start;border:2px solid var(--line);background:var(--card,#fff);border-radius:12px;padding:9px 11px;font:inherit;font-weight:700;cursor:pointer;color:var(--ink)}
 .langopt.on{border-color:var(--accent,var(--blue));background:var(--blue-l);color:var(--blue-d)}
 .langopt small{display:block;color:var(--ink3);font-weight:600;font-size:12px}
+
+/* ---- introduction: visual guide + spotlight tour ---- */
+.obstep{padding-bottom:170px}
+.langgrid{max-height:40vh;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.obtiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:6px 0 14px}
+.obtile{border:2px solid var(--line);border-radius:var(--r);padding:16px 6px;text-align:center;font-weight:800;font-size:13px;line-height:1.3}
+.obtile .big{display:block;font-size:38px;margin-bottom:6px}
+.obphone{border:2px solid var(--line);border-radius:22px;padding:12px;margin:6px 0 14px;background:var(--bg2)}
+.obbar{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.obbar .progress{height:12px}
+.obtools{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:8px 0}
+.obphone .flagbtn{position:relative;pointer-events:none}
+.obn{position:absolute;top:-7px;right:-7px;width:20px;height:20px;border-radius:50%;background:var(--green);color:#fff;font:800 12px/20px system-ui,sans-serif;text-align:center;font-style:normal;z-index:2}
+.obphone .pill,.obphone .obx,.obphone .progress{position:relative}
+.obphone .obbar .obn{top:-10px}
+.oblegend{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px;margin-bottom:10px}
+.oblegend div{display:flex;align-items:center;gap:8px;font-weight:700;font-size:13px}
+.oblegend .obn{position:static;flex-shrink:0}
+.obchips{display:flex;gap:6px;justify-content:center;margin-top:10px}
+.obchips span{border:2px solid var(--line);border-bottom-width:4px;border-radius:12px;padding:6px 10px;font-weight:800;background:#fff;color:var(--ink)}
+.obflow{display:flex;align-items:center;justify-content:center;gap:6px;margin:12px 0}
+.obflow .st{flex:1;border:2px solid var(--line);border-radius:var(--r);padding:12px 4px;text-align:center;font-weight:800;font-size:12px;line-height:1.3}
+.obflow .st b{display:block;font-size:26px}
+.obflow .ar{font-size:20px;color:var(--ink3);font-weight:800}
+.obmock{pointer-events:none;position:relative;margin:12px 0}
+.obmock .deck{cursor:default}
+.obmock .obtopm{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.obmock .obn{top:-8px;right:-8px}
+.obmock .obsetm{display:inline-block;position:relative}
+.obhint{display:flex;align-items:center;gap:10px;background:var(--green-l);color:var(--green-t);border-radius:var(--r);padding:12px 14px;font-weight:800;font-size:14px;margin-bottom:12px}
+.obhint b{font-size:22px}
+.iconbtn.obpulse{background:var(--green-l);color:var(--green-t);border-radius:10px;padding:4px 10px;animation:obpulse 1.2s ease-in-out infinite}
+@keyframes obpulse{50%{transform:scale(1.18)}}
+#tourLayer{position:fixed;inset:0;z-index:300}
+#tourLayer .tourshade{position:absolute;inset:0}
+#tourLayer .tourring{position:absolute;border-radius:18px;box-shadow:0 0 0 9999px rgba(10,24,10,.74);outline:6px solid rgba(255,255,255,.45);transition:all .25s ease;pointer-events:none}
+#tourLayer .tourtip{position:absolute;left:50%;transform:translateX(-50%);width:calc(100% - 32px);max-width:420px;background:var(--green,#58cc02);color:#fff;border-radius:22px;padding:16px 18px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+#tourLayer .tt{display:block;font-size:20px;font-weight:800;margin-bottom:4px}
+#tourLayer .td{margin:0 0 12px;font-size:15px;line-height:1.4;font-weight:600}
+#tourLayer .tbtns{display:flex;align-items:center;gap:10px}
+#tourLayer .tdots{flex:1;display:flex;gap:5px;justify-content:center}
+#tourLayer .tdots i{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.4)}
+#tourLayer .tdots i.on{background:#fff}
+#tourLayer .linkbtn{color:#fff}
+#tourLayer .btn{background:#fff;color:var(--green-t,#2b6b00);box-shadow:0 3px 0 rgba(0,0,0,.2)}
 </style>
 </head>
 <body>
@@ -4153,6 +4198,8 @@ function sessMeta(){
   return 'Round ' + s.round + ' · ' + state.session + ' done';
 }
 function renderHome(){
+  state.obBack = false;
+  setTimeout(maybeTour, 400);
   const f = document.createElement('div');
   const groups = activeGroups();
   const items = activeItems();
@@ -5155,7 +5202,7 @@ function renderSettings(){
     <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-blue btn-sm" id="expData">⬇ Export my data</button><button class="btn btn-ghost btn-sm" id="impData">⬆ Import data</button></div>`;
   dt.querySelector('#expData').onclick = exportData;
   dt.querySelector('#impData').onclick = ()=>document.getElementById('dataInput').click();
-  wrap.insertBefore(appearanceEl(), wrap.firstChild); wrap.insertBefore(customCssEl(), wrap.children[1]); wrap.insertBefore(funSettingsEl(), wrap.children[2]); 
+  wrap.insertBefore(appearanceEl(), wrap.firstChild); wrap.insertBefore(customCssEl(), wrap.children[1]); wrap.insertBefore(funSettingsEl(), wrap.children[2]); wrap.insertBefore(introAgainEl(), wrap.children[3]); 
   wrap.appendChild(gradingSettingsEl()); wrap.appendChild(repeatSettingsEl()); wrap.appendChild(resumeSettingsEl()); wrap.appendChild(notesSettingsEl()); wrap.appendChild(uiSettingsEl()); wrap.appendChild(betaSettingsEl()); wrap.appendChild(introSettingsEl()); wrap.appendChild(debugSettingsEl());
   wrap.appendChild(dbg); wrap.appendChild(dt);
   f.querySelector('#backBtn').onclick = ()=>{ state.screen = 'home'; render(); };
@@ -5183,10 +5230,11 @@ function renderAddLang(){
   const codes = Object.keys(LANGS).sort((a,b)=>LANGS[a].name.localeCompare(LANGS[b].name));
   f.innerHTML = `
     <div class="topbar">
-      <button class="iconbtn" id="backBtn">←</button>
+      <button class="iconbtn${state.obBack ? ' obpulse' : ''}" id="backBtn">←</button>
       <div style="font-weight:800;font-size:19px;flex:1">Add a language</div>
     </div>
     <div class="wrap statwrap">
+      ${state.obBack ? '<div class="obhint"><b>⬇</b><span>Tap <u>Get</u> on your language, then press <b style="font-size:inherit">←</b> to go back to the main page.</span></div>' : ''}
       <div class="alTabs">
         <button class="alTab${tab==='store'?' on':''}" data-t="store">📚 Ready-made</button>
         <button class="alTab${tab==='file'?' on':''}" data-t="file">📂 My file</button>
@@ -5317,12 +5365,13 @@ document.getElementById('fileInput').addEventListener('change', async e=>{
 /* ====================================================================
    V2.5 — interface language · introduction · known-words test · glossary
    ==================================================================== */
-Object.assign(LS, { ui:'arTrainer:ui', uiPacks:'arTrainer:uiPacks', onb:'arTrainer:onb', gloss:'arTrainer:gloss', tagLang:'arTrainer:tagLang' });
+Object.assign(LS, { ui:'arTrainer:ui', uiPacks:'arTrainer:uiPacks', onb:'arTrainer:onb', onb2:'arTrainer:onb2', tour:'arTrainer:tour', gloss:'arTrainer:gloss', tagLang:'arTrainer:tagLang' });
 let UI_LANG = loadLS(LS.ui, 'en');
 let UI_PACKS = loadLS(LS.uiPacks, {});           // packs the user imported: { code: { name, strings:{ English text: translation } } }
 let ONB_DONE = loadLS(LS.onb, false);
+let ONB2_DONE = loadLS(LS.onb2, false);          // v2 introduction: everyone sees it once, then it is done
 Object.assign(LS, { beta:'arTrainer:beta' });
-let BETA = Object.assign({ gloss:false, intro:false, anki:!!ANKI_ON, known:false }, loadLS(LS.beta, {}));
+let BETA = Object.assign({ gloss:false, anki:!!ANKI_ON, known:false }, loadLS(LS.beta, {}));
 if (!BETA.anki && ANKI_ON){ ANKI_ON = false; saveLS(LS.anki, false); }   // Anki review exists only while its beta switch is on   // advanced / beta features, off by default
 let TAG_LANG = loadLS(LS.tagLang, '');           // language the tags are displayed in ('' = as written)
 /* ---------- interface translation: exact-text lookup applied to the DOM (numbers become {n}) ---------- */
@@ -5475,6 +5524,12 @@ function uiSettingsEl(){
   d.querySelector('#uiGet').onclick = openUiStore;
   return d;
 }
+function introAgainEl(){
+  const d = document.createElement('div');
+  d.innerHTML = `<div class="sectionhead">Introduction</div><button class="btn btn-ghost btn-sm" id="onbAgain">▶ Show the introduction</button>`;
+  d.querySelector('#onbAgain').onclick = ()=>{ state.ob = newOb(); state.screen = 'onboard'; render(); };
+  return d;
+}
 function betaSettingsEl(){
   const d = document.createElement('div');
   d.innerHTML = `<div class="sectionhead">Advanced (beta)</div>
@@ -5482,8 +5537,7 @@ function betaSettingsEl(){
   const rows = d.querySelector('#bRows');
   [['anki', 'Review system (Anki style)', 'Finished sentences come back on a schedule (Again / Good) with daily limits per deck.'],
    ['known', 'Known-words test', 'Tell the app which words you already know, so it does not explain them again.'],
-   ['gloss', 'Glossary', 'A table of ideas × languages (tags in your language, masculine/feminine forms, links between forms).'],
-   ['intro', 'Introduction', 'The first-start questions for new users, and a button to run them again.']].forEach(([k, t, s])=>{
+   ['gloss', 'Glossary', 'A table of ideas × languages (tags in your language, masculine/feminine forms, links between forms).']].forEach(([k, t, s])=>{
     const r = document.createElement('div'); r.className = 'rowcb';
     r.innerHTML = `<span class="cb${BETA[k] ? ' on' : ''}">✓</span><div class="body"><div class="en">${t}</div><div class="hint" style="margin:2px 0 0">${s}</div></div>`;
     r.onclick = ()=>{
@@ -5499,7 +5553,6 @@ function betaSettingsEl(){
   if (BETA.gloss){
     more.insertAdjacentHTML('beforeend', `<div class="hint" style="margin-top:10px">Show note tags (noun, verb…) in this language. Fill the translations in the Glossary table.</div><select class="field" id="tgSel"></select><div style="margin-top:8px"><button class="btn btn-ghost btn-sm" id="glOpen">📖 Open the glossary</button></div>`);
   }
-  if (BETA.intro) more.insertAdjacentHTML('beforeend', `<div style="margin-top:10px"><button class="btn btn-ghost btn-sm" id="onbAgain">▶ Show the introduction</button></div>`);
   const kw = more.querySelector('#kwOpen'); if (kw) kw.onclick = ()=>{ state.kwBack = 'settings'; state.screen = 'known'; render(); };
   const tg = more.querySelector('#tgSel');
   if (tg){
@@ -5507,7 +5560,6 @@ function betaSettingsEl(){
     tg.value = TAG_LANG; tg.onchange = ()=>{ TAG_LANG = tg.value; saveLS(LS.tagLang, TAG_LANG); GL_IDX = null; toast('Tags updated'); };
     more.querySelector('#glOpen').onclick = ()=>{ state.screen = 'gloss'; render(); };
   }
-  const oa = more.querySelector('#onbAgain'); if (oa) oa.onclick = ()=>{ state.ob = newOb(); state.screen = 'onboard'; render(); };
   return d;
 }
 
@@ -5732,7 +5784,7 @@ function renderKnown(){
 
 /* ---------- first-start introduction ---------- */
 function newOb(){ return { step:0, native:UI_LANG !== 'en' ? UI_LANG : (KNOWN !== 'en' ? KNOWN : 'en'), learn:new Set(ACTIVE), q:'', grade:GRADE_MODE, anki:!!ANKI_ON, theme:THEME }; }
-const OB_STEPS = 5;
+const OB_STEPS = 7;
 function obLangGrid(ob, multi, box){
   const codes = Object.keys(LANGS).sort((a, b)=>LANGS[a].name.localeCompare(LANGS[b].name));
   const all = (multi ? [] : ['en']).concat(codes);
@@ -5767,9 +5819,9 @@ function finishOnboarding(){
   ANKI_ON = ob.anki; saveLS(LS.anki, ANKI_ON);
   if (ob.anki) BETA.anki = true; if (ob.kw) BETA.known = true; saveLS(LS.beta, BETA);
   applyTheme(ob.theme); saveLS(LS.theme, ob.theme); setCssOn('');
-  ONB_DONE = true; saveLS(LS.onb, true);
+  ONB_DONE = true; saveLS(LS.onb, true); ONB2_DONE = true; saveLS(LS.onb2, true); saveLS(LS.tour, 'pending');
   state.ob = null;
-  if (missing.length){ state.store.q = LG(missing[0]).name; state.al.tab = 'store'; state.screen = 'addlang'; render(); if (state.store.status !== 'ok') loadCatalog(); toast('Get ' + missing.map(c=>LG(c).name).join(', ') + ' from “Ready-made”'); }
+  if (missing.length){ state.obBack = true; state.store.q = LG(missing[0]).name; state.al.tab = 'store'; state.screen = 'addlang'; render(); if (state.store.status !== 'ok') loadCatalog(); toast('Get ' + missing.map(c=>LG(c).name).join(', ') + ' from “Ready-made”'); }
   else { state.screen = 'home'; render(); }
 }
 function renderOnboard(){
@@ -5779,10 +5831,9 @@ function renderOnboard(){
     <div class="footer"><div class="footer-inner"><div class="footer-row">${ob.step > 0 ? '<button class="btn btn-ghost" id="obBack" style="flex:0 0 auto">←</button>' : ''}<button class="btn btn-green" id="obNext">${ob.step === OB_STEPS - 1 ? 'Finish' : 'Next'}</button></div></div></div>`;
   const q = s=>f.querySelector(s), body = q('#obBody');
   if (ob.step === 0){
-    body.innerHTML = `<div class="hero"><h1>Welcome 👋</h1><p>Learn real sentences, step by step. A few questions to set the app up for you — you can change everything later in Settings.</p></div>
-      <div class="introcard" style="margin-bottom:10px"><b>① Sentences, not lists.</b> You meet a sentence, build it, translate it, and rate yourself honestly.</div>
-      <div class="introcard" style="margin-bottom:10px"><b>② Levels grow with you.</b> Short sentences first, then longer ones, in small chunks.</div>
-      <div class="introcard"><b>③ Notes make words yours.</b> Tap ✎ in a lesson to save a word, a prefix or a suffix; words you know make the app skip the explanations.</div>`;
+    body.innerHTML = `<div class="hero"><h1>Welcome 👋</h1><p>Learn real sentences.</p></div>
+      <div class="obtiles"><div class="obtile"><span class="big">📖</span>See a sentence</div><div class="obtile"><span class="big">🧩</span>Build &amp; translate</div><div class="obtile"><span class="big">⭐</span>Rate yourself</div></div>
+      <div class="obtiles"><div class="obtile"><span class="big">📈</span>Levels grow</div><div class="obtile"><span class="big">✎</span>Notes make words yours</div><div class="obtile"><span class="big">⚙</span>All changeable later</div></div>`;
   } else if (ob.step === 1){
     body.innerHTML = `<div class="hero"><h1>Your language</h1><p>The language you speak. Sentences are explained in it when your library has that translation; otherwise in English.</p></div>
       <input class="field" id="obQ" placeholder="Search" value="${esc(ob.q)}"><div class="langgrid" id="obGrid"></div><div class="hint" id="obNote"></div>`;
@@ -5810,6 +5861,31 @@ function renderOnboard(){
       THEMES.forEach(t=>{ const b = document.createElement('button'); b.type = 'button'; b.className = 'themecard' + (t.id === ob.theme ? ' on' : ''); b.innerHTML = `<span class="tsw">${t.sw.map(c=>`<i style="background:${c}"></i>`).join('')}</span><b>${esc(t.name)}</b>`; b.onclick = ()=>{ ob.theme = t.id; applyTheme(t.id); paint(); }; th.appendChild(b); });
     };
     paint();
+  } else if (ob.step === 4){
+    body.innerHTML = `<div class="hero"><h1>Inside a lesson</h1></div>
+      <div class="obphone">
+        <div class="obbar"><span class="iconbtn obx" style="position:relative">✕<i class="obn">1</i></span><div class="progress"><i style="width:40%"></i></div><span class="pill" style="position:relative">⭐ 12<i class="obn">2</i></span></div>
+        <div class="obtools">
+          <span class="flagbtn">🚩<i class="obn">3</i></span><span class="flagbtn notebtn">🔤<i class="obn">4</i></span><span class="flagbtn notebtn">✎<i class="obn">5</i></span><span class="flagbtn notebtn nv-hl">👁<i class="obn">6</i></span><span class="flagbtn notebtn gradebtn">Self<i class="obn">7</i></span>
+        </div>
+        <div class="obchips"><span>I</span><span>am</span><span>here</span></div>
+      </div>
+      <div class="oblegend">
+        <div><i class="obn">1</i>✕ Finish</div><div><i class="obn">2</i>⭐ Points</div>
+        <div><i class="obn">3</i>🚩 Not sure</div><div><i class="obn">4</i>🔤 Edit sentence</div>
+        <div><i class="obn">5</i>✎ Add note</div><div><i class="obn">6</i>👁 Show notes</div>
+        <div><i class="obn">7</i>Self / Auto grading</div><div>🧩 Tap words in order</div>
+      </div>`;
+  } else if (ob.step === 5){
+    body.innerHTML = `<div class="hero"><h1>The main page</h1></div>
+      <div class="obmock">
+        <div class="obtopm"><span class="titlebtn" style="position:relative"><span class="t">Arabic</span><span class="caret">▾</span><i class="obn">1</i></span><span class="pill">🔥 3</span><span class="pill">⭐ 40</span></div>
+        <div class="deck" style="position:relative"><div class="deck-ico">1</div><div class="deck-body"><div class="deck-title">Lesson 1</div><div class="gbar"><i style="width:30%"></i></div></div><div class="deck-meta">25<br>sent.</div><i class="obn">2</i></div>
+        <div style="margin-top:12px"><span class="btn btn-ghost btn-sm obsetm">⚙ Settings<i class="obn">3</i></span></div>
+      </div>
+      <div class="oblegend" style="grid-template-columns:1fr"><div><i class="obn">1</i>▾ Switch or add a language</div><div><i class="obn">2</i>👆 Tap a card = open the lesson</div><div><i class="obn">3</i>⚙ Themes, grading, this introduction</div></div>
+      <div class="sectionhead">After Finish</div>
+      <div class="obflow"><div class="st"><b>⬇</b>Get your language</div><span class="ar">→</span><div class="st"><b>←</b>Press back</div><span class="ar">→</span><div class="st"><b>👆</b>Tap a lesson</div></div>`;
   } else {
     body.innerHTML = `<div class="hero"><h1>Do you already know some words?</h1><p>If you learned some of the language elsewhere, tell the app which words so it does not explain them again. It takes a minute and you can do it any time from Settings.</p></div>
       <button class="btn btn-blue" id="obKw">✅ Take the quick test after finishing</button>
@@ -5822,8 +5898,50 @@ function renderOnboard(){
     ob.step++; ob.q = ''; render();
   };
   if (q('#obBack')) q('#obBack').onclick = ()=>{ ob.step--; ob.q = ''; render(); };
-  q('#obSkip').onclick = ()=>{ ONB_DONE = true; saveLS(LS.onb, true); state.ob = null; state.screen = 'home'; render(); };
+  q('#obSkip').onclick = ()=>{ ONB_DONE = true; saveLS(LS.onb, true); ONB2_DONE = true; saveLS(LS.onb2, true); state.ob = null; state.screen = 'home'; render(); };
   return f;
+}
+
+
+/* ---------- spotlight tour on the real main page (runs once after the introduction) ---------- */
+function maybeTour(){
+  if (loadLS(LS.tour, '') !== 'pending' || state.screen !== 'home' || state.ob || document.getElementById('tourLayer')) return;
+  const all = [
+    { sel:'#titleBtn', t:'Languages', d:'Tap here to switch or add a language.' },
+    { sel:'#decklist .deck', t:'Lesson', d:'Tap a card to open its lesson.' },
+    { sel:'#setBtn', t:'Settings', d:'Themes, grading, exercises, and this introduction again.' }
+  ];
+  const steps = all.filter(x=>document.querySelector(x.sel));
+  if (!steps.length) return;
+  let i = 0;
+  const L = document.createElement('div'); L.id = 'tourLayer';
+  L.innerHTML = '<div class="tourshade"></div><div class="tourring"></div><div class="tourtip"><b class="tt"></b><p class="td"></p><div class="tbtns"><button class="linkbtn" id="tourSkip">Skip</button><span class="tdots"></span><button class="btn btn-sm" id="tourNext">Next</button></div></div>';
+  document.body.appendChild(L);
+  const ring = L.querySelector('.tourring'), tip = L.querySelector('.tourtip');
+  const end = ()=>{ saveLS(LS.tour, 'done'); window.removeEventListener('resize', place); L.remove(); document.body.style.overflow = ''; };
+  function place(){
+    const st = steps[i], el = document.querySelector(st.sel);
+    if (!el){ end(); return; }
+    const r = el.getBoundingClientRect(), pad = 8;
+    ring.style.left = (r.left - pad) + 'px'; ring.style.top = (r.top - pad) + 'px';
+    ring.style.width = (r.width + pad*2) + 'px'; ring.style.height = (r.height + pad*2) + 'px';
+    const below = (innerHeight - r.bottom) > 190 || r.top < 200;
+    if (below){ tip.style.top = (r.bottom + pad + 16) + 'px'; tip.style.bottom = 'auto'; }
+    else { tip.style.bottom = (innerHeight - r.top + pad + 16) + 'px'; tip.style.top = 'auto'; }
+  }
+  function show(){
+    const st = steps[i], el = document.querySelector(st.sel);
+    document.body.style.overflow = '';
+    el.scrollIntoView({ block:'center' });
+    L.querySelector('.tt').textContent = st.t; L.querySelector('.td').textContent = st.d;
+    L.querySelector('.tdots').innerHTML = steps.map((_, k)=>'<i' + (k === i ? ' class="on"' : '') + '></i>').join('');
+    L.querySelector('#tourNext').textContent = i === steps.length - 1 ? 'Done' : 'Next';
+    setTimeout(()=>{ place(); document.body.style.overflow = 'hidden'; }, 260);
+  }
+  window.addEventListener('resize', place);
+  L.querySelector('#tourNext').onclick = ()=>{ if (i >= steps.length - 1) end(); else { i++; show(); } };
+  L.querySelector('#tourSkip').onclick = end;
+  show();
 }
 
 /* ==================== UTIL + BOOT ==================== */
@@ -5877,10 +5995,7 @@ function boot(){
     }
   } catch(e){}
   buildNoteIdx(); rebuildSeen();
-  if (!ONB_DONE && BETA.intro){                     // (beta feature, off by default) existing users are not interrupted; the introduction stays in Settings
-    if (ATTEMPTS.length || NOTES.length || Object.keys(LEVELS).length){ ONB_DONE = true; saveLS(LS.onb, true); }
-    else { state.ob = newOb(); state.screen = 'onboard'; }
-  }
+  if (!ONB2_DONE){ state.ob = newOb(); state.screen = 'onboard'; }   // everyone who has not seen the v2 introduction sees it once; Settings → Introduction replays it
   if (STATS.lastDay && STATS.lastDay !== todayStr()){
     const y = new Date(Date.now()-864e5).toISOString().slice(0,10);
     if (STATS.lastDay !== y) STATS.streak = 0;
