@@ -15,7 +15,6 @@
 ## V2.6 : 
 [pronunciation]
 
-## V2.7:
 Tashkil --> settings  : place and color
 tashkil (with the name : diacritics) goes instead to the run like the self and auto correction (+ add that to the intro too)
 
@@ -75,3 +74,7 @@ or the option of coping the prompt like it now works
 
 order the setting into foldable tabs or like expand and collapse
 in a way that makes it easier to understand them and keep count
+
+## V2.7:
+[custom css making tool built-in web]
+by استقراء التعديلات الي يسويها الذكاء الاصطناعي وصنع ادوات لها 
