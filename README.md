@@ -13,8 +13,12 @@
 
 
 ## V2.6 : 
-[pronunciation]
-
+### [pronunciation]:
++ [لكل لغة ملخص wiki تجويدي]
++ TTS NG (sherpa, RHvoice, espeak): testing & researching
++ integrate the TTS NG into the website (اتوقع مثل ما في تصطيب شيربا)
+  
+### other:
 Tashkil --> settings  : place and color
 tashkil (with the name : diacritics) goes instead to the run like the self and auto correction (+ add that to the intro too)
 
