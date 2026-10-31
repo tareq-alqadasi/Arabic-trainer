@@ -1,0 +1,33 @@
+name: Translate UI
+on:
+  workflow_dispatch:
+    inputs:
+      lang:
+        description: 'Language code (e.g. fr, de)'
+        required: true
+        default: 'fr'
+
+jobs:
+  translate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run translation
+        run: |
+          cd ui
+          python3 translate_ui.py --init
+          python3 translate_ui.py ${{ inputs.lang }}
+        env:
+          API_BASE: https://api.deepseek.com/v1
+          API_KEY: ${{ secrets.API_KEY }}
+          MODEL: deepseek-chat
+      - name: Commit the new file
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add ui/${{ inputs.lang }}.json
+          git commit -m "Add ${{ inputs.lang }} translation" || exit 0
+          git push
