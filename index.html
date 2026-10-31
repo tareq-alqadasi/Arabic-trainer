@@ -72,7 +72,7 @@ button{font-family:inherit}
 .sectionhead{font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--ink3);margin:22px 0 10px}
 .exwrap{max-width:680px;margin:0 auto;padding:8px 16px 230px}
 .qhead{display:flex;align-items:center;gap:10px;margin:4px 0 18px;flex-wrap:wrap;justify-content:space-between}
-.qhead h2{font-size:22px;font-weight:800;margin:0;line-height:1.35;flex:1;min-width:0}
+.qhead h2{font-size:22px;font-weight:800;margin:0;line-height:1.35;flex:1 1 100%;min-width:0}
 .flagbtn{background:#fff;border:2px solid var(--line);border-radius:50%;width:42px;height:42px;font-size:20px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--ink3);transition:.15s}
 .flagbtn:hover{border-color:var(--amber);color:var(--amber)}
 .flagbtn.on{background:var(--amber);border-color:var(--amber);color:#fff}
@@ -198,7 +198,7 @@ button{font-family:inherit}
 .nomatch{font-size:11.5px;color:var(--ink3);font-weight:700;margin-top:4px}
 .choice .sidetr{font-size:15px;font-weight:600;margin-top:2px}
 :root{--hl:rgba(255,200,0,.38);--hl-line:rgba(230,150,0,.6)}
-.qtools{display:flex;gap:8px;align-items:center}
+.qtools{display:flex;gap:8px;align-items:center;flex-wrap:wrap;flex:1 1 100%;justify-content:flex-end}
 .notebtn{width:38px;height:38px;font-size:17px}
 .flagbtn.notebtn.on{background:var(--blue);border-color:var(--blue);color:#fff}
 .nt{background:var(--hl);border-radius:4px;box-shadow:0 1px 0 var(--hl-line);cursor:pointer}
@@ -261,41 +261,41 @@ button .nt{cursor:inherit}
 @keyframes lt-blink{50%{opacity:0}}
 
 /* ---------- shared structure ---------- */
-html[data-theme]:not([data-theme="classic"]) body{font-family:var(--font);background:var(--bg);color:var(--ink)}
-html[data-theme]:not([data-theme="classic"]) .topbar{background:var(--topbg,var(--bg))}
-html[data-theme]:not([data-theme="classic"]) :is(.hero h1,.qhead h2,.sheet h3,.deck-title,.statcard b){font-family:var(--hfont,var(--font))}
-html[data-theme]:not([data-theme="classic"]) .btn{border-radius:var(--r);text-transform:var(--upper);letter-spacing:var(--ls);box-shadow:var(--btn-sh);border:var(--bw) solid var(--btn-line,transparent);font-weight:var(--btnw,800)}
-html[data-theme]:not([data-theme="classic"]) .btn:active:not(:disabled){transform:var(--press);box-shadow:var(--btn-sh-p)}
-html[data-theme]:not([data-theme="classic"]) .btn-green{background:var(--accent);color:var(--accent-ink);border-color:var(--accent-line,transparent)}
-html[data-theme]:not([data-theme="classic"]) .btn-green:hover:not(:disabled){background:var(--accent-d)}
-html[data-theme]:not([data-theme="classic"]) .btn-blue{background:var(--accent2);color:var(--accent2-ink)}
-html[data-theme]:not([data-theme="classic"]) .btn-red{background:var(--red);color:#fff}
-html[data-theme]:not([data-theme="classic"]) :is(.btn-ghost,.btn-amber,.btn-redg){background:var(--card);color:var(--ink);border:var(--bw) solid var(--line2);box-shadow:var(--btn-sh-g,none)}
-html[data-theme]:not([data-theme="classic"]) .btn-redg{color:var(--red)}
-html[data-theme]:not([data-theme="classic"]) .btn-ghost:hover:not(:disabled){background:var(--card2)}
-html[data-theme]:not([data-theme="classic"]) .btn-amber.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
-html[data-theme]:not([data-theme="classic"]) .btn-sm{border-radius:var(--r)}
-html[data-theme]:not([data-theme="classic"]) :is(.deck,.lvcard,.choice,.chip,.improw,.introcard,.srow,.dd,.themecard,.nview,.tchip,.nletter,.field,.typein,.flagbtn,.cb,.sheet,.selbar,.footer){background:var(--card);border-color:var(--line);color:var(--ink)}
-html[data-theme]:not([data-theme="classic"]) :is(.choice,.chip){box-shadow:var(--chip-sh,none)}
-html[data-theme]:not([data-theme="classic"]) :is(.deck,.srow):hover{background:var(--card2);border-color:var(--accent)}
-html[data-theme]:not([data-theme="classic"]) :is(.choice,.chip):hover{background:var(--card2)}
-html[data-theme]:not([data-theme="classic"]) .deck.picked{background:var(--card2);border-color:var(--accent)}
-html[data-theme]:not([data-theme="classic"]) .choice.sel{border-color:var(--accent);background:var(--card2);color:var(--ink);box-shadow:var(--sel-sh,inset 0 0 0 1px var(--accent))}
-html[data-theme]:not([data-theme="classic"]) .choice.right{border-color:var(--green);background:var(--green-l);color:var(--green-t)}
-html[data-theme]:not([data-theme="classic"]) .choice.wrong{border-color:var(--red);background:var(--red-l);color:var(--red-t)}
-html[data-theme]:not([data-theme="classic"]) .cb.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-html[data-theme]:not([data-theme="classic"]) .tchip.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-html[data-theme]:not([data-theme="classic"]) .nletter.on{background:var(--hl);border-color:var(--hl-line)}
-html[data-theme]:not([data-theme="classic"]) .themecard.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft,transparent)}
-html[data-theme]:not([data-theme="classic"]) .flagbtn.on{background:var(--amber);border-color:var(--amber);color:#fff}
-html[data-theme]:not([data-theme="classic"]) .flagbtn.notebtn.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-html[data-theme]:not([data-theme="classic"]) .progress>i{background:var(--accent);box-shadow:none}
-html[data-theme]:not([data-theme="classic"]) .answerzone.filled{border-color:var(--accent)}
-html[data-theme]:not([data-theme="classic"]) .toast{background:var(--toast-bg,var(--ink));color:var(--toast-ink,var(--bg))}
-html[data-theme]:not([data-theme="classic"]) :is(.ntype,.flagbadge,.notice){color:var(--amber-t,#8a5000)}
-html[data-theme]:not([data-theme="classic"]) :is(.field,.typein)::placeholder{color:var(--ink3)}
-html[data-theme]:not([data-theme="classic"]) .code{background:#0c0c0c;color:#d6d6d6}
-html[data-theme]:not([data-theme="classic"]) .nt{background:var(--hl);box-shadow:0 1px 0 var(--hl-line)}
+html[data-theme]:not([data-theme="classic"],[data-theme="duolingo"]) body{font-family:var(--font);background:var(--bg);color:var(--ink)}
+html[data-theme]:not([data-theme="classic"],[data-theme="duolingo"]) .topbar{background:var(--topbg,var(--bg))}
+html[data-theme]:not([data-theme="classic"],[data-theme="duolingo"]) :is(.hero h1,.qhead h2,.sheet h3,.deck-title,.statcard b){font-family:var(--hfont,var(--font))}
+html[data-theme]:not([data-theme="classic"],[data-theme="duolingo"]) .btn{border-radius:var(--r);text-transform:var(--upper);letter-spacing:var(--ls);box-shadow:var(--btn-sh);border:var(--bw) solid var(--btn-line,transparent);font-weight:var(--btnw,800)}
+html[data-theme]:not([data-theme="classic"],[data-theme="duolingo"]) .btn:active:not(:disabled){transform:var(--press);box-shadow:var(--btn-sh-p)}
+html[data-theme]:not([data-theme="classic"],[data-theme="duolingo"]) .btn-green{background:var(--accent);color:var(--accent-ink);border-color:var(--accent-line,transparent)}
+html[data-theme]:not([data-theme="classic"],[data-theme="duolingo"]) .btn-green:hover:not(:disabled){background:var(--accent-d)}
+html[data-theme]:not([data-theme="classic"],[data-theme="duolingo"]) .btn-blue{background:var(--accent2);color:var(--accent2-ink)}
+html[data-theme]:not([data-theme="classic"],[data-theme="duolingo"]) .btn-red{background:var(--red);color:#fff}
+html[data-theme]:not([data-theme="classic"],[data-theme="duolingo"]) :is(.btn-ghost,.btn-amber,.btn-redg){background:var(--card);color:var(--ink);border:var(--bw) solid var(--line2);box-shadow:var(--btn-sh-g,none)}
+html[data-theme]:not([data-theme="classic"],[data-theme="duolingo"]) .btn-redg{color:var(--red)}
+html[data-theme]:not([data-theme="classic"],[data-theme="duolingo"]) .btn-ghost:hover:not(:disabled){background:var(--card2)}
+html[data-theme]:not([data-theme="classic"],[data-theme="duolingo"]) .btn-amber.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+html[data-theme]:not([data-theme="classic"],[data-theme="duolingo"]) .btn-sm{border-radius:var(--r)}
+html[data-theme]:not([data-theme="classic"],[data-theme="duolingo"]) :is(.deck,.lvcard,.choice,.chip,.improw,.introcard,.srow,.dd,.themecard,.nview,.tchip,.nletter,.field,.typein,.flagbtn,.cb,.sheet,.selbar,.footer){background:var(--card);border-color:var(--line);color:var(--ink)}
+html[data-theme]:not([data-theme="classic"],[data-theme="duolingo"]) :is(.choice,.chip){box-shadow:var(--chip-sh,none)}
+html[data-theme]:not([data-theme="classic"],[data-theme="duolingo"]) :is(.deck,.srow):hover{background:var(--card2);border-color:var(--accent)}
+html[data-theme]:not([data-theme="classic"],[data-theme="duolingo"]) :is(.choice,.chip):hover{background:var(--card2)}
+html[data-theme]:not([data-theme="classic"],[data-theme="duolingo"]) .deck.picked{background:var(--card2);border-color:var(--accent)}
+html[data-theme]:not([data-theme="classic"],[data-theme="duolingo"]) .choice.sel{border-color:var(--accent);background:var(--card2);color:var(--ink);box-shadow:var(--sel-sh,inset 0 0 0 1px var(--accent))}
+html[data-theme]:not([data-theme="classic"],[data-theme="duolingo"]) .choice.right{border-color:var(--green);background:var(--green-l);color:var(--green-t)}
+html[data-theme]:not([data-theme="classic"],[data-theme="duolingo"]) .choice.wrong{border-color:var(--red);background:var(--red-l);color:var(--red-t)}
+html[data-theme]:not([data-theme="classic"],[data-theme="duolingo"]) .cb.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+html[data-theme]:not([data-theme="classic"],[data-theme="duolingo"]) .tchip.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+html[data-theme]:not([data-theme="classic"],[data-theme="duolingo"]) .nletter.on{background:var(--hl);border-color:var(--hl-line)}
+html[data-theme]:not([data-theme="classic"],[data-theme="duolingo"]) .themecard.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft,transparent)}
+html[data-theme]:not([data-theme="classic"],[data-theme="duolingo"]) .flagbtn.on{background:var(--amber);border-color:var(--amber);color:#fff}
+html[data-theme]:not([data-theme="classic"],[data-theme="duolingo"]) .flagbtn.notebtn.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+html[data-theme]:not([data-theme="classic"],[data-theme="duolingo"]) .progress>i{background:var(--accent);box-shadow:none}
+html[data-theme]:not([data-theme="classic"],[data-theme="duolingo"]) .answerzone.filled{border-color:var(--accent)}
+html[data-theme]:not([data-theme="classic"],[data-theme="duolingo"]) .toast{background:var(--toast-bg,var(--ink));color:var(--toast-ink,var(--bg))}
+html[data-theme]:not([data-theme="classic"],[data-theme="duolingo"]) :is(.ntype,.flagbadge,.notice){color:var(--amber-t,#8a5000)}
+html[data-theme]:not([data-theme="classic"],[data-theme="duolingo"]) :is(.field,.typein)::placeholder{color:var(--ink3)}
+html[data-theme]:not([data-theme="classic"],[data-theme="duolingo"]) .code{background:#0c0c0c;color:#d6d6d6}
+html[data-theme]:not([data-theme="classic"],[data-theme="duolingo"]) .nt{background:var(--hl);box-shadow:0 1px 0 var(--hl-line)}
 
 /* ---------- PAPER: printed study sheet ---------- */
 html[data-theme="paper"]{
@@ -515,7 +515,7 @@ html[dir=rtl] .deck-meta{text-align:start}
 .obstep{padding-bottom:170px}
 .langgrid{max-height:40vh;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 .obtiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:6px 0 14px}
-.obtile{border:2px solid var(--line);border-radius:var(--r);padding:16px 6px;text-align:center;font-weight:800;font-size:13px;line-height:1.3}
+.obtile{padding:10px 4px;text-align:center;font-weight:800;font-size:13px;line-height:1.3}
 .obtile .big{display:block;font-size:38px;margin-bottom:6px}
 .obphone{border:2px solid var(--line);border-radius:22px;padding:12px;margin:6px 0 14px;background:var(--bg2)}
 .obbar{display:flex;align-items:center;gap:10px;margin-bottom:12px}
@@ -525,6 +525,7 @@ html[dir=rtl] .deck-meta{text-align:start}
 .obn{position:absolute;top:-7px;right:-7px;width:20px;height:20px;border-radius:50%;background:var(--green);color:#fff;font:800 12px/20px system-ui,sans-serif;text-align:center;font-style:normal;z-index:2}
 .obphone .pill,.obphone .obx,.obphone .progress{position:relative}
 .obphone .obbar .obn{top:-10px}
+.obn.l{right:auto;inset-inline-start:-8px}
 .oblegend{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px;margin-bottom:10px}
 .oblegend div{display:flex;align-items:center;gap:8px;font-weight:700;font-size:13px}
 .oblegend .obn{position:static;flex-shrink:0}
@@ -555,6 +556,48 @@ html[dir=rtl] .deck-meta{text-align:start}
 #tourLayer .tdots i.on{background:#fff}
 #tourLayer .linkbtn{color:#fff}
 #tourLayer .btn{background:#fff;color:var(--green-t,#2b6b00);box-shadow:0 3px 0 rgba(0,0,0,.2)}
+
+.acc{border:2px solid var(--line);border-radius:var(--r);margin:10px 0;overflow:hidden;background:var(--card,#fff)}
+.acchead{display:flex;align-items:center;gap:10px;width:100%;background:none;border:0;font:inherit;font-weight:800;font-size:15px;color:var(--ink);padding:14px;cursor:pointer;text-align:start;min-height:48px}
+.accn{background:var(--green-l);color:var(--green-t);border-radius:50%;width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.acct{flex:1}
+.accc{font-size:12px;color:var(--ink3);font-weight:700}
+.accar{transition:transform .15s;color:var(--ink3)}
+.acc.open .accar{transform:rotate(180deg)}
+.acc.open .acchead{border-bottom:1px solid var(--line)}
+.accbody{padding:0 14px 14px}
+.accbody .sectionhead{display:none}
+.iconbtn.busy{opacity:.4}
+.flagbtn.tashbtn{font-size:22px;line-height:1}
+
+.statgrid.two{grid-template-columns:1fr 1fr}
+.statcard b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:clamp(18px,7vw,30px)}
+.statcard b small{font-size:.6em;font-weight:700;opacity:.7}
+.obnews{background:var(--amber-l,#fff3e0);color:var(--amber-t,#8a5000);border-radius:var(--r);padding:12px 14px;margin-bottom:12px;font-weight:700;font-size:14px;line-height:1.4}
+.phtxt{line-height:1.55;margin:8px 0}
+.phlist{margin:8px 0;padding-inline-start:22px;line-height:1.55}
+.phex{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;margin:6px 0}
+.phex .fl{font-size:22px}
+.phblock .glx td,.phblock .glx th{padding:6px 8px;text-align:start}
+#tourLayer .linkbtn{color:#fff !important}
+#tourLayer .tourtip .btn{background:#fff !important;color:#1b5e20 !important}
+
+.md{line-height:1.6;font-size:15px;word-wrap:break-word}
+.md h1,.md h2{border-bottom:1px solid var(--line);padding-bottom:.3em}
+.md h1{font-size:24px;margin:14px 0}.md h2{font-size:20px;margin:20px 0 10px}.md h3{font-size:17px;margin:16px 0 8px}
+.md p{margin:8px 0}
+.md ul,.md ol{padding-inline-start:24px;margin:8px 0}
+.md table{border-collapse:collapse;width:100%;margin:0}
+.md th,.md td{border:1px solid var(--line);padding:6px 10px;text-align:start}
+.md th{background:var(--bg2)}
+.mdscroll{overflow-x:auto;margin:10px 0}
+.md blockquote{margin:10px 0;padding:2px 14px;border-inline-start:4px solid var(--line2);color:var(--ink2)}
+.md code{background:var(--bg2);padding:1px 5px;border-radius:4px;font-size:.9em}
+.md pre{background:var(--bg2);padding:10px;border-radius:8px;overflow-x:auto}
+.md pre code{background:none;padding:0}
+.md img{max-width:100%}
+.md hr{border:0;border-top:1px solid var(--line);margin:16px 0}
+.md a{color:var(--accent,var(--blue))}
 </style>
 </head>
 <body>
@@ -1365,7 +1408,7 @@ let ACTIVE = loadLS(LS.langs, ['ar']);
 let LEVELS = loadLS(LS.levels, {});
 let INTRO_SEEN = loadLS(LS.intro, {});
 let TYPE_ON = loadLS(LS.types, {});
-let HINTS_ON = loadLS(LS.hints, false);   // 'what differs' hint after match exercises (off by default)
+let HINTS_ON = loadLS(LS.hints, true);   // 'what differs' hint after match exercises (it appears only when two options differ by exactly one word)
 let KNOWN = loadLS(LS.known, 'en');   // language shown as the known/question side ('en' = English)
 let SIDE = loadLS(LS.side, '');      // optional extra translation shown beside the known side ('' = none)
 let EN_IDX = {};                     // lang -> Map(english key -> sentence)
@@ -1388,6 +1431,9 @@ function saveLib(){
   try{ localStorage.setItem(LS.lib, JSON.stringify(LIB)); return true; }
   catch(e){ toast('Storage full — library not saved'); return false; }
 }
+function localDay(){ const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+function xpToday(){ return STATS.dayDate === localDay() ? (STATS.dayXp || 0) : 0; }          // stars restart every (local) day …
+function addXp(n){ const t = localDay(); if (STATS.dayDate !== t){ STATS.dayDate = t; STATS.dayXp = 0; } STATS.dayXp += n; STATS.xp = (STATS.xp || 0) + n; }   // … while STATS.xp keeps the running total
 function todayStr(){ return new Date().toISOString().slice(0,10); }
 function touchStreak(){
   const t = todayStr();
@@ -1842,7 +1888,7 @@ function levelWords(L){ return L === 1 ? '1–3' : (2*L) + '–' + (2*L+1); }
 function langSentences(lang){ return [...BY_UID.values()].filter(s=>s.lang === lang); }
 function levelPool(lang, L){ return langSentences(lang).filter(s=>levelOfLen(sentLen(s)) === L); }
 function maxLevel(lang){ let m = 1; for (const s of langSentences(lang)) m = Math.max(m, levelOfLen(sentLen(s))); return m; }
-const CHUNK_TARGET = 12;   // sentences per mini-cycle (a → b → c)
+let CHUNK_TARGET = loadLS('arTrainer:chunk', 6);   // sentences per mini-cycle (a → b → c); smaller = the harder question types (c) come around more often. Setting: Repetition & chunks
 function lv(lang){
   if (!LEVELS[lang]) LEVELS[lang] = { level:1, sub:0, chunk:0, done:{} };
   const v = LEVELS[lang]; if (v.chunk == null) v.chunk = 0;
@@ -2123,7 +2169,7 @@ function exitSession(){
   if (state.sess) state.sess.ended = true;
   undoDropAnswers();               // callers that started the session must not open the lesson afterwards
   const from = state.sess ? state.sess.from : 'home';
-  state.screen = (from === 'group' && getGroup(state.gid)) ? 'group' : (from === 'flags' ? 'flags' : 'home');
+  state.screen = (from === 'group' && getGroup(state.gid)) ? 'group' : (from === 'flags' ? 'flags' : (from === 'library' ? 'library' : 'home'));
   render(); toast('Progress saved ✓');
 }
 
@@ -2318,8 +2364,8 @@ const notesList = ()=>HL_ON && NOTES_VIEW === 'list';
 const INTRO_T_DEF = { mode:'fixed', fixed:1, a:1, b:0.5, max:6, manual:{}, other:1 };
 let INTRO_T = Object.assign({}, INTRO_T_DEF, loadLS(LS.introT, {}));
 let THEME = loadLS(LS.theme, 'classic');
-Object.assign(LS, { fun:'arTrainer:fun' });
-let FUN_ON = loadLS(LS.fun, false);                 // Duolingo-style celebrations during practice (off = plain numbers only)
+Object.assign(LS, { fun:'arTrainer:fun', phonNotes:'arTrainer:phonNotes', onbVer:'arTrainer:onbVer' });
+let FUN_ON = loadLS(LS.fun, true);                 // Duolingo-style celebrations during practice (off = plain numbers only)
 function funPop(text, big){
   if (!FUN_ON) return;
   const e = document.createElement('div'); e.className = 'funpop' + (big ? ' big' : ''); e.textContent = text;
@@ -2335,7 +2381,7 @@ function funBurst(){
   }
 }
 let ANKI_ON = loadLS(LS.anki, false);               // Anki-style spaced review on top of the levels (off = the app works exactly as before)
-let INTRO_GAP = loadLS(LS.introGap, 0);          // 0 = ask about a sentence right after its intro card · 1–5 = after that many other cards
+let INTRO_GAP = loadLS(LS.introGap, 1);          // 0 = ask about a sentence right after its intro card · 1–5 = after that many other cards
 let GAP_N = loadLS(LS.gap, 1);                   // cards that must pass before the same sentence may come again (1–8)
 let GRADE_MODE = loadLS(LS.grade, 'self');       // 'self' = you rate every answer (Anki style) · 'auto' = the app decides
 const autoGrade = ()=>GRADE_MODE === 'auto';
@@ -3004,8 +3050,741 @@ function renderNotes(){
 }
 
 /* ---------- themes ---------- */
+const CLASSIC_CSS = `/* ============================================================
+   Material Design — classic Android app look
+   ============================================================ */
+
+html {
+  --bg: #fafafa !important;
+  --bg2: #f5f5f5 !important;
+  --card: #ffffff !important;
+  --card2: #eeeeee !important;
+  --ink: #212121 !important;
+  --ink2: #616161 !important;
+  --ink3: #9e9e9e !important;
+  --line: #e0e0e0 !important;
+  --line2: #bdbdbd !important;
+  --accent: #1976d2 !important;
+  --accent-d: #1565c0 !important;
+  --accent-ink: #ffffff !important;
+  --accent2: #0288d1 !important;
+  --accent2-ink: #ffffff !important;
+  --accent-soft: rgba(25,118,210,.12) !important;
+  --green: #4caf50 !important;
+  --green-d: #388e3c !important;
+  --green-l: #e8f5e9 !important;
+  --green-t: #1b5e20 !important;
+  --blue: #1976d2 !important;
+  --blue-d: #1565c0 !important;
+  --blue-l: #e3f2fd !important;
+  --red: #d32f2f !important;
+  --red-d: #c62828 !important;
+  --red-l: #ffebee !important;
+  --red-t: #b71c1c !important;
+  --amber: #f57c00 !important;
+  --amber-l: #fff3e0 !important;
+  --amber-t: #e65100 !important;
+  --hl: rgba(255,213,79,.45) !important;
+  --hl-line: rgba(245,124,0,.6) !important;
+  --r: 4px !important;
+  --bw: 0 !important;
+  --upper: none !important;
+  --ls: 0.05em !important;
+  --btnw: 500 !important;
+  --btn-sh: 0 1px 3px rgba(0,0,0,.12), 0 1px 2px rgba(0,0,0,.24) !important;
+  --btn-sh-p: 0 1px 2px rgba(0,0,0,.12) !important;
+  --press: none !important;
+  --chip-sh: 0 1px 2px rgba(0,0,0,.08) !important;
+  --font: 'Roboto', 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif !important;
+  --hfont: 'Roboto', 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif !important;
+  --topbg: #ffffff !important;
+}
+
+body {
+  background: #fafafa !important;
+  color: #212121 !important;
+  font-family: 'Roboto', 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif !important;
+  -webkit-font-smoothing: antialiased !important;
+}
+
+.topbar {
+  background: #ffffff !important;
+  border-bottom: 0 !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,.12), 0 1px 2px rgba(0,0,0,.24) !important;
+  padding-block: 12px !important;
+  z-index: 25 !important;
+}
+.iconbtn {
+  color: #616161 !important;
+  border-radius: 50% !important;
+  min-width: 40px !important;
+  min-height: 40px !important;
+  transition: background-color .2s, color .2s !important;
+}
+.iconbtn:hover {
+  background: rgba(0,0,0,.06) !important;
+  color: #212121 !important;
+}
+.iconbtn.undobtn {
+  min-width: 40px !important;
+  min-height: 40px !important;
+}
+.pill {
+  font-weight: 500 !important;
+  font-size: 13px !important;
+  letter-spacing: 0 !important;
+  background: #f5f5f5 !important;
+  color: #616161 !important;
+  border-radius: 14px !important;
+  padding: 4px 10px !important;
+}
+.pill.flame {
+  color: #e65100 !important;
+}
+
+.hero h1 {
+  font-family: 'Roboto', 'Segoe UI', system-ui, sans-serif !important;
+  font-weight: 400 !important;
+  font-size: 26px !important;
+  letter-spacing: 0 !important;
+  color: #212121 !important;
+  margin-bottom: 8px !important;
+}
+.hero p {
+  font-size: 14px !important;
+  color: #616161 !important;
+  line-height: 1.5 !important;
+}
+.sectionhead {
+  font-family: 'Roboto', 'Segoe UI', system-ui, sans-serif !important;
+  font-weight: 500 !important;
+  font-size: 12px !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  color: #757575 !important;
+  margin: 20px 0 10px !important;
+}
+.qhead h2 {
+  font-family: 'Roboto', 'Segoe UI', system-ui, sans-serif !important;
+  font-weight: 400 !important;
+  font-size: 22px !important;
+  letter-spacing: 0 !important;
+  color: #212121 !important;
+}
+
+.btn {
+  font-family: 'Roboto', 'Segoe UI', system-ui, sans-serif !important;
+  border: 0 !important;
+  border-radius: 4px !important;
+  font-weight: 500 !important;
+  font-size: 14px !important;
+  letter-spacing: 0.05em !important;
+  text-transform: none !important;
+  padding: 12px 16px !important;
+  min-height: 44px !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,.12), 0 1px 2px rgba(0,0,0,.24) !important;
+  transition: box-shadow .2s ease, background-color .2s ease !important;
+  user-select: none !important;
+}
+.btn:active:not(:disabled) {
+  box-shadow: 0 1px 2px rgba(0,0,0,.12) !important;
+  transform: none !important;
+}
+.btn:disabled {
+  box-shadow: none !important;
+  opacity: .38 !important;
+}
+
+.btn-green {
+  background: #1976d2 !important;
+  color: #ffffff !important;
+}
+.btn-green:hover:not(:disabled) {
+  background: #1565c0 !important;
+}
+#rightBtn {
+  background: #4caf50 !important;
+  color: #ffffff !important;
+}
+#rightBtn:hover:not(:disabled) {
+  background: #388e3c !important;
+}
+
+.btn-blue {
+  background: #0288d1 !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+}
+.btn-blue:hover:not(:disabled) {
+  background: #0277bd !important;
+}
+
+.btn-red {
+  background: #d32f2f !important;
+  color: #ffffff !important;
+}
+.btn-red:hover:not(:disabled) {
+  background: #c62828 !important;
+}
+
+.btn-ghost,
+.btn-amber,
+.btn-redg {
+  background: transparent !important;
+  color: #1976d2 !important;
+  border: 0 !important;
+  box-shadow: 0 0 0 1px #e0e0e0 inset !important;
+}
+.btn-ghost:hover:not(:disabled) {
+  background: rgba(25,118,210,.04) !important;
+}
+.btn-amber {
+  color: #f57c00 !important;
+}
+.btn-redg {
+  color: #d32f2f !important;
+}
+.btn-redg:hover:not(:disabled) {
+  background: rgba(211,47,47,.04) !important;
+}
+.btn-amber.on {
+  background: #f57c00 !important;
+  color: #ffffff !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,.12) !important;
+}
+
+.btn-sm {
+  min-height: 36px !important;
+  padding: 8px 14px !important;
+  font-size: 13px !important;
+}
+
+.linkbtn {
+  color: #1976d2 !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.05em !important;
+  padding: 8px 10px !important;
+  min-height: 36px !important;
+}
+
+.progress {
+  height: 4px !important;
+  background: #e0e0e0 !important;
+  border-radius: 2px !important;
+}
+.progress > i {
+  background: #1976d2 !important;
+  border-radius: 2px !important;
+  box-shadow: none !important;
+  transition: width .4s cubic-bezier(0.4,0,0.2,1) !important;
+}
+
+.deck {
+  background: #ffffff !important;
+  border: 0 !important;
+  border-radius: 4px !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,.12), 0 1px 2px rgba(0,0,0,.24) !important;
+  padding: 14px 16px !important;
+  min-height: 64px !important;
+  transition: box-shadow .2s !important;
+}
+.deck:hover {
+  background: #ffffff !important;
+  border-color: transparent !important;
+  box-shadow: 0 3px 6px rgba(0,0,0,.16), 0 3px 6px rgba(0,0,0,.23) !important;
+}
+.deck.done {
+  background: #ffffff !important;
+  border-color: transparent !important;
+}
+.deck.picked {
+  background: #f5f5f5 !important;
+  border-color: transparent !important;
+}
+.deck .deck-ico.cbwrap {
+  background: transparent !important;
+}
+.deck-ico {
+  background: #e3f2fd !important;
+  color: #1976d2 !important;
+  border-radius: 50% !important;
+  width: 40px !important;
+  height: 40px !important;
+  font-size: 18px !important;
+  font-weight: 500 !important;
+}
+.deck.done .deck-ico {
+  background: #e8f5e9 !important;
+  color: #388e3c !important;
+}
+.deck-title {
+  font-weight: 500 !important;
+  font-size: 15px !important;
+  color: #212121 !important;
+}
+.deck-sub {
+  color: #757575 !important;
+  font-size: 13px !important;
+}
+.deck-meta {
+  color: #9e9e9e !important;
+  font-weight: 500 !important;
+}
+.gbar {
+  height: 3px !important;
+  background: #eeeeee !important;
+  border-radius: 2px !important;
+  margin-top: 8px !important;
+}
+.gbar > i {
+  background: #1976d2 !important;
+  border-radius: 2px !important;
+}
+
+.statcard {
+  background: #ffffff !important;
+  border-radius: 4px !important;
+  box-shadow: 0 1px 2px rgba(0,0,0,.08) !important;
+  padding: 16px 12px !important;
+}
+.statcard b {
+  font-weight: 500 !important;
+  font-size: 22px !important;
+  color: #1976d2 !important;
+}
+.statcard span {
+  color: #757575 !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.06em !important;
+  font-size: 11px !important;
+}
+
+.lvcard {
+  background: #ffffff !important;
+  border: 0 !important;
+  border-radius: 4px !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,.12), 0 1px 2px rgba(0,0,0,.24) !important;
+  padding: 16px !important;
+  align-items: flex-start !important;
+}
+.lvcard .lvinfo b {
+  font-family: 'Roboto', 'Segoe UI', system-ui, sans-serif !important;
+  font-weight: 500 !important;
+  font-size: 15px !important;
+  color: #212121 !important;
+}
+.lvcard .lvinfo span {
+  color: #757575 !important;
+  font-weight: 400 !important;
+}
+
+.answerzone {
+  border-bottom: 1px solid #bdbdbd !important;
+  min-height: 80px !important;
+  padding-bottom: 10px !important;
+}
+.answerzone.filled {
+  border-bottom: 2px solid #1976d2 !important;
+}
+.placeholder {
+  color: #9e9e9e !important;
+  font-weight: 400 !important;
+}
+
+.chip {
+  background: #ffffff !important;
+  border: 1px solid #e0e0e0 !important;
+  border-radius: 4px !important;
+  color: #212121 !important;
+  box-shadow: 0 1px 2px rgba(0,0,0,.08) !important;
+  font-weight: 500 !important;
+  padding: 9px 14px !important;
+  min-height: 40px !important;
+  transition: box-shadow .15s, background-color .15s !important;
+}
+.chip:hover {
+  background: #f5f5f5 !important;
+}
+.chip:active {
+  transform: none !important;
+  box-shadow: 0 1px 1px rgba(0,0,0,.08) !important;
+}
+.chip.flat {
+  box-shadow: 0 1px 2px rgba(0,0,0,.08) !important;
+  border-color: #e0e0e0 !important;
+  background: #ffffff !important;
+}
+.chip.flat:hover {
+  background: #f5f5f5 !important;
+}
+
+.choice {
+  background: #ffffff !important;
+  border: 1px solid #e0e0e0 !important;
+  border-radius: 4px !important;
+  color: #212121 !important;
+  box-shadow: none !important;
+  padding: 14px 16px !important;
+  min-height: 56px !important;
+  font-weight: 400 !important;
+  transition: background-color .2s, border-color .2s !important;
+}
+.choice:hover {
+  background: #f5f5f5 !important;
+}
+.choice.sel {
+  border-color: #1976d2 !important;
+  background: #e3f2fd !important;
+  color: #0d47a1 !important;
+  box-shadow: 0 0 0 1px #1976d2 inset !important;
+}
+.choice.right {
+  border-color: #4caf50 !important;
+  background: #e8f5e9 !important;
+  color: #1b5e20 !important;
+  box-shadow: 0 0 0 1px #4caf50 inset !important;
+}
+.choice.wrong {
+  border-color: #d32f2f !important;
+  background: #ffebee !important;
+  color: #b71c1c !important;
+  box-shadow: 0 0 0 1px #d32f2f inset !important;
+}
+.choice:disabled {
+  cursor: default !important;
+}
+
+.typein,
+.field {
+  background: #ffffff !important;
+  border: 1px solid #bdbdbd !important;
+  border-radius: 4px !important;
+  color: #212121 !important;
+  font-family: 'Roboto', 'Segoe UI', system-ui, sans-serif !important;
+  font-weight: 400 !important;
+  font-size: 16px !important;
+  padding: 12px 14px !important;
+  min-height: 44px !important;
+  transition: border-color .2s, box-shadow .2s !important;
+  outline: none !important;
+}
+.typein:focus,
+.field:focus {
+  border-color: #1976d2 !important;
+  box-shadow: 0 0 0 1px #1976d2 inset !important;
+}
+.typein::placeholder,
+.field::placeholder {
+  color: #9e9e9e !important;
+}
+
+.compare {
+  background: #f5f5f5 !important;
+  border-radius: 4px !important;
+  padding: 16px !important;
+}
+.cmp-label {
+  color: #757575 !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.06em !important;
+}
+.cmp-text {
+  font-weight: 400 !important;
+  color: #212121 !important;
+}
+.cmp-row.good .cmp-text {
+  color: #1b5e20 !important;
+  font-weight: 500 !important;
+}
+.cmp-row.bad .cmp-text {
+  color: #b71c1c !important;
+  font-weight: 500 !important;
+}
+.cmp-text.empty {
+  color: #9e9e9e !important;
+  font-style: normal !important;
+}
+
+.footer,
+.selbar {
+  background: #ffffff !important;
+  border-top: 0 !important;
+  box-shadow: 0 -2px 8px rgba(0,0,0,.08) !important;
+}
+.footer-hint {
+  color: #757575 !important;
+  font-weight: 400 !important;
+}
+.rate-title {
+  color: #616161 !important;
+  font-weight: 400 !important;
+}
+.rate-title b {
+  font-weight: 500 !important;
+}
+.selcount {
+  color: #757575 !important;
+  font-weight: 500 !important;
+}
+
+.introcard {
+  background: #ffffff !important;
+  border: 1px solid #e0e0e0 !important;
+  border-radius: 4px !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,.08) !important;
+  padding: 20px 18px !important;
+}
+.introtag {
+  color: #1976d2 !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.08em !important;
+}
+.iw .w {
+  font-weight: 500 !important;
+  color: #212121 !important;
+}
+.intro-en {
+  font-weight: 400 !important;
+  color: #212121 !important;
+}
+
+.flagbtn {
+  background: #ffffff !important;
+  border: 1px solid #e0e0e0 !important;
+  color: #757575 !important;
+  border-radius: 50% !important;
+  min-width: 40px !important;
+  min-height: 40px !important;
+  transition: background-color .2s, color .2s, border-color .2s !important;
+}
+.flagbtn:hover {
+  border-color: #1976d2 !important;
+  color: #1976d2 !important;
+  background: #f5f5f5 !important;
+}
+.flagbtn.on {
+  background: #f57c00 !important;
+  border-color: #f57c00 !important;
+  color: #ffffff !important;
+}
+.flagbtn.notebtn.on {
+  background: #1976d2 !important;
+  border-color: #1976d2 !important;
+  color: #ffffff !important;
+}
+.flagbtn.gradebtn {
+  border-radius: 20px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.05em !important;
+}
+
+.overlay {
+  background: rgba(0,0,0,.32) !important;
+}
+.sheet {
+  background: #ffffff !important;
+  border-radius: 8px 8px 0 0 !important;
+  box-shadow: 0 -4px 20px rgba(0,0,0,.15) !important;
+}
+@media (min-width: 600px) {
+  .sheet {
+    border-radius: 8px !important;
+  }
+}
+.sheet h3 {
+  font-family: 'Roboto', 'Segoe UI', system-ui, sans-serif !important;
+  font-weight: 500 !important;
+  font-size: 18px !important;
+  color: #212121 !important;
+}
+.srow {
+  border: 1px solid #e0e0e0 !important;
+  border-radius: 4px !important;
+  font-weight: 400 !important;
+  padding: 12px 14px !important;
+  min-height: 48px !important;
+}
+.srow:hover {
+  background: #f5f5f5 !important;
+  border-color: #e0e0e0 !important;
+}
+.dd {
+  background: #ffffff !important;
+  border: 1px solid #e0e0e0 !important;
+  border-radius: 4px !important;
+  box-shadow: 0 4px 8px rgba(0,0,0,.15), 0 2px 4px rgba(0,0,0,.12) !important;
+}
+.ddrow {
+  border-radius: 4px !important;
+  font-weight: 400 !important;
+  min-height: 44px !important;
+}
+.ddrow:hover {
+  background: #f5f5f5 !important;
+}
+.ddrow .cnt {
+  color: #757575 !important;
+}
+
+.toast {
+  background: #323232 !important;
+  color: #ffffff !important;
+  border-radius: 4px !important;
+  font-weight: 400 !important;
+  font-size: 14px !important;
+  padding: 12px 20px !important;
+  box-shadow: 0 3px 6px rgba(0,0,0,.16), 0 3px 6px rgba(0,0,0,.23) !important;
+}
+
+.attemptrow {
+  border-bottom-color: #eeeeee !important;
+}
+.attemptrow .en {
+  font-weight: 500 !important;
+}
+.rowcb {
+  border-bottom-color: #eeeeee !important;
+}
+.cb {
+  border-radius: 2px !important;
+  border: 2px solid #9e9e9e !important;
+  transition: background-color .2s, border-color .2s !important;
+}
+.cb.on {
+  background: #1976d2 !important;
+  border-color: #1976d2 !important;
+  color: #ffffff !important;
+}
+
+.tchip {
+  border: 1px solid #e0e0e0 !important;
+  background: #ffffff !important;
+  color: #616161 !important;
+  border-radius: 16px !important;
+  font-weight: 500 !important;
+  padding: 5px 14px !important;
+  min-height: 32px !important;
+}
+.tchip.on {
+  background: #e3f2fd !important;
+  border-color: #1976d2 !important;
+  color: #1976d2 !important;
+}
+.themecard {
+  border: 1px solid #e0e0e0 !important;
+  border-radius: 4px !important;
+  background: #ffffff !important;
+}
+.themecard.on {
+  border-color: #1976d2 !important;
+  box-shadow: 0 0 0 2px rgba(25,118,210,.2) !important;
+}
+.tabbtn {
+  font-family: 'Roboto', 'Segoe UI', system-ui, sans-serif !important;
+  font-weight: 500 !important;
+  font-size: 13px !important;
+  color: #616161 !important;
+  border: 1px solid #e0e0e0 !important;
+  border-radius: 4px !important;
+  background: #ffffff !important;
+  min-height: 40px !important;
+}
+.tabbtn.on {
+  color: #1976d2 !important;
+  border-color: #1976d2 !important;
+  background: #e3f2fd !important;
+}
+.alTab {
+  font-family: 'Roboto', 'Segoe UI', system-ui, sans-serif !important;
+  font-weight: 500 !important;
+  color: #757575 !important;
+  letter-spacing: 0.05em !important;
+  padding: 12px 8px !important;
+  min-height: 48px !important;
+  border-bottom: 2px solid transparent !important;
+}
+.alTab.on {
+  color: #1976d2 !important;
+  border-bottom-color: #1976d2 !important;
+}
+
+.lbadge,
+.flagbadge,
+.ntag {
+  background: #e3f2fd !important;
+  color: #1976d2 !important;
+  border-radius: 4px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.05em !important;
+}
+.ntype,
+.notice {
+  background: #fff3e0 !important;
+  color: #e65100 !important;
+  border-radius: 4px !important;
+  font-weight: 500 !important;
+}
+
+.dot.ok { background: #4caf50 !important; }
+.dot.no { background: #d32f2f !important; }
+.dot.flag { background: #f57c00 !important; }
+
+.nt {
+  background: rgba(255,213,79,.45) !important;
+  box-shadow: 0 1px 0 rgba(245,124,0,.6) !important;
+  border-radius: 2px !important;
+}
+.nt.nts {
+  background: transparent !important;
+  box-shadow: none !important;
+  border-bottom: 2px dashed rgba(245,124,0,.6) !important;
+}
+.ntline {
+  border-left-color: rgba(245,124,0,.6) !important;
+}
+
+.funpop {
+  background: #212121 !important;
+  color: #ffffff !important;
+  border: 0 !important;
+  border-radius: 4px !important;
+  font-weight: 500 !important;
+  font-size: 16px !important;
+  box-shadow: 0 3px 6px rgba(0,0,0,.2) !important;
+}
+.funpop.big {
+  font-size: 18px !important;
+  color: #ffffff !important;
+}
+
+.translit {
+  color: #757575 !important;
+  font-style: italic !important;
+}
+.sidetr {
+  color: #757575 !important;
+  font-weight: 400 !important;
+}
+.nomatch {
+  color: #9e9e9e !important;
+  font-weight: 400 !important;
+}
+.empty {
+  color: #9e9e9e !important;
+  font-weight: 400 !important;
+}
+.code {
+  background: #263238 !important;
+  color: #eceff1 !important;
+  border-radius: 4px !important;
+}
+`;
+Object.assign(LS, { themeNames:'arTrainer:themeNames' });
+let THEME_NAMES = loadLS(LS.themeNames, {});            // the user's own names for built-in themes
+const themeName = t=>THEME_NAMES[t.id] || t.name;
 const THEMES = [
-  { id:'classic',  name:'Classic',   desc:'The original look',                          sw:['#ffffff','#f7f7f7','#58cc02','#3c3c3c'] },
+  { id:'classic',  name:'Classic',   desc:'Clean Material look, blue accent',            sw:['#fafafa','#ffffff','#1976d2','#212121'] },
+  { id:'duolingo', name:'Duolingo',  desc:'The original green look',                    sw:['#ffffff','#f7f7f7','#58cc02','#3c3c3c'] },
   { id:'paper',    name:'Paper',     desc:'Warm paper, serif type, ink rules',          sw:['#f5efe3','#fbf7ee','#8c2f1b','#2a2118'] },
   { id:'terminal', name:'Terminal',  desc:'Black screen, monospace, green phosphor',    sw:['#0a0f0a','#101810','#3dff7a','#b6ffcb'] },
   { id:'aurora',   name:'Aurora',    desc:'Dark gradient, frosted glass cards',         sw:['#1b1740','#2a2563','#8b7bff','#eef0ff'] },
@@ -3019,6 +3798,10 @@ Object.assign(LS, { cssThemeOn:'arTrainer:cssThemeOn' });
 let CSS_ON = loadLS(LS.cssThemeOn, '');               // id of the saved theme in use ('' = none); its CSS is a layer apart from the text field
 (()=>{ const m = CUSTOM_CSS && CSS_THEMES.find(t=>t.css === CUSTOM_CSS);       // older versions put a saved theme into the text field
   if (m){ CSS_ON = m.id; saveLS(LS.cssThemeOn, CSS_ON); CUSTOM_CSS = ''; saveLS(LS.css, ''); } })();
+(()=>{ if (loadLS('arTrainer:themeV2', false)) return;
+  let ch = false; CSS_THEMES.forEach(t=>{ if (t.base === 'classic'){ t.base = 'duolingo'; ch = true; } });
+  if (ch) saveLS(LS.cssThemes, CSS_THEMES);
+  saveLS('arTrainer:themeV2', true); })();
 function setCssOn(id){ CSS_ON = id || ''; saveLS(LS.cssThemeOn, CSS_ON); applyCustomCss(); }          // saved looks: { id, name, base (built-in theme), css }
 function saveCssThemes(){ saveLS(LS.cssThemes, CSS_THEMES); }
 function cssSwatch(t){                                // preview colours: the theme's own CSS variables, else its base theme
@@ -3036,6 +3819,9 @@ function applyTheme(id){
   if (!THEMES.some(t=>t.id === id)) id = 'classic';
   THEME = id;
   document.documentElement.setAttribute('data-theme', id);
+  let tc = document.getElementById('themeCss');
+  if (!tc){ tc = document.createElement('style'); tc.id = 'themeCss'; const u = document.getElementById('userCss'); if (u) document.head.insertBefore(tc, u); else document.head.appendChild(tc); }
+  tc.textContent = id === 'classic' ? CLASSIC_CSS : '';
   const mt = document.querySelector('meta[name="theme-color"]');
   if (mt) mt.setAttribute('content', THEMES.find(t=>t.id === id).sw[0]);
 }
@@ -3055,15 +3841,22 @@ function appearanceEl(){
   d.innerHTML = '<div class="sectionhead" style="margin-top:8px">Appearance</div><div class="themegrid"></div>';
   const g = d.querySelector('.themegrid');
   THEMES.forEach(t=>{
-    const b = document.createElement('button'); b.type = 'button'; b.className = 'themecard' + (t.id === THEME ? ' on' : '');
-    b.innerHTML = `<span class="tsw">${t.sw.map(c=>`<i style="background:${c}"></i>`).join('')}</span><b>${esc(t.name)}</b><small>${esc(t.desc)}</small>`;
+    const w = document.createElement('div'); w.className = 'themewrap';
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'themecard' + (t.id === THEME && !CSS_ON ? ' on' : '');
+    b.innerHTML = `<span class="tsw">${t.sw.map(c=>`<i style="background:${c}"></i>`).join('')}</span><b>${esc(themeName(t))}</b><small>${esc(t.desc)}</small>`;
     b.onclick = ()=>{ applyTheme(t.id); saveLS(LS.theme, t.id); setCssOn(''); g.querySelectorAll('.themecard').forEach(x=>x.classList.remove('on')); b.classList.add('on'); };
-    g.appendChild(b);
+    const ed = document.createElement('button'); ed.type = 'button'; ed.className = 'tdel tedit'; ed.textContent = '✎'; ed.title = 'Rename this theme';
+    ed.onclick = e=>{
+      e.stopPropagation(); const nm = (prompt('Theme name', themeName(t)) || '').trim(); if (!nm || nm === themeName(t)) return;
+      if (THEMES.some(y=>y.id !== t.id && themeName(y).toLowerCase() === nm.toLowerCase()) || CSS_THEMES.some(y=>y.name.toLowerCase() === nm.toLowerCase())){ toast('That name is already used'); return; }
+      THEME_NAMES[t.id] = nm; saveLS(LS.themeNames, THEME_NAMES); render(true);
+    };
+    w.appendChild(b); w.appendChild(ed); g.appendChild(w);
   });
   CSS_THEMES.forEach(t=>{
     const w = document.createElement('div'); w.className = 'themewrap';
     const b = document.createElement('button'); b.type = 'button'; b.className = 'themecard' + (t.id === CSS_ON ? ' on' : '');
-    b.innerHTML = `<span class="tsw">${cssSwatch(t).map(c=>`<i style="background:${esc(c)}"></i>`).join('')}</span><b>${esc(t.name)}</b><small>Saved · ${esc((THEMES.find(x=>x.id === t.base) || THEMES[0]).name)} + CSS</small>`;
+    b.innerHTML = `<span class="tsw">${cssSwatch(t).map(c=>`<i style="background:${esc(c)}"></i>`).join('')}</span><b>${esc(t.name)}</b><small>Saved · ${esc(themeName(THEMES.find(x=>x.id === t.base) || THEMES[0]))} + CSS</small>`;
     b.onclick = ()=>{ applyTheme(t.base); saveLS(LS.theme, t.base); setCssOn(t.id); render(true); };
     const ed = document.createElement('button'); ed.type = 'button'; ed.className = 'tdel tedit'; ed.textContent = '✎'; ed.title = 'Rename this saved theme';
     ed.onclick = e=>{
@@ -3077,51 +3870,76 @@ function appearanceEl(){
   });
   return d;
 }
-const CSS_BRIEF = ()=>`I use a small offline language-learning web app (one HTML file). I want to restyle it by adding my own CSS, which the app injects in a <style id="userCss"> at the END of <head>, after every built-in rule (including the six built-in themes).
+const CSS_PROMPT = want=>{
+  const w = (want || '').trim();
+  const wantBlock = w ? w : `<e.g., "A sleek dark mode inspired by Linear and Spotify, with frosted glass, vibrant green accents, and pill-shaped buttons.">
+<e.g., "A crisp, minimalist light mode inspired by Notion and iOS, with warm off-white backgrounds, serif headings, and soft shadows.">`;
+  return `I use a small offline language-learning web app (a single HTML file). I want to completely restyle it by adding my own CSS. The app injects my CSS inside a <style id="userCss"> tag at the very END of the <head>, after every built-in rule.
 
-WHAT I WANT (edit this part): <describe the look you want, the screens it applies to, colors, fonts, where buttons should sit...>
+WHAT I WANT${w ? '' : ' (edit this part)'}:
+${wantBlock}
 
-RULES FOR YOUR ANSWER
-1. Output ONLY plain CSS in one code block. No JavaScript, no HTML, no @import of remote files (the app works offline; use system fonts or a font stack).
-2. Put !important on EVERY declaration. The built-in themes use very specific selectors such as html[data-theme]:not([data-theme="classic"]) .btn, and plain rules lose against them.
-3. Prefer overriding the CSS variables first (on html, like: html{ --accent:#e11d48 !important; }), then add selector rules for anything the variables cannot do (layout, placement, sizes, shapes).
-4. Mobile first (the app is used on a phone 360–430px wide, content column max 680px). Keep tap targets at least 40px. Do not hide the Check / Continue / right / wrong buttons.
-5. The app has right-to-left languages (Arabic, Hebrew, Persian, Urdu). Use logical properties (margin-inline-start, padding-inline-end, inset-inline-*) and never force direction:ltr on text.
-6. Texts in the language being learned have the class .fl (and .rtl / .arf for right-to-left/Arabic). Do not change their line-height below 1.5 (diacritics get clipped).
-7. If something in my request is ambiguous (which screen? light or dark? what accent color?), ask me before writing CSS.
+CRITICAL RULES FOR YOUR ANSWER
+1. Output ONLY plain CSS in one code block. No JavaScript, no HTML, no @import.
+2. Put !important on EVERY single declaration. The app's built-in styles and themes use highly specific selectors (like html[data-theme]:not([data-theme="classic"],[data-theme="duolingo"]) .btn). Plain rules will lose.
+3. ALWAYS override the CSS variables first (on html { ... }). Only use specific selectors for structural changes (shapes, borders, layout).
+4. Mobile first (360–430px wide). Keep tap targets at least 44px. Never hide the Check, Continue, right, or wrong buttons.
+5. RTL support: use logical properties (margin-inline-start, padding-inline-end, inset-inline-*). Never force direction: ltr.
+6. Foreign text (.fl, .rtl, .arf) must NEVER have line-height below 1.5 (diacritics get clipped).
+7. If something in my request is ambiguous (which screen? light or dark? which accent color?), ask me before writing CSS.
+
+CRITICAL BUG-FIX ZONES (DO NOT SKIP)
+In previous attempts these elements were forgotten, resulting in white-on-white text or invisible backgrounds. You MUST explicitly style them for dark mode or light mode:
+- Bottom sheets (.sheet, .overlay): needs its own background, text color, input fields, and tab buttons.
+- Dropdown menu (.dd, .ddrow): needs background, text color, hover state, and checkbox styling.
+- Theme picker (.themecard, .tsw): needs explicit background and text color so the swatches don't blend into the page.
+- Toasts (.toast): needs a highly contrasting background and text color.
+- Settings rows (.rowcb, .srow) and tabs (.tabbtn, .alTab): need explicit text and border colors.
 
 ACTIVE BUILT-IN THEME NOW: ${THEME}   (html has data-theme="${THEME}")
 
-CSS VARIABLES (set on html; every theme except "classic" uses all of them. "classic" only uses the colour ones)
- Colours: --bg page · --bg2 / --card / --card2 panels · --ink / --ink2 / --ink3 text strong→faint · --line / --line2 borders
-          --accent main button & progress · --accent-d hover · --accent-ink text on accent · --accent2 / --accent2-ink secondary button · --accent-soft halo
-          --green --green-d --green-l --green-t (right answer: base, dark, light bg, text) · --red --red-d --red-l --red-t (wrong) · --blue --blue-d --blue-l · --amber --amber-l --amber-t (flags/warnings)
-          --hl / --hl-line  note highlight background / underline
- Shape:   --r corner radius (px) · --bw border width · --upper text-transform of buttons (none|uppercase) · --ls letter-spacing · --btnw button font-weight
-          --btn-sh / --btn-sh-p button shadow normal / pressed · --press transform when pressed · --chip-sh shadow of answer chips
- Type:    --font body font stack · --hfont heading font stack · --topbg top-bar background
+CSS VARIABLES TO OVERRIDE (set these first on html)
+ Colours: --bg (page) · --bg2 / --card / --card2 (panels) · --ink / --ink2 / --ink3 (text strong→faint) · --line / --line2 (borders)
+ Accents: --accent (main button) · --accent-ink (text on main button) · --accent2 (secondary button) · --accent-soft (halo)
+ Feedback: --green / --green-t (right) · --red / --red-t (wrong) · --amber (flags) · --hl / --hl-line (note highlights)
+ Shape:   --r (corner radius) · --bw (border width) · --upper (uppercase) · --btn-sh / --btn-sh-p (button shadow normal/pressed) · --press (transform on press) · --chip-sh (word chip shadow)
+ Type:    --font (body font stack) · --hfont (heading font stack) · --topbg (top bar background)
 
-MAIN ELEMENTS (class / id)
- Layout:  .topbar (sticky top) · .wrap (home column) · .exwrap (lesson column) · .footer / .footer-inner (fixed bottom bar of a lesson) · .sheet inside .overlay (bottom sheets) · .toast
- Home:    .hero (h1 + p) · .statgrid > .statcard (b + span) · .lvcard (level card: .lvinfo, .gbar>i progress) · .deck (library row: .deck-ico, .deck-title, .deck-sub, .deck-meta) · .sectionhead
- Buttons: .btn with .btn-green (primary) .btn-blue .btn-red .btn-ghost .btn-amber .btn-redg and .btn-sm · .iconbtn · .flagbtn / .notebtn (round tool buttons in a lesson, wrapper .qtools)
- Lesson:  .qhead h2 (instruction) · .answerzone (+ .filled, .rtl) · .bank > .chip (word bank; .chip.used hidden) · .choice (+ .sel .right .wrong) · .typein · .compare > .cmp-row > .cmp-label / .cmp-text (+ .good .bad)
-          .progress > i (top progress bar) · .pill (xp, streak) · .rate-title · .rate-row (self-rating buttons) · .footer-hint · .introcard (.introtag .iw .w .translit .intro-en)
- Text:    .fl foreign-language text (.rtl .arf) · .translit transliteration line · .sidetr side translation · .nt highlighted word that has a note · .ntstrip / .ntline notes under a sentence
- Ids:     #quitBtn #checkBtn #contBtn #wrongBtn #rightBtn #gotBtn #undoBtn #titleBtn #dd
- Forms:   .field (inputs/selects/textareas) · .rowcb / .cb (checkbox rows) · .tchip (tag chips) · .themecard
+MAIN UI ELEMENTS
+ Layout: .topbar (sticky top) · .wrap (home column) · .exwrap (lesson column) · .footer / .footer-inner (fixed bottom bar) · .sheet (bottom sheet)
+ Home: .hero (h1 + p) · .statgrid > .statcard (b + span) · .lvcard (level card) · .deck (library row) · .sectionhead
+ Buttons: .btn + modifiers .btn-green (primary) .btn-ghost .btn-redg (danger) .btn-sm · .iconbtn · .flagbtn (tool buttons)
+ Lesson: .qhead h2 (instruction) · .answerzone (answer box) · .bank > .chip (word bank) · .choice (multiple choice buttons; .sel, .right, .wrong) · .typein (text input) · .compare (feedback box)
+ Text: .fl (foreign text) · .translit (transliteration) · .nt (highlighted word) · .ntstrip (notes list under sentence)
+ Forms: .field (inputs/selects) · .rowcb / .cb (checkbox rows) · .tchip (tag chips) · .tabbtn (tabs)
 
-Please give me the CSS now (after asking anything you need).`;
+Please give me the CSS now.`;
+};
 
+function builtinCss(id){                              // the CSS behind a built-in theme, readable from the page's own stylesheet
+  if (id === 'classic') return CLASSIC_CSS;
+  if (id === 'duolingo') return '/* Duolingo is the plain base look of the app: it has no extra rules. */';
+  const out = [];
+  try { for (const sh of document.styleSheets){ let rules; try { rules = sh.cssRules; } catch(e){ continue; }
+    for (const r of rules) if (r.cssText && r.cssText.indexOf('[data-theme="' + id + '"]') >= 0 && r.cssText.indexOf(':not(') < 0) out.push(r.cssText); } } catch(e){}
+  return out.join('\n') || '/* no rules found */';
+}
+function activeCssBundle(extra){                      // base theme + saved theme + the text box
+  const t = CSS_ON && CSS_THEMES.find(x=>x.id === CSS_ON);
+  const parts = ['/* Base theme: ' + THEME + ' */\n' + builtinCss(THEME)];
+  if (t) parts.push('/* Saved theme: ' + t.name + ' */\n' + t.css);
+  if (extra && extra.trim()) parts.push('/* My CSS */\n' + extra.trim());
+  return parts.join('\n\n');
+}
 function customCssEl(){
   const d = document.createElement('div');
   d.innerHTML = `<div class="sectionhead">Custom CSS</div>
-    <div class="hint">Pick a look above, then refine it with your own CSS (colours, placement, sizes…). It is applied on top of the chosen look and saved with your backup. Not sure how to write it? Copy the brief below, add what you want at the “WHAT I WANT” line, paste it to any AI chat and paste its answer here.</div>
+    <div class="hint">Pick a look above, then refine it with your own CSS (colours, placement, sizes…). It is applied on top of the chosen look and saved with your backup. Not sure how to write it? Tap “Make with AI”, say what you want, and paste the answer here.</div>
     <textarea class="field cssbox" id="cssTa" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder="/* e.g.  html{ --accent:#e11d48 !important; } */"></textarea>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
       <button class="btn btn-green btn-sm" id="cssApply">Apply</button>
       <button class="btn btn-blue btn-sm" id="cssSave">💾 Save as theme</button>
-      <button class="btn btn-ghost btn-sm" id="cssBrief">📋 Copy brief for an AI</button>
+      <button class="btn btn-ghost btn-sm" id="cssBrief">✨ Make with AI</button>
       <button class="btn btn-ghost btn-sm" id="cssCopy">Copy my CSS</button>
       <button class="btn btn-redg btn-sm" id="cssReset">Remove</button>
     </div>
@@ -3149,8 +3967,20 @@ function customCssEl(){
     if (i >= 0) CSS_THEMES[i] = t; else CSS_THEMES.push(t);
     saveCssThemes(); CUSTOM_CSS = ''; ta.value = ''; saveLS(LS.css, ''); setCssOn(t.id); render(true); toast('Theme saved — it now lives in the theme list');
   };
-  d.querySelector('#cssBrief').onclick = ()=>copyText(CSS_BRIEF()).then(ok=>toast(ok ? 'Brief copied — paste it into an AI chat' : 'Copy failed'));
-  d.querySelector('#cssCopy').onclick = ()=>copyText(ta.value).then(ok=>toast(ok ? 'CSS copied' : 'Copy failed'));
+  d.querySelector('#cssBrief').onclick = ()=>openSheet((sh, close)=>{
+    sh.innerHTML = `<h3>Make with AI</h3>
+      <div class="hint">Write the look you want, copy the ready prompt, paste it into any AI chat, then paste the CSS it gives you into the box.</div>
+      <textarea class="field" id="aiWant" rows="4" placeholder="e.g. A dark mode like Spotify, green accents, pill-shaped buttons"></textarea>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px">
+        <button class="btn btn-green" id="aiReady">📋 Copy ready prompt</button>
+        <button class="btn btn-ghost" id="aiPlain">📋 Copy the prompt only, I will write it there</button>
+        <button class="btn btn-ghost" id="aiX">Close</button>
+      </div>`;
+    sh.querySelector('#aiX').onclick = close;
+    sh.querySelector('#aiReady').onclick = ()=>{ const w = sh.querySelector('#aiWant').value.trim(); if (!w){ toast('Write what you want first'); return; } copyText(CSS_PROMPT(w)).then(ok=>{ toast(ok ? 'Prompt copied — paste it into an AI chat' : 'Copy failed'); if (ok) close(); }); };
+    sh.querySelector('#aiPlain').onclick = ()=>copyText(CSS_PROMPT('')).then(ok=>{ toast(ok ? 'Prompt copied — edit the “WHAT I WANT” part' : 'Copy failed'); if (ok) close(); });
+  });
+  d.querySelector('#cssCopy').onclick = ()=>copyText(activeCssBundle(ta.value)).then(ok=>toast(ok ? 'CSS copied' : 'Copy failed'));
   d.querySelector('#cssReset').onclick = ()=>{ if (!CUSTOM_CSS && !ta.value) return; if (!confirm('Remove your custom CSS?')) return; CUSTOM_CSS = ''; ta.value = ''; saveLS(LS.css, ''); applyCustomCss(); msg.textContent = 'Removed.'; };
   return d;
 }
@@ -3164,7 +3994,14 @@ function resumeSettingsEl(){
 }
 function repeatSettingsEl(){
   const d = document.createElement('div');
-  d.innerHTML = '<div class="sectionhead">Repetition</div><div class="hint">A sentence never comes straight back. Cards that must pass between two appearances of the same sentence:</div>';
+  d.innerHTML = '<div class="sectionhead">Repetition &amp; chunks</div><div class="hint">Chunk size: how many sentences are practised together before the question type moves on (a → b → c). Smaller chunks bring the harder type c around more often.</div>';
+  const cs = document.createElement('select'); cs.className = 'field'; cs.style.width = '120px';
+  cs.innerHTML = [4, 6, 8, 10, 12, 16, 20].map(n=>`<option value="${n}"${n === CHUNK_TARGET ? ' selected' : ''}>${n}</option>`).join('');
+  cs.onchange = ()=>{ CHUNK_TARGET = parseInt(cs.value, 10) || 6; saveLS('arTrainer:chunk', CHUNK_TARGET); ACTIVE.forEach(c=>{ try { normalizeLevel(c); } catch(e){} }); toast('Chunk size: ' + CHUNK_TARGET); };
+  d.appendChild(cs);
+  const h1 = document.createElement('div'); h1.className = 'hint'; h1.style.marginTop = '14px';
+  h1.textContent = 'A sentence never comes straight back. Cards that must pass between two appearances of the same sentence:';
+  d.appendChild(h1);
   const sel = document.createElement('select'); sel.className = 'field'; sel.style.width = '120px';
   for (let i = 1; i <= 8; i++) sel.innerHTML += `<option value="${i}"${i === gapN() ? ' selected' : ''}>${i}</option>`;
   sel.onchange = ()=>{ GAP_N = parseInt(sel.value, 10); saveLS(LS.gap, GAP_N); };
@@ -3180,10 +4017,10 @@ function repeatSettingsEl(){
   return d;
 }
 function gradingSettingsEl(){
-  const d = document.createElement('div');
+  const d = document.createElement('div'); d.dataset.radio = '1';
   d.innerHTML = '<div class="sectionhead">Grading</div>';
   const opts = [
-    { id:'self', t:'Self-rating', s:'You press right or wrong after seeing the answer (Anki style).' },
+    { id:'self', t:'Self-rating', s:'You press right or wrong after seeing the answer.' },
     { id:'auto', t:'Automatic', s:'The app decides if the answer is right, then you press Continue.' },
   ];
   opts.forEach(o=>{
@@ -3675,12 +4512,7 @@ function ankiPreview(){
 /* ---------- Settings section ---------- */
 function ankiSettingsEl(){
   const d = document.createElement('div');
-  d.innerHTML = '<div class="sectionhead">Review system (Anki style)</div>';
-  const r = document.createElement('div'); r.className = 'rowcb';
-  r.innerHTML = `<span class="cb${ANKI_ON ? ' on' : ''}">✓</span><div class="body"><div class="en">Spaced review</div>
-    <div class="hint" style="margin:2px 0 0">On: sentences you finish in a level come back on a schedule (Again / Good). Due reviews come first, levels still bring the new sentences, and each deck has daily limits. Off: the app works exactly as before.</div></div>`;
-  r.onclick = ()=>{ ANKI_ON = !ANKI_ON; saveLS(LS.anki, ANKI_ON); render(true); };
-  d.appendChild(r);
+  d.innerHTML = '<div class="sectionhead">Spaced repetition (Anki mode)</div><div class="hint" style="margin-top:10px">Sentences you finish in a level come back on a schedule (Again / Good). Due reviews come first, levels still bring the new sentences, and each deck has daily limits. Switch it off above to go back to the normal behaviour.</div>';
   if (ANKI_ON){
     const c = srsDueCounts(null, Date.now()), n = Object.keys(srsStore().cards).length;
     const info = document.createElement('div'); info.className = 'hint'; info.style.margin = '8px 0';
@@ -3814,7 +4646,14 @@ function decorateUndo(){
   [['undoBtn', '↶', UNDO, undoPop, 'Undo'], ['redoBtn', '↷', REDO, redoPop, 'Redo']].forEach(([id, ch, st, fn, nm])=>{
     const b = document.createElement('button');
     b.className = 'iconbtn undobtn'; b.id = id; b.textContent = ch;
-    if (st.length){ b.title = nm + ': ' + st[st.length - 1].label; b.onclick = fn; }
+    if (st.length){
+      b.title = nm + ': ' + st[st.length - 1].label;
+      b.onclick = ()=>{                                // big changes take a moment: say so, and ignore taps meanwhile
+        if (b.disabled) return;
+        b.disabled = true; b.classList.add('busy'); toast('Please wait… ' + (nm === 'Undo' ? 'undoing' : 'redoing'));
+        setTimeout(()=>{ try { fn(); } finally { b.disabled = false; b.classList.remove('busy'); } }, 50);
+      };
+    }
     else { b.disabled = true; b.title = 'Nothing to ' + nm.toLowerCase(); }
     tb.appendChild(b);
   });
@@ -4111,7 +4950,7 @@ function render(keep){
   if (!keep) window.scrollTo(0,0);
   if (state.screen !== 'home') state.ddOpen = false;
   app.innerHTML = '';
-  const m = { home:renderHome, lesson:renderLesson, group:renderGroup, stats:renderStats, flags:renderFlags, addlang:renderAddLang, settings:renderSettings, store:renderStore, notes:renderNotes, deckopts:renderDeckOpts, onboard:renderOnboard, known:renderKnown, gloss:renderGloss, insights:renderInsights };
+  const m = { home:renderHome, lesson:renderLesson, group:renderGroup, stats:renderStats, flags:renderFlags, addlang:renderAddLang, settings:renderSettings, store:renderStore, notes:renderNotes, deckopts:renderDeckOpts, onboard:renderOnboard, library:renderLibrary, phon:renderPhon, known:renderKnown, gloss:renderGloss, insights:renderInsights };
   app.appendChild((m[state.screen] || renderHome)());
   ACTIVE_SHADOW = ACTIVE.slice();
   decorateUndo();
@@ -4120,8 +4959,8 @@ function render(keep){
 /* Phone back button: moves between screens instead of closing the app */
 function wantDepth(){
   if (state.screen === 'home' || state.screen === 'onboard') return 0;
-  if (state.screen === 'deckopts') return 2;
-  if (state.screen === 'lesson') return (state.sess && (state.sess.from === 'group' || state.sess.from === 'flags')) ? 2 : 1;
+  if (state.screen === 'deckopts' || state.screen === 'group') return 2;
+  if (state.screen === 'lesson'){ const fr = state.sess && state.sess.from; return fr === 'group' ? 3 : ((fr === 'flags' || fr === 'library') ? 2 : 1); }
   return 1;
 }
 function syncHistory(){
@@ -4141,6 +4980,7 @@ window.addEventListener('popstate', ()=>{
     else if (state.screen === 'store'){ state.screen = 'addlang'; render(); }
     else if (state.screen === 'deckopts'){ state.screen = state.deckBack || 'settings'; render(); }
     else if (state.screen === 'gloss'){ state.screen = 'settings'; render(); }
+    else if (state.screen === 'group'){ state.screen = 'library'; render(); }
     else { state.screen = 'home'; render(); }
   }
 });
@@ -4217,8 +5057,8 @@ function renderHome(){
   f.innerHTML = `
     <div class="topbar">
       <button class="titlebtn${state.ddOpen?' open':''}" id="titleBtn"><span class="t">${esc(pageTitle())}</span><span class="caret">▾</span></button>
-      <span class="pill">🔥 ${STATS.streak||0}</span>
-      <span class="pill" style="margin-left:8px">⭐ ${STATS.xp||0}</span>
+      <span class="pill" title="Days in a row">🔥 ${STATS.streak||0}</span>
+      <span class="pill" style="margin-left:8px" title="Stars today">⭐ ${xpToday()}</span>
       <div class="dd" id="dd" ${state.ddOpen?'':'hidden'}>
         ${present.map(p=>`<div class="ddrow" data-lang="${p.code}">
             <span class="cb${ACTIVE.includes(p.code)?' on':''}">✓</span>
@@ -4232,13 +5072,13 @@ function renderHome(){
         <h1>${L0.hello && LIB.groups.length ? esc(L0.hello) + ' ' : ''}👋</h1>
         <p>${LIB.groups.length ? 'Real ' + esc(names) + ' sentences. Read, build, translate — then rate yourself honestly. Anki-style.' : 'Pick a language to start.'}</p>
       </div>
-      <div class="statgrid">
-        <div class="statcard"><b>${items.length}</b><span>Sentences</span></div>
-        <div class="statcard"><b>${acc}%</b><span>Accuracy</span></div>
-        <div class="statcard"><b>${known}/${items.length}</b><span>Known</span></div>
+      <div class="statgrid two">
+        <div class="statcard"><b>${STATS.xp||0}</b><span>⭐ Total</span></div>
+        <div class="statcard"><b>${known}<small>/${items.length}</small></b><span>Known</span></div>
       </div>
       ${ACTIVE.filter(c=>EN_IDX[c]).map(levelCardHTML).join('')}
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px">
+        <button class="btn btn-green btn-sm" id="libBtn">📚 Library (${groups.length})</button>
         <button class="btn btn-blue btn-sm" id="loadBtn">📂 Import</button>
         <button class="btn btn-ghost btn-sm" id="allBtn">▶ Practice all</button>
         <button class="btn btn-ghost btn-sm" id="revBtn">🔁 Review mistakes</button>
@@ -4248,28 +5088,11 @@ function renderHome(){
         <button class="btn btn-ghost btn-sm" id="notesBtn">📝 Notes (${NOTES.filter(n=>!n.auto).length})</button>
         ${BETA.known ? '<button class="btn btn-ghost btn-sm" id="kwBtn">✅ Known words</button>' : ''}
         ${BETA.gloss ? '<button class="btn btn-ghost btn-sm" id="glBtn">📖 Glossary</button>' : ''}
-        <button class="btn btn-ghost btn-sm" id="setBtn">⚙ Settings</button>
-        ${hasAr ? `<button class="btn btn-amber btn-sm${SHOW_TASHKIL?' on':''}" id="tashBtn">َ Tashkīl ${SHOW_TASHKIL?'on':'off'}</button>` : ''}
+        ${BETA.phon ? '<button class="btn btn-ghost btn-sm" id="phBtn">🔊 Sounds</button>' : ''}
+        <button class="btn btn-amber btn-sm on" id="setBtn">⚙ Settings</button>
       </div>
-      <div class="sechead">
-        <div class="sectionhead">Library</div>
-        <div>
-          ${sm ? '<button class="linkbtn" id="selAll">All</button>' : ''}
-          ${groups.length ? `<button class="linkbtn" id="selToggle">${sm?'Done':'Select'}</button>` : ''}
-        </div>
-      </div>
-      <div class="decklist" id="decklist"></div>
-    </div>
-    ${sm && state.sel.size ? `<div class="selbar"><div class="selbar-inner">
-      <div class="selcount">${state.sel.size} selected · ${[...state.sel].reduce((a,i)=>a+(getGroup(i)?getGroup(i).items.length:0),0)} sentences</div>
-      <div class="selbtns">
-        <button class="btn btn-green btn-sm" id="sPractice">Practice</button>
-        <button class="btn btn-ghost btn-sm" id="sCopy">Copy to…</button>
-        <button class="btn btn-ghost btn-sm" id="sMove">Move to…</button>
-        <button class="btn btn-ghost btn-sm" id="sShare">Share</button>
-        ${state.sel.size === 1 ? '<button class="btn btn-ghost btn-sm" id="sSplit">Split…</button>' : ''}
-        <button class="btn btn-redg btn-sm" id="sDel">Delete</button>
-      </div></div></div>` : ''}`;
+      <div id="decklist"></div>
+    </div>`;
 
   const list = f.querySelector('#decklist');
   if (!groups.length){
@@ -4283,30 +5106,6 @@ function renderHome(){
       LIB.groups.push(...g); ACTIVE = ['ar']; saveLS(LS.langs, ACTIVE); afterLibChange('Restore Arabic');
     };
   }
-  groups.forEach((g, i)=>{
-    const el = document.createElement('div');
-    const picked = state.sel.has(g.id);
-    const k = g.items.filter(s=>last.get(s.uid) === true).length;
-    const pct = g.items.length ? Math.round(k/g.items.length*100) : 0;
-    el.className = 'deck' + (sm && picked ? ' picked' : '');
-    el.innerHTML = `
-      ${sm ? `<div class="deck-ico cbwrap"><span class="cb${picked?' on':''}">✓</span></div>` : `<div class="deck-ico">${i+1}</div>`}
-      <div class="deck-body">
-        <div class="deck-title">${esc(g.name)}${multi?`<span class="lbadge">${esc(g.lang)}</span>`:''}</div>
-        <div class="deck-sub">${g.items.length ? esc(knText(g.items[0])) : '(empty)'}</div>
-        <div class="gbar"><i style="width:${pct}%"></i></div>
-      </div>
-      <div class="deck-meta">${g.items.length}<br>sent.</div>
-      ${sm ? '' : '<button class="iconbtn dotmenu" title="Manage">⋯</button>'}`;
-    el.onclick = ()=>{
-      if (sm){ if (picked) state.sel.delete(g.id); else state.sel.add(g.id); render(true); }
-      else startSession(g.items, g.name, 'home');
-    };
-    const dm = el.querySelector('.dotmenu');
-    if (dm) dm.onclick = ev=>{ ev.stopPropagation(); state.gid = g.id; state.ssel.clear(); state.screen = 'group'; render(); };
-    list.appendChild(el);
-  });
-
   f.querySelector('#titleBtn').onclick = ()=>{
     const dd = f.querySelector('#dd'); dd.hidden = !dd.hidden;
     state.ddOpen = !dd.hidden; f.querySelector('#titleBtn').classList.toggle('open', state.ddOpen);
@@ -4321,6 +5120,8 @@ function renderHome(){
   });
   f.querySelector('#ddAdd').onclick = openScrape;
 
+  f.querySelector('#libBtn').onclick = ()=>{ LIB_SHOW = 60; state.screen = 'library'; render(); };
+  if (f.querySelector('#phBtn')) f.querySelector('#phBtn').onclick = ()=>{ state.screen = 'phon'; render(); };
   f.querySelector('#loadBtn').onclick = ()=>document.getElementById('fileInput').click();
   f.querySelector('#allBtn').onclick = ()=>startSession(items, 'Practice all', 'home');
   f.querySelector('#revBtn').onclick = ()=>{
@@ -4339,9 +5140,157 @@ function renderHome(){
   if (f.querySelector('#kwBtn')) f.querySelector('#kwBtn').onclick = ()=>{ state.kwBack = 'home'; state.screen = 'known'; render(); };
   if (f.querySelector('#glBtn')) f.querySelector('#glBtn').onclick = ()=>{ state.screen = 'gloss'; render(); };
   f.querySelectorAll('[data-lv]').forEach(b=>{ b.onclick = ()=>startLevel(b.getAttribute('data-lv')); });
-  const tb = f.querySelector('#tashBtn');
-  if (tb) tb.onclick = ()=>{ SHOW_TASHKIL = !SHOW_TASHKIL; saveTashkil(); render(true); toast(SHOW_TASHKIL ? 'Tashkīl on' : 'Tashkīl off'); };
 
+  return f;
+}
+
+/* ==================== SOUND GUIDE · one markdown page per language, shown like on GitHub ====================
+   Pages are plain files in the repository:   phonology/<code>.md   (ar.md, de.md, …)
+   The app downloads a page once (like the interface packs), keeps it for offline use, and renders it with the small
+   markdown reader below. A built-in sample for Arabic works without internet.
+   Supported markdown: # headings, paragraphs, **bold**, *italic*, ~~strike~~, `code`, ``` blocks, lists, tables, > quotes, ---, [links](https://…), ![images](https://…).
+   Not yet: nested lists, HTML, relative links between pages.
+   IDEAS: a catalog (listDir(repo, 'phonology')) to show which languages have a page · audio links · "Update" badge when the file changed
+          (use the sha like the interface packs) · link sounds to the sentences of the library · a minimal-pairs trainer. */
+const PHON_EMBEDDED = {"ar": "# Arabic sounds\n\n> Sample page. The real pages live in the repository, in the folder `phonology/`: one markdown file per language, for example `phonology/ar.md`.\n\nArabic is written with **28 consonant letters**. The three short vowels (*a, i, u*) are usually not written; the three long vowels (*ā, ī, ū*) are written with the letters ا ي و.\n\n## Vowels\n\n| Type | Name / letter | Sound | Example | Reads |\n|---|---|---|---|---|\n| Short | fatḥa | a | كَتَبَ | kataba |\n| Short | kasra | i | بِنْت | bint |\n| Short | ḍamma | u | كُتُب | kutub |\n| Long | ا | ā | كِتاب | kitāb |\n| Long | ي | ī | كَبير | kabīr |\n| Long | و | ū | نور | nūr |\n\n## Sounds new to many learners\n\n- **ع (ʿayn)**: a voiced sound made deep in the throat.\n- **ح (ḥ)**: a breathy, whispered h from the throat.\n- **خ (kh)** and **غ (gh)**: scraped sounds at the back of the mouth.\n- **ق (q)**: a k made further back than the English k.\n- **ص ض ط ظ**: \"emphatic\" consonants, said with a heavier, darker tongue; they colour the vowels next to them.\n- **ء (hamza)**: a glottal stop, like the break in \"uh-oh\".\n\n## Minimal pairs\n\n| Arabic | Reads | Meaning |\n|---|---|---|\n| كَلْب · قَلْب | kalb · qalb | dog · heart |\n| تين · طين | tīn · ṭīn | fig · mud |\n"};
+let PHON_MD = loadLS('arTrainer:phonMd', {});          // downloaded pages: { code: { text, at } }
+let PHON_NOTES = loadLS(LS.phonNotes, {});
+function mdInline(t){
+  t = esc(t);
+  const codes = [];
+  t = t.replace(/`([^`]+)`/g, (m, c)=>{ codes.push(c); return '\u0000' + (codes.length - 1) + '\u0000'; });
+  t = t.replace(/!\[([^\]]*)\]\((https?:[^)\s]+)\)/g, '<img alt="$1" src="$2" loading="lazy">');
+  t = t.replace(/\[([^\]]+)\]\((https?:[^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+  t = t.replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>').replace(/(^|[^*])\*([^*\s][^*]*)\*/g, '$1<i>$2</i>').replace(/~~([^~]+)~~/g, '<s>$1</s>');
+  return t.replace(/\u0000(\d+)\u0000/g, (m, i)=>'<code>' + codes[i] + '</code>');
+}
+function mdToHtml(src){
+  const lines = String(src || '').replace(/\r/g, '').split('\n'), out = [];
+  const isTbl = l=>/^\s*\|.*\|\s*$/.test(l), isLi = l=>/^\s*([-*+]|\d+\.)\s+/.test(l);
+  const sepRow = l=>/^\s*\|?\s*:?-{2,}:?\s*(\|\s*:?-{2,}:?\s*)*\|?\s*$/.test(l);
+  const cells = r=>r.trim().replace(/^\||\|$/g, '').split('|').map(c=>c.trim());
+  let i = 0;
+  while (i < lines.length){
+    const l = lines[i]; let m;
+    if (!l.trim()){ i++; continue; }
+    if (/^```/.test(l)){ const buf = []; i++; while (i < lines.length && !/^```/.test(lines[i])){ buf.push(lines[i]); i++; } i++; out.push('<pre><code>' + esc(buf.join('\n')) + '</code></pre>'); continue; }
+    if ((m = l.match(/^(#{1,6})\s+(.*)$/))){ out.push(`<h${m[1].length}>${mdInline(m[2])}</h${m[1].length}>`); i++; continue; }
+    if (/^\s*([-*_])(\s*\1){2,}\s*$/.test(l)){ out.push('<hr>'); i++; continue; }
+    if (isTbl(l) && i + 1 < lines.length && sepRow(lines[i + 1])){
+      const head = cells(l), rows = []; i += 2;
+      while (i < lines.length && isTbl(lines[i])){ rows.push(cells(lines[i])); i++; }
+      out.push('<div class="mdscroll"><table><thead><tr>' + head.map(c=>`<th dir="auto">${mdInline(c)}</th>`).join('') + '</tr></thead><tbody>' + rows.map(r=>'<tr>' + r.map(c=>`<td dir="auto">${mdInline(c)}</td>`).join('') + '</tr>').join('') + '</tbody></table></div>');
+      continue;
+    }
+    if (/^>/.test(l)){ const buf = []; while (i < lines.length && /^>/.test(lines[i])){ buf.push(lines[i].replace(/^>\s?/, '')); i++; } out.push('<blockquote>' + mdToHtml(buf.join('\n')) + '</blockquote>'); continue; }
+    if (isLi(l)){
+      const ord = /^\s*\d+\./.test(l), items = [];
+      while (i < lines.length && isLi(lines[i])){ items.push(lines[i].replace(/^\s*([-*+]|\d+\.)\s+/, '')); i++; }
+      out.push((ord ? '<ol>' : '<ul>') + items.map(x=>`<li>${mdInline(x)}</li>`).join('') + (ord ? '</ol>' : '</ul>'));
+      continue;
+    }
+    const buf = [];
+    while (i < lines.length && lines[i].trim() && !/^(#{1,6}\s|```|>)/.test(lines[i]) && !isLi(lines[i]) && !isTbl(lines[i])){ buf.push(lines[i]); i++; }
+    if (!buf.length){ buf.push(l); i++; }
+    out.push('<p>' + mdInline(buf.join(' ')) + '</p>');
+  }
+  return out.join('\n');
+}
+async function phonFetch(code){
+  const r = await fetch(new URL('phonology/' + code + '.md', location.href), { cache:'no-cache' });
+  if (r.status === 404) throw new Error('none');
+  if (!r.ok) throw new Error('http ' + r.status);
+  PHON_MD[code] = { text:await r.text(), at:Date.now() };
+  saveLS('arTrainer:phonMd', PHON_MD);
+}
+const PHON_TRIED = new Set();
+function renderPhon(){
+  const f = document.createElement('div');
+  const st = state.phon || (state.phon = { lang:ACTIVE[0] || 'ar' });
+  if (!ACTIVE.includes(st.lang)) st.lang = ACTIVE[0] || st.lang;
+  const lang = st.lang, dl = PHON_MD[lang], text = dl ? dl.text : PHON_EMBEDDED[lang];
+  f.innerHTML = `<div class="topbar"><button class="iconbtn" id="backBtn">←</button><div style="font-weight:800;font-size:19px;flex:1">Sounds</div></div>
+    <div class="wrap statwrap">
+      <div id="phLangs" style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0"></div>
+      <div class="hint" id="phSrc"></div>
+      <div class="md" id="phMd"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin:12px 0"><button class="btn btn-ghost btn-sm" id="phGet">⬇ Get / update from the repository</button></div>
+      <div class="sectionhead">My notes</div>
+      <textarea class="field" id="phNotes" rows="6"></textarea>
+    </div>`;
+  const chips = f.querySelector('#phLangs');
+  ACTIVE.forEach(c=>{ const b = document.createElement('button'); b.type = 'button'; b.className = 'tchip' + (c === lang ? ' on' : ''); b.textContent = LG(c).name; b.onclick = ()=>{ st.lang = c; render(true); }; chips.appendChild(b); });
+  f.querySelector('#phSrc').textContent = dl ? 'Downloaded from the repository (phonology/' + lang + '.md).' : (text ? 'Built-in sample. The repository page replaces it once downloaded.' : '');
+  f.querySelector('#phMd').innerHTML = text ? mdToHtml(text) : `<div class="empty">There is no sound guide for ${esc(LG(lang).name)} yet.<br>A page is a markdown file named <b>phonology/${esc(lang)}.md</b> in the repository.</div>`;
+  const get = quiet=>phonFetch(lang).then(()=>{ if (state.screen === 'phon' && state.phon.lang === lang) render(true); if (!quiet) toast('Sound guide updated'); })
+    .catch(e=>{ if (!quiet) toast(e.message === 'none' ? 'No page for ' + LG(lang).name + ' in the repository yet' : 'Could not download (needs the web version, online)'); });
+  f.querySelector('#phGet').onclick = ()=>get(false);
+  if (!dl && !PHON_TRIED.has(lang)){ PHON_TRIED.add(lang); get(true); }
+  const ta = f.querySelector('#phNotes'); ta.placeholder = 'Your own notes about the sounds of ' + LG(lang).name; ta.value = PHON_NOTES[lang] || '';
+  ta.oninput = ()=>{ PHON_NOTES[lang] = ta.value; saveLS(LS.phonNotes, PHON_NOTES); };
+  f.querySelector('#backBtn').onclick = ()=>{ state.screen = 'home'; render(); };
+  return f;
+}
+
+/* ==================== LIBRARY (its own page: keeps the main page light) ==================== */
+let LIB_SHOW = 60;                                    // decks drawn at once (the page stays fast with hundreds of groups)
+function renderLibrary(){
+  const f = document.createElement('div');
+  const groups = activeGroups(), last = lastMap(), multi = ACTIVE.length > 1, sm = state.selMode;
+  const nSent = groups.reduce((a, g)=>a + g.items.length, 0);
+  f.innerHTML = `
+    <div class="topbar">
+      <button class="iconbtn" id="backBtn">←</button>
+      <div style="font-weight:800;font-size:19px;flex:1">Library</div>
+      ${sm ? '<button class="linkbtn" id="selAll">All</button>' : ''}
+      ${groups.length ? `<button class="linkbtn" id="selToggle">${sm?'Done':'Select'}</button>` : ''}
+    </div>
+    <div class="wrap statwrap" style="padding-bottom:${sm && state.sel.size ? 150 : 40}px">
+      <div class="hint" style="margin-top:6px">${groups.length} groups · ${nSent} sentences. Your decks, Anki style: tap one to practise its sentences freely (no levels). Tap ⋯ to open it and edit its sentences.</div>
+      <div class="decklist" id="decklist"></div>
+    </div>
+    ${sm && state.sel.size ? `<div class="selbar"><div class="selbar-inner">
+      <div class="selcount">${state.sel.size} selected · ${[...state.sel].reduce((a,i)=>a+(getGroup(i)?getGroup(i).items.length:0),0)} sentences</div>
+      <div class="selbtns">
+        <button class="btn btn-green btn-sm" id="sPractice">Practice</button>
+        <button class="btn btn-ghost btn-sm" id="sCopy">Copy to…</button>
+        <button class="btn btn-ghost btn-sm" id="sMove">Move to…</button>
+        <button class="btn btn-ghost btn-sm" id="sShare">Share</button>
+        ${state.sel.size === 1 ? '<button class="btn btn-ghost btn-sm" id="sSplit">Split…</button>' : ''}
+        <button class="btn btn-redg btn-sm" id="sDel">Delete</button>
+      </div></div></div>` : ''}`;
+  const list = f.querySelector('#decklist');
+  groups.slice(0, LIB_SHOW).forEach((g, i)=>{
+    const el = document.createElement('div');
+    const picked = state.sel.has(g.id);
+    const k = g.items.filter(s=>last.get(s.uid) === true).length;
+    const pct = g.items.length ? Math.round(k/g.items.length*100) : 0;
+    el.className = 'deck' + (sm && picked ? ' picked' : '');
+    el.innerHTML = `
+      ${sm ? `<div class="deck-ico cbwrap"><span class="cb${picked?' on':''}">✓</span></div>` : `<div class="deck-ico">${i+1}</div>`}
+      <div class="deck-body">
+        <div class="deck-title">${esc(g.name)}${multi?`<span class="lbadge">${esc(g.lang)}</span>`:''}</div>
+        <div class="deck-sub">${g.items.length ? esc(knText(g.items[0])) : '(empty)'}</div>
+        <div class="gbar"><i style="width:${pct}%"></i></div>
+      </div>
+      <div class="deck-meta">${g.items.length}<br>sent.</div>
+      ${sm ? '' : '<button class="iconbtn dotmenu" title="Manage">⋯</button>'}`;
+    el.onclick = ()=>{
+      if (sm){ if (picked) state.sel.delete(g.id); else state.sel.add(g.id); render(true); }
+      else startSession(g.items, g.name, 'library');
+    };
+    const dm = el.querySelector('.dotmenu');
+    if (dm) dm.onclick = ev=>{ ev.stopPropagation(); state.gid = g.id; state.ssel.clear(); state.groupBack = 'library'; state.screen = 'group'; render(); };
+    list.appendChild(el);
+  });
+
+  if (groups.length > LIB_SHOW){
+    const more = document.createElement('button'); more.className = 'btn btn-ghost btn-sm'; more.style.margin = '10px 0';
+    more.textContent = 'Show more (' + (groups.length - LIB_SHOW) + ' left)';
+    more.onclick = ()=>{ LIB_SHOW += 60; render(true); };
+    list.appendChild(more);
+  }
+  f.querySelector('#backBtn').onclick = ()=>{ state.screen = 'home'; render(); };
   const st = f.querySelector('#selToggle');
   if (st) st.onclick = ()=>{ state.selMode = !state.selMode; state.sel.clear(); render(true); };
   const sa = f.querySelector('#selAll');
@@ -4349,7 +5298,7 @@ function renderHome(){
 
   const selGs = ()=>[...state.sel].map(getGroup).filter(Boolean);
   const q = id=>f.querySelector(id);
-  if (q('#sPractice')) q('#sPractice').onclick = ()=>{ const gs = selGs(); startSession(gs.flatMap(g=>g.items), gs.length === 1 ? gs[0].name : gs.length + ' groups', 'home'); };
+  if (q('#sPractice')) q('#sPractice').onclick = ()=>{ const gs = selGs(); startSession(gs.flatMap(g=>g.items), gs.length === 1 ? gs[0].name : gs.length + ' groups', 'library'); };
   if (q('#sCopy')) q('#sCopy').onclick = ()=>{
     const gs = selGs(), lang = singleLang(gs); if (!lang) return;
     chooseTarget({ title:'Copy ' + gs.length + ' group' + (gs.length>1?'s':'') + ' to…', lang, exclude:gs.map(g=>g.id), dup:true, onPick:t=>transferGroups(gs, t, false) });
@@ -4417,7 +5366,7 @@ function renderGroup(){
   });
 
   const q = id=>f.querySelector(id);
-  q('#backBtn').onclick = ()=>{ state.screen = 'home'; render(); };
+  q('#backBtn').onclick = ()=>{ state.screen = state.groupBack || 'library'; render(); };
   q('#gPractice').onclick = ()=>startSession(g.items, g.name, 'group');
   q('#gRename').onclick = ()=>openRename(g);
   q('#gSplit').onclick = ()=>openSplit(g);
@@ -4450,8 +5399,7 @@ function renderLesson(){
   top.innerHTML = `
     <button class="iconbtn" id="quitBtn" title="Finish">✕</button>
     <div class="progress"><i style="width:${pct}%"></i></div>
-    ${FUN_ON && (state.combo || 0) >= 3 ? `<span class="pill flame">🔥 ${state.combo}</span>` : ''}
-    <span class="pill${FUN_ON && state.funBump ? ' bump' : ''}">⭐ ${state.xp}</span>`;
+    <span class="pill${FUN_ON && state.funBump ? ' bump' : ''}" title="Stars today">⭐ ${xpToday()}</span>`;
   state.funBump = false;
   f.appendChild(top);
 
@@ -4501,7 +5449,15 @@ function renderLesson(){
   gradeB.title = 'Grading: ' + (autoGrade() ? 'automatic (the app decides)' : 'self (you decide)') + ' — tap to switch';
   gradeB.textContent = autoGrade() ? 'Auto' : 'Self';
   gradeB.onclick = ()=>{ GRADE_MODE = autoGrade() ? 'self' : 'auto'; saveLS(LS.grade, GRADE_MODE); toast(autoGrade() ? 'Automatic grading' : 'Self-rating'); render(true); };
-  tools.appendChild(trB); tools.appendChild(addN); if (showN) tools.appendChild(showN); tools.appendChild(gradeB); tools.appendChild(flag);
+  let tashB = null;
+  if (ex.sent.lang === 'ar'){                    // Arabic only: show / hide the vowel marks (like Self / Auto grading, one tap)
+    tashB = document.createElement('button');
+    tashB.className = 'flagbtn notebtn tashbtn' + (SHOW_TASHKIL ? ' on' : '');
+    tashB.title = 'Tashkīl (Arabic vowel marks): ' + (SHOW_TASHKIL ? 'on' : 'off') + ' — tap to switch';
+    tashB.textContent = '\u062A\u064E';
+    tashB.onclick = ()=>{ SHOW_TASHKIL = !SHOW_TASHKIL; saveTashkil(); toast(SHOW_TASHKIL ? 'Tashkīl on' : 'Tashkīl off'); render(true); };
+  }
+  tools.appendChild(trB); tools.appendChild(addN); if (showN) tools.appendChild(showN); if (tashB) tools.appendChild(tashB); tools.appendChild(gradeB); tools.appendChild(flag);
   head.appendChild(tools);
   wrap.appendChild(head);
 
@@ -4787,7 +5743,7 @@ function rate(userSaysCorrect){
     STATS.correct = (STATS.correct||0) + 1;
     state.combo = (state.combo||0) + 1;
     const bonus = Math.min(5, state.combo);
-    state.xp += 10 + bonus; STATS.xp = (STATS.xp||0) + 10 + bonus;
+    state.xp += 10 + bonus; addXp(10 + bonus);
     state.correctSession++;
     if (FUN_ON){ state.funBump = true; if ([5, 10, 20, 30, 50].includes(state.combo)) funPop('🔥 ' + state.combo + ' in a row', true); else funPop('+' + (10 + bonus) + ' XP'); }
   } else {
@@ -4828,6 +5784,7 @@ function renderStats(){
     byId[a.id].tries++;
     if (!a.correct) byId[a.id].wrong++;
   }
+  const _items = activeItems(), _last = lastMap(), _known = _items.filter(s=>_last.get(s.uid) === true).length, _acc = STATS.total ? Math.round(STATS.correct / STATS.total * 100) : 0;
   const hardest = Object.values(byId).filter(x=>x.wrong>0 && BY_UID.has(x.id)).sort((a,b)=>b.wrong-a.wrong).slice(0,12);
 
   f.innerHTML = `
@@ -4836,6 +5793,13 @@ function renderStats(){
       <div style="font-weight:800;font-size:19px;flex:1">My answers</div>
     </div>
     <div class="wrap statwrap">
+      <div class="statgrid" style="margin-top:8px">
+        <div class="statcard"><b>${_items.length}</b><span>Sentences</span></div>
+        <div class="statcard"><b>${_acc}%</b><span>Accuracy</span></div>
+        <div class="statcard"><b>${_known}<small>/${_items.length}</small></b><span>Known</span></div>
+        <div class="statcard"><b>${STATS.xp||0}</b><span>⭐ Total</span></div>
+        <div class="statcard"><b>${xpToday()}</b><span>⭐ Today</span></div>
+      </div>
       <div class="statgrid" style="margin-top:8px">
         <div class="statcard"><b>${n}</b><span>Attempts</span></div>
         <div class="statcard"><b>${acc}%</b><span>Self-rated OK</span></div>
@@ -5113,6 +6077,51 @@ document.getElementById('dataInput').addEventListener('change', async e=>{
 });
 
 /* ==================== SETTINGS ==================== */
+let SET_OPEN = new Set();                              // titles of the open Settings sections (kept while the screen redraws)
+function accordionize(wrap){
+  const headOf = el=>el.classList.contains('sectionhead') ? el : (el.firstElementChild && el.firstElementChild.classList.contains('sectionhead') ? el.firstElementChild : null);
+  const lead = [], groups = []; let cur = null;
+  Array.from(wrap.children).forEach(el=>{
+    const h = headOf(el);
+    if (h){
+      cur = { title:h.textContent.trim(), body:document.createElement('div') };
+      if (h === el){ groups.push(cur); }                                // a bare heading: the siblings after it belong to it
+      else { h.remove(); cur.body = el; groups.push(cur); cur = null; } // a wrapper that starts with its heading
+      if (h === el) cur.bare = true;
+    } else if (cur && cur.bare) cur.body.appendChild(el);
+    else lead.push(el);
+  });
+  while (wrap.firstChild) wrap.removeChild(wrap.firstChild);
+  lead.forEach(x=>wrap.appendChild(x));
+  const tools = document.createElement('div'); tools.style.cssText = 'display:flex;justify-content:flex-end;gap:4px;margin:6px 0';   // (sections are listed in SET_ORDER below)
+  tools.innerHTML = '<button class="linkbtn" id="accAll">Expand all</button><button class="linkbtn" id="accNone">Collapse all</button>';
+  wrap.appendChild(tools);
+  const accs = [];
+  const SET_ORDER = ['Languages', 'Interface language', 'Appearance', 'Custom CSS', 'Exercise types', 'Grading', 'Repetition & chunks', 'Hints', 'Practice style', 'Arabic', 'Notes', 'Introduction card', 'Saved queue', 'Introduction', 'Data', 'Advanced (beta)', 'Developer', 'Levels (debug)'];
+  const ord = t=>{ const i = SET_ORDER.indexOf(t); return i < 0 ? 99 : i; };
+  groups.sort((x, y)=>ord(x.title) - ord(y.title));
+  groups.forEach((g, i)=>{
+    const acc = document.createElement('div'); acc.className = 'acc';
+    const head = document.createElement('button'); head.type = 'button'; head.className = 'acchead';
+    const cbs = g.body.querySelectorAll('.rowcb .cb'), on = g.body.querySelectorAll('.rowcb .cb.on').length;
+    let cnt = '';
+    if (cbs.length){
+      if (g.body.dataset.radio){ const sel = g.body.querySelector('.rowcb .cb.on'); cnt = sel ? sel.parentElement.querySelector('.en').textContent : ''; }
+      else if (cbs.length === 1) cnt = on ? 'On' : 'Off';
+      else cnt = on + '/' + cbs.length;
+    }
+    head.innerHTML = `<span class="accn">${i + 1}</span><span class="acct"></span><span class="accc"></span><span class="accar">▾</span>`;
+    head.querySelector('.accc').textContent = cnt;
+    head.querySelector('.acct').textContent = g.title;
+    g.body.classList.add('accbody');
+    const set = open=>{ acc.classList.toggle('open', open); g.body.hidden = !open; if (open) SET_OPEN.add(g.title); else SET_OPEN.delete(g.title); };
+    head.onclick = ()=>set(g.body.hidden);
+    acc.appendChild(head); acc.appendChild(g.body); wrap.appendChild(acc);
+    set(SET_OPEN.has(g.title)); accs.push(set);
+  });
+  tools.querySelector('#accAll').onclick = ()=>accs.forEach(f=>f(true));
+  tools.querySelector('#accNone').onclick = ()=>accs.forEach(f=>f(false));
+}
 function renderSettings(){
   const f = document.createElement('div');
   f.innerHTML = `<div class="topbar"><button class="iconbtn" id="backBtn">←</button>
@@ -5203,8 +6212,9 @@ function renderSettings(){
   dt.querySelector('#expData').onclick = exportData;
   dt.querySelector('#impData').onclick = ()=>document.getElementById('dataInput').click();
   wrap.insertBefore(appearanceEl(), wrap.firstChild); wrap.insertBefore(customCssEl(), wrap.children[1]); wrap.insertBefore(funSettingsEl(), wrap.children[2]); wrap.insertBefore(introAgainEl(), wrap.children[3]); 
-  wrap.appendChild(gradingSettingsEl()); wrap.appendChild(repeatSettingsEl()); wrap.appendChild(resumeSettingsEl()); wrap.appendChild(notesSettingsEl()); wrap.appendChild(uiSettingsEl()); wrap.appendChild(betaSettingsEl()); wrap.appendChild(introSettingsEl()); wrap.appendChild(debugSettingsEl());
+  wrap.appendChild(tashkilSettingsEl()); wrap.appendChild(gradingSettingsEl()); wrap.appendChild(repeatSettingsEl()); wrap.appendChild(resumeSettingsEl()); wrap.appendChild(notesSettingsEl()); wrap.appendChild(uiSettingsEl()); wrap.appendChild(betaSettingsEl()); wrap.appendChild(introSettingsEl()); wrap.appendChild(debugSettingsEl());
   wrap.appendChild(dbg); wrap.appendChild(dt);
+  accordionize(wrap);
   f.querySelector('#backBtn').onclick = ()=>{ state.screen = 'home'; render(); };
   return f;
 }
@@ -5369,10 +6379,19 @@ Object.assign(LS, { ui:'arTrainer:ui', uiPacks:'arTrainer:uiPacks', onb:'arTrain
 let UI_LANG = loadLS(LS.ui, 'en');
 let UI_PACKS = loadLS(LS.uiPacks, {});           // packs the user imported: { code: { name, strings:{ English text: translation } } }
 let ONB_DONE = loadLS(LS.onb, false);
-let ONB2_DONE = loadLS(LS.onb2, false);          // v2 introduction: everyone sees it once, then it is done
+/* INTRO VERSIONS: INTRO_VERSION goes up whenever the introduction changes in a way users should see again.
+   A user who finished an older version sees it again, with a note “We changed something” (INTRO_NEWS says what).
+   IDEA (not built): feature previews = small cards for users who 1) have seen the intro and 2) have an older INTRO_VERSION,
+   each card tied to ONE new feature (id → text + a link to its screen), shown once and then dismissed. */
+const INTRO_VERSION = 3;
+const INTRO_NEWS = { 3: 'The main page changed: the Library is now its own page, and stars restart every day.' /* , 4: '…' */ };
+let ONB2_DONE = loadLS(LS.onb2, false);          // the introduction has been seen (at least once)
 Object.assign(LS, { beta:'arTrainer:beta' });
-let BETA = Object.assign({ gloss:false, anki:!!ANKI_ON, known:false }, loadLS(LS.beta, {}));
-if (!BETA.anki && ANKI_ON){ ANKI_ON = false; saveLS(LS.anki, false); }   // Anki review exists only while its beta switch is on   // advanced / beta features, off by default
+let INTRO_SEEN_VER = loadLS(LS.onbVer, ONB2_DONE ? 2 : 0);          // the introduction version the user last saw
+function markIntroSeen(){ ONB2_DONE = true; saveLS(LS.onb2, true); INTRO_SEEN_VER = INTRO_VERSION; saveLS(LS.onbVer, INTRO_VERSION); }
+let BETA = Object.assign({ gloss:false, phon:false, anki:!!ANKI_ON, known:false }, loadLS(LS.beta, {}));
+if (!BETA.anki && ANKI_ON){ ANKI_ON = false; saveLS(LS.anki, false); }
+if (BETA.anki && !ANKI_ON){ BETA.anki = false; saveLS(LS.beta, BETA); }          // older versions had two switches (unlock + on): keep it simple, on = both   // Anki review exists only while its beta switch is on   // advanced / beta features, off by default
 let TAG_LANG = loadLS(LS.tagLang, '');           // language the tags are displayed in ('' = as written)
 /* ---------- interface translation: exact-text lookup applied to the DOM (numbers become {n}) ---------- */
 function uiStrings(){ const p = UI_PACKS[UI_LANG]; return UI_LANG === 'en' || !p ? null : (p.strings || {}); }
@@ -5506,13 +6525,61 @@ function openUiStore(){
     }).catch(()=>{ box.innerHTML = '<div class="empty">Couldn\'t load the language list.<br>Check your internet connection.</div>'; });
   });
 }
+const AI_TR_FILES = {"PROMPT.md": "# Prompt: translate the interface into one language\n\nUse it once per language with a cheap model (or let `translate_ui.py` do the loop for you).\nReplace `{{LANGUAGE}}` (name in English, e.g. `French`) and `{{JSON}}` (one batch of `ui/en.json`, see below).\n\n---\n\nYou are a professional UI localizer. Translate the VALUES of the JSON object below from English into **{{LANGUAGE}}**.\n\nContext: a small offline language-learning app (flash-card style sentence practice with levels, spaced repetition, notes on words, themes). The user is a learner who speaks {{LANGUAGE}}.\n\nHard rules (the output is checked by a program; a wrong answer is rejected):\n1. Output ONE JSON object only. No explanation, no markdown fence, no comments.\n2. Keep every KEY exactly as given and keep ALL keys. Only values change.\n3. Placeholders must be kept exactly and the same number of times: `{n}` = a number, `{L}` = the name of a language. Do not translate, rename, add or remove them. You may move them where the grammar of {{LANGUAGE}} needs it.\n4. Keep emoji, arrows (← → ↶ ↷ ▶), ellipsis (…), ＋, ✓ ✗ and similar symbols where they are. Keep `“ ”` quotes style natural for {{LANGUAGE}}.\n5. Short and natural, like real app buttons and hints. Buttons: imperative or noun, as is usual in {{LANGUAGE}} apps. Friendly, not formal-legal. Use the singular \"you\" form that apps normally use in {{LANGUAGE}}.\n6. Some keys are sentence FRAGMENTS (they continue after a bold word, or end with a colon or “·”). Translate the fragment so that it still reads correctly when the fragments are shown one after the other.\n7. Do not translate: the words `CSV`, `JSON`, `CSS`, `Anki`, `AI` unless {{LANGUAGE}} has a well-established form; the characters `…` in pattern examples; the Arabic example text ي-غادر-ون, ال… and similar examples.\n8. Words used in the app and how to render them: \"sentence\" = a full example sentence being studied; \"level\" and \"chunk\" = a step of the course and a small batch inside it; \"group\"/\"deck\" = a collection of sentences; \"note\" = the learner's own note on a word; \"tag\" = a label on a note; \"flag\" = a mark to find a sentence again; \"Again/Good\" = the two self-rating buttons (like Anki); \"tashkīl\" = Arabic vowel marks (keep the word as is).\n9. If the target language is written right-to-left, simply write the translation normally; do not add direction marks.\n\nThe object has two parts, translate both:\n- \"strings\": interface texts.\n- \"names\": names of languages. Give each name as a native speaker of {{LANGUAGE}} calls that language (e.g. German → «Allemand» in French). If {{LANGUAGE}} itself is in the list, keep the usual name.\n\nJSON:\n{{JSON}}\n", "translate_ui.py": "#!/usr/bin/env python3\n\"\"\"\nTranslate ui/en.json into other languages with ANY OpenAI-compatible chat API (cheap models are fine).\nOutput: ui/<code>.json  ->  commit them to the repository, the app lists and downloads them (Settings -> Interface language).\n\n  export API_BASE=https://api.openai.com/v1      # or any compatible endpoint\n  export API_KEY=...            export MODEL=gpt-4o-mini\n  python3 translate_ui.py ar fr de tr          # some languages\n  python3 translate_ui.py --all                # every language of the app (codes read from ../index.html)\n  python3 translate_ui.py --check fr           # only validate an existing ui/fr.json\nOptions: --batch 100 (strings per request)  --force (overwrite)  --dry-run (no API: copies English, to test the pipeline)\n\"\"\"\nimport json, os, re, sys, time, urllib.request, urllib.error\n\nHERE = os.path.dirname(os.path.abspath(__file__))\nPROMPT = open(os.path.join(HERE, 'PROMPT.md'), encoding='utf-8').read().split('\\n---\\n', 1)[1].strip()\nSRC = json.load(open(os.path.join(HERE, 'en.json'), encoding='utf-8'))\n\ndef app_languages():\n    html = open(os.path.join(HERE, '..', 'index.html'), encoding='utf-8').read()\n    return {c: n for c, n, _ in re.findall(r\"add\\('([a-z]+)','([^']*)','([^']*)'\", html)}\n\ndef marks(s): return sorted(re.findall(r'\\{n\\}|\\{L\\}', s))\n\ndef validate(src, out):\n    \"\"\"returns a list of problems (empty = fine)\"\"\"\n    if not isinstance(out, dict): return ['not an object']\n    bad = []\n    for k, v in src.items():\n        if k not in out: bad.append('missing: ' + k[:60]); continue\n        if not isinstance(out[k], str) or not out[k].strip(): bad.append('empty: ' + k[:60]); continue\n        if marks(k) != marks(out[k]): bad.append('placeholders differ: ' + k[:60])\n    return bad\n\ndef call(messages):\n    base, key, model = os.environ['API_BASE'].rstrip('/'), os.environ['API_KEY'], os.environ['MODEL']\n    req = urllib.request.Request(base + '/chat/completions', method='POST',\n        data=json.dumps({'model': model, 'messages': messages, 'temperature': 0.2}).encode(),\n        headers={'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key})\n    with urllib.request.urlopen(req, timeout=300) as r:\n        return json.load(r)['choices'][0]['message']['content']\n\ndef parse_json(txt):\n    txt = re.sub(r'^```(?:json)?\\s*|\\s*```$', '', txt.strip())\n    a, b = txt.find('{'), txt.rfind('}')\n    return json.loads(txt[a:b + 1])\n\ndef translate_part(language, part, key, dry):\n    \"\"\"part = {'strings': {...}} or {'names': {...}}; returns the translated dict for `key`\"\"\"\n    if dry: return dict(part[key])\n    prompt = PROMPT.replace('{{LANGUAGE}}', language).replace('{{JSON}}', json.dumps(part, ensure_ascii=False, indent=1))\n    msgs = [{'role': 'user', 'content': prompt}]\n    for attempt in range(4):\n        try:\n            out = parse_json(call(msgs)).get(key)\n            bad = validate(part[key], out) if key == 'strings' else ([] if isinstance(out, dict) and set(part[key]) <= set(out) else ['names missing'])\n            if not bad: return {k: out[k] for k in part[key]}\n            print('   retry (%s): %s' % (attempt + 1, '; '.join(bad[:3])))\n            msgs = [msgs[0], {'role': 'assistant', 'content': json.dumps({key: out}, ensure_ascii=False)},\n                    {'role': 'user', 'content': 'Fix these problems and answer with the full JSON again:\\n- ' + '\\n- '.join(bad[:15])}]\n        except (ValueError, urllib.error.URLError, KeyError) as e:\n            print('   retry (%s): %s' % (attempt + 1, e)); time.sleep(3)\n    raise SystemExit('giving up on ' + language)\n\ndef run(code, name, batch, force, dry):\n    path = os.path.join(HERE, code + '.json')\n    if os.path.exists(path) and not force: print(code, 'exists (use --force)'); return\n    print(code, name)\n    items = list(SRC['strings'].items()); strings = {}\n    for i in range(0, len(items), batch):\n        strings.update(translate_part(name, {'strings': dict(items[i:i + batch])}, 'strings', dry))\n    names = translate_part(name, {'names': SRC['names']}, 'names', dry)\n    bad = validate(SRC['strings'], strings)\n    if bad: raise SystemExit('invalid: ' + '; '.join(bad[:5]))\n    json.dump({'app': 'arTrainer-ui', 'lang': code, 'strings': strings, 'names': names}, open(path, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)\n\nif __name__ == '__main__':\n    a = sys.argv[1:]; flag = lambda f: f in a\n    batch = int(a[a.index('--batch') + 1]) if '--batch' in a else 100\n    langs = app_languages()\n    if flag('--check'):\n        for c in [x for x in a if x in langs]:\n            print(c, validate(SRC['strings'], json.load(open(os.path.join(HERE, c + '.json'), encoding='utf-8'))['strings']) or 'ok')\n        sys.exit()\n    codes = [c for c in langs if c != 'en'] if flag('--all') else [x for x in a if x in langs]\n    if not codes: sys.exit(__doc__)\n    for c in codes: run(c, langs[c], batch, flag('--force'), flag('--dry-run'))", "ar.json": "{\n \"app\": \"arTrainer-ui\",\n \"lang\": \"ar\",\n \"strings\": {\n  \"(a CSV/TXT you already have) or\": \"(ملف CSV/TXT لديك) أو\",\n  \"(collect sentences from a web page).\": \"(اجمع الجمل من صفحة ويب).\",\n  \"). You choose the language and the group on the next screen.\": \"). تختار اللغة والمجموعة في الشاشة التالية.\",\n  \"A new sentence skips its introduction card and goes straight to questions when it has at most this many completely unknown words. A word is known if it has a note (word, prefix, suffix or infix) or appeared in an earlier sentence.\": \"تتخطى الجملة الجديدة بطاقة التعريف وتنتقل مباشرة إلى الأسئلة إذا كان عدد كلماتها المجهولة تماماً لا يزيد عن هذا الحد. تُعدّ الكلمة معروفة إذا كانت لها ملاحظة (كلمة أو بادئة أو لاحقة أو وسط) أو ظهرت في جملة سابقة.\",\n  \"A sentence never comes straight back. Cards that must pass between two appearances of the same sentence:\": \"لا تعود الجملة مباشرة بعد ظهورها. عدد البطاقات التي يجب أن تمرّ بين ظهورين للجملة نفسها:\",\n  \"A table of ideas × languages (tags in your language, masculine/feminine forms, links between forms).\": \"جدول أفكار × لغات (الوسوم بلغتك، صيغ المذكر والمؤنث، الروابط بين الصيغ).\",\n  \"Accuracy\": \"الدقة\",\n  \"Add\": \"إضافة\",\n  \"Add a form\": \"إضافة صيغة\",\n  \"Add a language\": \"إضافة لغة\",\n  \"Add a note\": \"إضافة ملاحظة\",\n  \"Add note\": \"إضافة ملاحظة\",\n  \"Add · {L}\": \"إضافة · {L}\",\n  \"Advanced (beta)\": \"متقدم (تجريبي)\",\n  \"Advanced. Open the page that lists one language's sentences, paste this code in the browser console and run it. It copies a CSV to the clipboard: save it as a .txt file, then use\": \"للمتقدمين. افتح صفحة تعرض جمل لغة واحدة، والصق هذا الكود في console المتصفح وشغّله. سينسخ ملف CSV إلى الحافظة: احفظه بصيغة .txt ثم استخدم\",\n  \"After a match exercise, shows the word that differs from the closest option (experimental)\": \"بعد تمرين المطابقة، يعرض الكلمة المختلفة عن أقرب خيار (تجريبي)\",\n  \"After a new sentence's introduction card, ask about that sentence:\": \"بعد بطاقة تعريف الجملة الجديدة، اسألني عن هذه الجملة:\",\n  \"After {n} other card\": \"بعد {n} بطاقة أخرى\",\n  \"After {n} other cards\": \"بعد {n} بطاقات أخرى\",\n  \"All\": \"الكل\",\n  \"Allowed unknown words by level: {n}→{n}  ·  {n}→{n}  ·  {n}→{n}  ·  {n}→{n}  ·  {n}→{n}  ·  {n}→{n}\": \"الكلمات المجهولة المسموحة حسب المستوى: {n}→{n}  ·  {n}→{n}  ·  {n}→{n}  ·  {n}→{n}  ·  {n}→{n}  ·  {n}→{n}\",\n  \"Answer\": \"الجواب\",\n  \"Answers\": \"الإجابات\",\n  \"Appearance\": \"المظهر\",\n  \"Apply\": \"تطبيق\",\n  \"{L} (the sentence)\": \"{L} (الجملة)\",\n  \"{L} Trainer\": \"مدرّب {L}\",\n  \"{L} sentences\": \"جمل {L}\",\n  \"{L} · Level {n}a\": \"{L} · المستوى {n}a\",\n  \"As written ({L})\": \"كما كُتبت ({L})\",\n  \"Attempts\": \"المحاولات\",\n  \"Aurora\": \"الشفق\",\n  \"Auto\": \"آلي\",\n  \"Automatic\": \"تلقائي\",\n  \"Backup contains your library, progress, levels and settings. Importing replaces everything on this device.\": \"تحتوي النسخة الاحتياطية على مكتبتك وتقدمك ومستوياتك وإعداداتك. الاستيراد يستبدل كل شيء على هذا الجهاز.\",\n  \"Black screen, monospace, green phosphor\": \"شاشة سوداء، خط أحادي العرض، فوسفور أخضر\",\n  \"Brutalist\": \"وحشي\",\n  \"Build the {L} sentence\": \"ابنِ جملة {L}\",\n  \"Build the sentence\": \"ابنِ الجملة\",\n  \"Build the translation\": \"ابنِ الترجمة\",\n  \"By formula\": \"بمعادلة\",\n  \"Cancel\": \"إلغاء\",\n  \"Check\": \"تحقّق\",\n  \"Check your internet connection.\": \"تحقق من اتصالك بالإنترنت.\",\n  \"Choose the {L} translation\": \"اختر ترجمة {L}\",\n  \"Choose the sentence\": \"اختر الجملة\",\n  \"Choose the translation\": \"اختر الترجمة\",\n  \"Classic\": \"كلاسيكي\",\n  \"Clear\": \"مسح\",\n  \"Close\": \"إغلاق\",\n  \"Compare with the answer, then\": \"قارن مع الجواب، ثم\",\n  \"Console code\": \"كود الـ console\",\n  \"Continue\": \"متابعة\",\n  \"Copy\": \"نسخ\",\n  \"Copy code\": \"نسخ الكود\",\n  \"Copy my CSS\": \"نسخ CSS الخاص بي\",\n  \"Copy to…\": \"نسخ إلى…\",\n  \"Correct\": \"صحيح\",\n  \"Couldn't load the language list.\": \"تعذّر تحميل قائمة اللغات.\",\n  \"Create\": \"إنشاء\",\n  \"Custom CSS\": \"CSS مخصص\",\n  \"Dark gradient, frosted glass cards\": \"تدرّج داكن وبطاقات زجاجية\",\n  \"Data\": \"البيانات\",\n  \"Deck options\": \"خيارات المجموعة\",\n  \"Default ({n} decks)\": \"افتراضي ({n} مجموعات)\",\n  \"Delete\": \"حذف\",\n  \"Do you already know some words?\": \"هل تعرف بعض الكلمات مسبقاً؟\",\n  \"Done\": \"تم\",\n  \"Duplicates (same sentence repeated in the file or already in your library)\": \"المكرّر (جملة مكررة في الملف أو موجودة في مكتبتك)\",\n  \"Edit\": \"تعديل\",\n  \"Edit the presets. Pick which preset a deck uses from the deck's own page.\": \"عدّل القوالب. اختر القالب الذي تستخدمه كل مجموعة من صفحتها.\",\n  \"Edit the translation shown (only for this sentence)\": \"عدّل الترجمة المعروضة (لهذه الجملة فقط)\",\n  \"Edit translation\": \"تعديل الترجمة\",\n  \"{L} (default)\": \"{L} (افتراضي)\",\n  \"{L} (shown translation)\": \"{L} (الترجمة المعروضة)\",\n  \"{L} (shown)\": \"{L} (معروضة)\",\n  \"{L} shown, pick the translation\": \"تُعرض {L}، اختر الترجمة\",\n  \"Exercise types\": \"أنواع التمارين\",\n  \"Expected\": \"المتوقّع\",\n  \"Finish\": \"إنهاء\",\n  \"Flag this sentence (unsure?)\": \"علّم هذه الجملة (غير متأكد؟)\",\n  \"Flagged\": \"المعلَّمة\",\n  \"Flagged ({n})\": \"المعلَّمة ({n})\",\n  \"Forget saved queues\": \"نسيان الطوابير المحفوظة\",\n  \"Forget seen introductions\": \"نسيان التعريفات التي شوهدت\",\n  \"Get\": \"تنزيل\",\n  \"Glossary\": \"جدول المصطلحات\",\n  \"Got it\": \"فهمت\",\n  \"Grading\": \"التقييم\",\n  \"Grading: automatic (the app decides) — tap to switch\": \"التقييم: تلقائي (التطبيق يقرّر) — اضغط للتبديل\",\n  \"Grading: self (you decide) — tap to switch\": \"التقييم: ذاتي (أنت تقرّر) — اضغط للتبديل\",\n  \"Graduating interval (days)\": \"فاصل التخرّج (أيام)\",\n  \"Group\": \"المجموعة\",\n  \"Group by\": \"تجميع حسب\",\n  \"Hard outlines, flat colour, big shadows\": \"حدود سميكة وألوان مسطحة وظلال كبيرة\",\n  \"Hardest sentences\": \"أصعب الجمل\",\n  \"Highlight words that have a note\": \"إبراز الكلمات التي لها ملاحظة\",\n  \"Highlights only — tap for: Highlights + notes list\": \"الإبراز فقط — اضغط لعرض: الإبراز + قائمة الملاحظات\",\n  \"Hints\": \"تلميحات\",\n  \"How do you like to study?\": \"كيف تحب أن تدرس؟\",\n  \"If the repository has the menus in this language they are downloaded when you finish.\": \"إن كان المستودع يحتوي القوائم بهذه اللغة فستُنزَّل عند الانتهاء.\",\n  \"If you learned some of the language elsewhere, tell the app which words so it does not explain them again. It takes a minute and you can do it any time from Settings.\": \"إذا تعلمت جزءاً من اللغة في مكان آخر، أخبر التطبيق بالكلمات التي تعرفها حتى لا يشرحها مرة أخرى. يستغرق دقيقة ويمكنك فعله في أي وقت من الإعدادات.\",\n  \"Import\": \"استيراد\",\n  \"Import a\": \"استورد ملف\",\n  \"Interface language\": \"لغة الواجهة\",\n  \"Interface languages\": \"لغات الواجهة\",\n  \"Interval modifier (%)\": \"معدّل الفاصل (%)\",\n  \"Introduction\": \"المقدمة\",\n  \"Introduction card\": \"بطاقة التعريف\",\n  \"Keep duplicates\": \"إبقاء المكرّر\",\n  \"Known\": \"معروفة\",\n  \"Known language — the language the sentences are translated into\": \"اللغة المعروفة — اللغة التي تُترجم إليها الجمل\",\n  \"Known words\": \"الكلمات المعروفة\",\n  \"Language\": \"اللغة\",\n  \"Language of “{L} sentences”\": \"لغة «جمل {L}»\",\n  \"Language: {L}\": \"اللغة: {L}\",\n  \"Languages\": \"اللغات\",\n  \"Learn real sentences, step by step. A few questions to set the app up for you — you can change everything later in Settings.\": \"تعلّم جملاً حقيقية خطوة بخطوة. بضعة أسئلة لإعداد التطبيق لك — ويمكنك تغيير كل شيء لاحقاً من الإعدادات.\",\n  \"Learning steps (minutes)\": \"خطوات التعلّم (دقائق)\",\n  \"Learning: {L} (change it from the title menu)\": \"تتعلّم: {L} (غيّرها من قائمة العنوان)\",\n  \"Level\": \"المستوى\",\n  \"Level {n}\": \"المستوى {n}\",\n  \"Library\": \"المكتبة\",\n  \"Loading…\": \"جارٍ التحميل…\",\n  \"Look\": \"الشكل\",\n  \"Manage\": \"إدارة\",\n  \"Match: sentence → translation\": \"مطابقة: جملة ← ترجمة\",\n  \"Match: translation → sentence\": \"مطابقة: ترجمة ← جملة\",\n  \"Maximum interval (days)\": \"أقصى فاصل (أيام)\",\n  \"Maximum reviews / day\": \"أقصى عدد مراجعات / يوم\",\n  \"Move to…\": \"نقل إلى…\",\n  \"My answers\": \"إجاباتي\",\n  \"My file\": \"ملفي\",\n  \"New\": \"جديد\",\n  \"New group name\": \"اسم المجموعة الجديدة\",\n  \"New interval after a lapse (%)\": \"الفاصل الجديد بعد النسيان (%)\",\n  \"New sentence\": \"جملة جديدة\",\n  \"New sentences / day\": \"جمل جديدة / يوم\",\n  \"New · you will see it once\": \"جديدة · ستراها مرة واحدة\",\n  \"Next\": \"التالي\",\n  \"No flags yet. Tap 🚩 in any exercise to mark a sentence.\": \"لا علامات بعد. اضغط 🚩 في أي تمرين لتعليم جملة.\",\n  \"No languages published yet.\": \"لا توجد لغات منشورة بعد.\",\n  \"No mistakes yet — nice!\": \"لا أخطاء بعد — أحسنت!\",\n  \"No notes yet.\": \"لا ملاحظات بعد.\",\n  \"None\": \"لا شيء\",\n  \"Note\": \"ملاحظة\",\n  \"Notes\": \"الملاحظات\",\n  \"Nothing recorded yet. Start practicing!\": \"لم يُسجَّل شيء بعد. ابدأ التدريب!\",\n  \"Now: Level {n}a · chunk {n}/{n} · {n}/{n} done · levels {n}–{n}\": \"الآن: المستوى {n}a · الدفعة {n}/{n} · أُنجز {n}/{n} · المستويات {n}–{n}\",\n  \"On: sentences you finish in a level come back on a schedule (Again / Good). Due reviews come first, levels still bring the new sentences, and each deck has daily limits. Off: the app works exactly as before.\": \"مفعّل: الجمل التي تنهيها في مستوى تعود حسب جدول (مرة أخرى / جيد). تأتي المراجعات المستحقة أولاً، وتستمر المستويات في جلب الجمل الجديدة، ولكل مجموعة حدود يومية. معطّل: يعمل التطبيق كما كان.\",\n  \"One row = one idea. Put the same idea in several languages, add every form it can take (masculine, feminine, plural…), and\": \"كل صف = فكرة واحدة. ضع الفكرة نفسها بعدة لغات، وأضف كل الصيغ الممكنة (مذكر، مؤنث، جمع…)، ثم\",\n  \"Only for this sentence, while you practise {L}. The library text is not changed.\": \"لهذه الجملة فقط أثناء تدرّبك على {L}. نص المكتبة لا يتغير.\",\n  \"Options\": \"خيارات\",\n  \"Or just press Finish and start.\": \"أو اضغط «إنهاء» وابدأ مباشرة.\",\n  \"Paper\": \"ورق\",\n  \"Pattern\": \"النمط\",\n  \"Per level (manual)\": \"لكل مستوى (يدوي)\",\n  \"Pick a look above, then refine it with your own CSS (colours, placement, sizes…). It is applied on top of the chosen look and saved with your backup. Not sure how to write it? Copy the brief below, add what you want at the “WHAT I WANT” line, paste it to any AI chat and paste its answer here.\": \"اختر شكلاً من الأعلى ثم حسّنه بـ CSS خاص بك (ألوان، أماكن، أحجام…). يُطبَّق فوق الشكل المختار ويُحفظ مع نسختك الاحتياطية. لا تعرف كيف تكتبه؟ انسخ الملخص أدناه، واكتب ما تريده عند سطر «WHAT I WANT»، والصقه في أي محادثة ذكاء اصطناعي ثم الصق جوابه هنا.\",\n  \"Pick one or more. Languages that are not in your library yet are fetched from the ready-made list when you finish.\": \"اختر لغة أو أكثر. اللغات غير الموجودة في مكتبتك تُجلب من القائمة الجاهزة عند الانتهاء.\",\n  \"Pick the matching {L} sentence\": \"اختر جملة {L} المطابقة\",\n  \"Pick the right sentence among similar ones\": \"اختر الجملة الصحيحة بين جمل متشابهة\",\n  \"Pick the right translation among similar ones\": \"اختر الترجمة الصحيحة بين ترجمات متشابهة\",\n  \"Practice\": \"تدرّب\",\n  \"Preset\": \"قالب\",\n  \"Put the translation words in order\": \"رتّب كلمات الترجمة\",\n  \"Put the words in order\": \"رتّب الكلمات\",\n  \"Qualifier (optional): which form is it? e.g. masculine, plural, formal\": \"وصف (اختياري): أي صيغة هي؟ مثل مذكر، جمع، رسمي\",\n  \"Rate myself\": \"سأقيّم نفسي\",\n  \"Real {L} sentences. Read, build, translate — then rate yourself honestly. Anki-style.\": \"جمل {L} حقيقية. اقرأ وابنِ وترجم — ثم قيّم نفسك بصدق. على طريقة Anki.\",\n  \"Recent attempts\": \"المحاولات الأخيرة\",\n  \"Relearning steps (minutes)\": \"خطوات إعادة التعلّم (دقائق)\",\n  \"Remove\": \"إزالة\",\n  \"Remove flag\": \"إزالة العلامة\",\n  \"Remove this language\": \"إزالة هذه اللغة\",\n  \"Rename\": \"إعادة تسمية\",\n  \"Rename group\": \"إعادة تسمية المجموعة\",\n  \"Repetition\": \"التكرار\",\n  \"Reset values\": \"إعادة القيم\",\n  \"Review\": \"مراجعة\",\n  \"Review system (Anki style)\": \"نظام المراجعة (على طريقة Anki)\",\n  \"Right after the card\": \"مباشرة بعد البطاقة\",\n  \"Round {n} · {n} done\": \"الجولة {n} · أُنجز {n}\",\n  \"Same for every level\": \"نفسه لكل المستويات\",\n  \"Save\": \"حفظ\",\n  \"Save & next\": \"حفظ والتالي\",\n  \"Saved queue\": \"الطابور المحفوظ\",\n  \"Scrape\": \"استخراج\",\n  \"Search\": \"بحث\",\n  \"Search languages\": \"ابحث عن لغة\",\n  \"Search pattern, note or tag\": \"ابحث في النمط أو الملاحظة أو الوسم\",\n  \"Select\": \"تحديد\",\n  \"Select all\": \"تحديد الكل\",\n  \"Self\": \"ذاتي\",\n  \"Self-rated OK\": \"صحيح بتقييمي\",\n  \"Self-rating\": \"تقييم ذاتي\",\n  \"Sentence group\": \"مجموعة الجمل\",\n  \"Sentence shown, pick the translation\": \"تُعرض الجملة، اختر الترجمة\",\n  \"Sentence shown, type the {L} ({L} only)\": \"تُعرض الجملة، اكتب {L} ({L} فقط)\",\n  \"Sentences\": \"الجمل\",\n  \"Sentences are linked across languages by their {L} text. A language is offered when at least half of its sentences match.\": \"تُربط الجمل بين اللغات عبر نصها بـ{L}. تُعرض اللغة إذا تطابق نصف جملها على الأقل.\",\n  \"Sentences per batch\": \"الجمل في كل دفعة\",\n  \"Sentences you finished come back after growing intervals.\": \"الجمل التي أنهيتها تعود بعد فواصل متزايدة.\",\n  \"Set\": \"تعيين\",\n  \"Settings\": \"الإعدادات\",\n  \"Share\": \"مشاركة\",\n  \"Share {n} sentences\": \"مشاركة {n} جملة\",\n  \"Short sentences first, then longer ones, in small chunks.\": \"الجمل القصيرة أولاً ثم الأطول، في دفعات صغيرة.\",\n  \"Show note tags (noun, verb…) in this language. Fill the translations in the Glossary table.\": \"اعرض وسوم الملاحظات (اسم، فعل…) بهذه اللغة. املأ الترجمات في جدول المصطلحات.\",\n  \"Shows each new sentence once, with reading and translation\": \"يعرض كل جملة جديدة مرة واحدة مع القراءة والترجمة\",\n  \"Side translation — shown beside the known-language sentence\": \"ترجمة جانبية — تُعرض بجانب جملة اللغة المعروفة\",\n  \"Skip\": \"تخطّي\",\n  \"Skip duplicates — keep one\": \"تخطّي المكرّر — إبقاء واحدة\",\n  \"Soft sand and sage, calm and airy\": \"رمل ناعم وميرمية، هادئ ومنعش\",\n  \"Source page has a transliteration line\": \"الصفحة المصدر تحتوي سطر نقحرة\",\n  \"Spaced repetition (Anki mode)\": \"التكرار المتباعد (نمط Anki)\",\n  \"Spaced review\": \"مراجعة متباعدة\",\n  \"Split\": \"تقسيم\",\n  \"Split “{L} sentences” ({n})\": \"تقسيم «جمل {L}» ({n})\",\n  \"Split…\": \"تقسيم…\",\n  \"Starting ease (%)\": \"السهولة الابتدائية (%)\",\n  \"Tag\": \"وسم\",\n  \"Tags\": \"الوسوم\",\n  \"Take the word from\": \"خذ الكلمة من\",\n  \"Tap\": \"اضغط\",\n  \"Tap a highlight to read the note. Turn off to hide all highlights and the notes button in lessons.\": \"اضغط على الكلمة المبرزة لقراءة الملاحظة. أوقفه لإخفاء كل الإبراز وزر الملاحظات في الدروس.\",\n  \"Tap the words you\": \"اضغط على الكلمات التي\",\n  \"Tap ✎ during an exercise, or ＋ New.\": \"اضغط ✎ أثناء التمرين، أو ＋ جديد.\",\n  \"Tap ✎ in a lesson to save a word, a prefix or a suffix; words you know make the app skip the explanations.\": \"اضغط ✎ في الدرس لحفظ كلمة أو بادئة أو لاحقة؛ والكلمات التي تعرفها تجعل التطبيق يتخطى الشرح.\",\n  \"Tell the app which words you already know from outside, so it does not explain them again.\": \"أخبر التطبيق بالكلمات التي تعرفها من خارجه حتى لا يشرحها مجدداً.\",\n  \"Terminal\": \"طرفية\",\n  \"The app decides if the answer is right, then you press Continue.\": \"التطبيق يقرّر صحة الجواب ثم تضغط «متابعة».\",\n  \"The app decides if the answer is right.\": \"التطبيق يقرّر صحة الجواب.\",\n  \"The first-start questions for new users, and a button to run them again.\": \"أسئلة البداية للمستخدمين الجدد، وزر لإعادة تشغيلها.\",\n  \"The language of the menus and buttons. Translations are downloaded from the app's repository (or added from a file), then work offline. Sentences you study are not affected.\": \"لغة القوائم والأزرار. تُنزَّل الترجمات من مستودع التطبيق ثم تعمل دون اتصال. الجمل التي تدرسها لا تتأثر.\",\n  \"The language you speak. Sentences are explained in it when your library has that translation; otherwise in {L}.\": \"اللغة التي تتحدثها. تُشرح الجمل بها إن كانت في مكتبتك ترجمة لها، وإلا فبـ{L}.\",\n  \"The original look\": \"الشكل الأصلي\",\n  \"Tip: any language app that exports CSV works; the first column is the {L} sentence.\": \"نصيحة: يصلح أي تطبيق لغات يصدّر CSV؛ العمود الأول هو جملة {L}.\",\n  \"Translate to {L}\": \"ترجم إلى {L}\",\n  \"Try again\": \"حاول مجدداً\",\n  \"Type the translation\": \"اكتب الترجمة\",\n  \"Unfinished features. They are off until you turn them on.\": \"ميزات غير مكتملة. تبقى مطفأة حتى تشغّلها.\",\n  \"Unknown words allowed (all levels)\": \"الكلمات المجهولة المسموحة (كل المستويات)\",\n  \"Use library text\": \"استخدم نص المكتبة\",\n  \"Warm paper, serif type, ink rules\": \"ورق دافئ وخط مسنّن وخطوط حبر\",\n  \"Welcome 👋\": \"أهلاً بك 👋\",\n  \"What do you want to learn?\": \"ماذا تريد أن تتعلّم؟\",\n  \"When you leave a lesson the app remembers the card you were on and the cards still waiting, so you continue exactly there (like Anki). Clear it to start with a fresh shuffled queue.\": \"عند مغادرة الدرس يتذكّر التطبيق البطاقة التي كنت عليها والبطاقات المنتظرة، فتكمل من حيث توقفت (مثل Anki). امسحه للبدء بطابور جديد مخلوط.\",\n  \"Which language is “german”?\": \"ما لغة «german»؟\",\n  \"Word or phrase\": \"كلمة أو عبارة\",\n  \"Write … for the part of the word that changes:\": \"اكتب … مكان الجزء الذي يتغير من الكلمة:\",\n  \"Wrong = Again, right = Good. There is no Easy or Hard button, so the ease only drops after a lapse.\": \"خطأ = مرة أخرى، صواب = جيد. لا يوجد زر سهل أو صعب، لذا تنخفض السهولة بعد النسيان فقط.\",\n  \"You decide — be honest.\": \"أنت تقرّر — كن صادقاً.\",\n  \"You meet a sentence, build it, translate it, and rate yourself honestly.\": \"تقابل جملة، وتبنيها، وتترجمها، ثم تقيّم نفسك بصدق.\",\n  \"You press right or wrong after seeing the answer.\": \"تضغط صواب أو خطأ بعد رؤية الجواب (على طريقة Anki).\",\n  \"Your answer\": \"إجابتك\",\n  \"Your language\": \"لغتك\",\n  \"Your language is not listed? Use\": \"لغتك غير موجودة؟ استخدم\",\n  \"Your progress is kept. Use this if the language is wrong.\": \"يبقى تقدّمك محفوظاً. استخدم هذا إذا كانت اللغة خاطئة.\",\n  \"Zen\": \"زن\",\n  \"adjective\": \"صفة\",\n  \"adverb\": \"ظرف\",\n  \"already know\": \"تعرفها مسبقاً\",\n  \"both ends. No … = the whole word.\": \"الطرفان معاً. بدون … = الكلمة كاملة.\",\n  \"contains ·\": \"تحتوي على ·\",\n  \"dual\": \"مثنى\",\n  \"ends with ·\": \"تنتهي بـ ·\",\n  \"english,target\": \"الإنجليزية,اللغة الهدف\",\n  \"english,transliteration,target\": \"الإنجليزية,النقحرة,اللغة الهدف\",\n  \"file (one sentence per line:\": \"(جملة واحدة في كل سطر:\",\n  \"formal\": \"رسمي\",\n  \"from outside this app. They are saved as notes tagged “known” (not highlighted), so sentences made of known words skip their introduction card. Most frequent words first.\": \"من خارج هذا التطبيق. تُحفظ كملاحظات بوسم «known» (دون إبراز)، فتتخطى الجمل المكوّنة من كلمات معروفة بطاقة تعريفها. الأكثر تكراراً أولاً.\",\n  \"informal\": \"غير رسمي\",\n  \"new tag\": \"وسم جديد\",\n  \"noun\": \"اسم\",\n  \"or\": \"أو\",\n  \"or write your own\": \"أو اكتب وصفك\",\n  \"particle\": \"أداة\",\n  \"pl\": \"جمع\",\n  \"preposition\": \"حرف جر\",\n  \"pronoun\": \"ضمير\",\n  \"rate yourself\": \"قيّم نفسك\",\n  \"sg\": \"مفرد\",\n  \"starts with ·\": \"تبدأ بـ ·\",\n  \"the forms that correspond. Tags such as “noun” are rows too: translate them to show tags in your language.\": \"الصيغ المتقابلة. الوسوم مثل «noun» صفوف أيضاً: ترجمها لتعرض الوسوم بلغتك.\",\n  \"to add a language. It is saved on this device and works offline.\": \"لإضافة لغة. تُحفظ على هذا الجهاز وتعمل دون اتصال.\",\n  \"verb\": \"فعل\",\n  \"words not yet known · {n} sentences · page {n}/{n}\": \"كلمة غير معروفة بعد · {n} جملة · صفحة {n}/{n}\",\n  \"{n} KB\": \"{n} ك.ب\",\n  \"{n} of {n} selected on this page\": \"محدّد {n} من {n} في هذه الصفحة\",\n  \"{n} selected\": \"محدّد {n}\",\n  \"{n} selected · {n} sentences\": \"محدّد {n} · {n} جملة\",\n  \"{n} sentences · {n} known\": \"{n} جملة · {n} معروفة\",\n  \"{n}–{n} words · chunk {n}/{n} · Intro & match · {n}/{n}\": \"{n}–{n} كلمات · الدفعة {n}/{n} · تعريف ومطابقة · {n}/{n}\",\n  \"{n}–{n} words · chunk {n}/{n} · Intro & match · {n}/{n} · due {n}\": \"{n}–{n} كلمات · الدفعة {n}/{n} · تعريف ومطابقة · {n}/{n} · مستحق {n}\",\n  \"“What differs” hint\": \"تلميح «ما الذي يختلف»\",\n  \"▶ Continue\": \"▶ متابعة\",\n  \"▶ Practice\": \"▶ تدرّب\",\n  \"▶ Practice all\": \"▶ تدرّب على الكل\",\n  \"▶ Show the introduction\": \"▶ أظهر المقدمة\",\n  \"⚙ Settings\": \"⚙ الإعدادات\",\n  \"✅ Known words\": \"✅ كلمات معروفة\",\n  \"✅ Known-words test\": \"✅ اختبار الكلمات المعروفة\",\n  \"✅ Take the quick test after finishing\": \"✅ سأجري الاختبار السريع بعد الإنهاء\",\n  \"✓ Correct\": \"✓ صحيح\",\n  \"✓ I was right\": \"✓ كنت محقاً\",\n  \"✗ I was wrong\": \"✗ كنت مخطئاً\",\n  \"✗ Not quite\": \"✗ ليس تماماً\",\n  \"⬆ Import (JSON)\": \"⬆ استيراد (JSON)\",\n  \"⬆ Import data\": \"⬆ استيراد البيانات\",\n  \"⬇ Export (JSON)\": \"⬇ تصدير (JSON)\",\n  \"⬇ Export CSV\": \"⬇ تصدير CSV\",\n  \"⬇ Export JSON\": \"⬇ تصدير JSON\",\n  \"⬇ Export my data\": \"⬇ تصدير بياناتي\",\n  \"⬇ Get interface languages\": \"⬇ تنزيل لغات الواجهة\",\n  \"＋ Add language\": \"＋ إضافة لغة\",\n  \"＋ New\": \"＋ جديد\",\n  \"＋ Row\": \"＋ صف\",\n  \"＋ another part\": \"＋ جزء آخر\",\n  \"＋ language\": \"＋ لغة\",\n  \"📂 Choose file(s)\": \"📂 اختر ملفاً\",\n  \"📂 Import\": \"📂 استيراد\",\n  \"📂 Import file\": \"📂 استيراد ملف\",\n  \"📂 My file\": \"📂 ملفي\",\n  \"📊 My answers\": \"📊 إجاباتي\",\n  \"📋 Copy as text (CSV)\": \"📋 نسخ كنص (CSV)\",\n  \"📋 Copy brief for an AI\": \"📋 نسخ الملخص لذكاء اصطناعي\",\n  \"📋 Copy table (CSV)\": \"📋 نسخ الجدول (CSV)\",\n  \"📖 Glossary\": \"📖 جدول المصطلحات\",\n  \"📖 Open the glossary\": \"📖 افتح جدول المصطلحات\",\n  \"📚 Ready-made\": \"📚 جاهزة\",\n  \"📝 Notes ({n})\": \"📝 الملاحظات ({n})\",\n  \"🔁 Review mistakes\": \"🔁 مراجعة الأخطاء\",\n  \"🕸 Scrape\": \"🕸 استخراج\",\n  \"🗑 Clear history\": \"🗑 مسح السجل\",\n  \"🚩 Flagged ({n})\": \"🚩 المعلَّمة ({n})\",\n  \"Import and use\": \"استيراد واستخدام\",\n  \"Infix (inside)\": \"وسط الكلمة\",\n  \"Interface language pack\": \"حزمة لغة الواجهة\",\n  \"Prefix\": \"بادئة\",\n  \"Remove my pack\": \"إزالة حزمتي\",\n  \"Run the first-start questions again (languages, how you want to study). Your progress is not touched.\": \"أعد أسئلة البداية (اللغات وطريقة الدراسة). تقدّمك لا يتأثر.\",\n  \"Stem (word inside an inflected form)\": \"جذع (كلمة داخل صيغة متصرفة)\",\n  \"Suffix\": \"لاحقة\",\n  \"Tap a word. Then tap the first and last letter of the part you want (a prefix, a suffix, or the whole word).\": \"اضغط كلمة، ثم اضغط أول وآخر حرف من الجزء الذي تريده (بادئة أو لاحقة أو الكلمة كاملة).\",\n  \"The language of the menus and buttons. Sentences you study are not affected.\": \"لغة القوائم والأزرار. الجمل التي تدرسها لا تتأثر.\",\n  \"The menus are not translated into this language yet. You can add them later in Settings.\": \"القوائم غير مترجمة إلى هذه اللغة بعد. يمكنك إضافتها لاحقاً من الإعدادات.\",\n  \"Type\": \"النوع\",\n  \"Word\": \"كلمة\",\n  \"{n} · Choose the language, copy the request and paste it into any AI chat. {n} · Paste the JSON it answers here.\": \"١ · اختر اللغة وانسخ الطلب والصقه في أي محادثة ذكاء اصطناعي. ٢ · الصق هنا الـJSON الذي يجيب به.\",\n  \"＋ Add another language (with an AI)\": \"＋ إضافة لغة أخرى (بمساعدة ذكاء اصطناعي)\",\n  \"📋 Copy request for an AI\": \"📋 نسخ الطلب لذكاء اصطناعي\",\n  \"{n} forms added\": \"أُضيفت {n} صيغ\",\n  \"{n} texts imported\": \"استُوردت {n} نصوص\",\n  \"{n} words saved as known\": \"حُفظت {n} كلمات كمعروفة\",\n  \"Nothing selected — next words\": \"لا شيء محدّد — الكلمات التالية\",\n  \"All levels completed\": \"اكتملت كل المستويات\",\n  \"All {n} were duplicates — nothing imported\": \"كانت كل الـ{n} مكررة — لم يُستورد شيء\",\n  \"No sentences found\": \"لم تُوجد جمل\",\n  \"Already in your library\": \"موجودة في مكتبتك مسبقاً\",\n  \"Batch size must be smaller than the group\": \"حجم الدفعة يجب أن يكون أصغر من المجموعة\",\n  \"Chunk done ✓\": \"اكتملت الدفعة ✓\",\n  \"next {n}/{n}\": \"التالية {n}/{n}\",\n  \"Couldn't download. Check your connection and try again.\": \"تعذّر التنزيل. تحقق من الاتصال وحاول مجدداً.\",\n  \"Delete ALL recorded answers, flags and stats?\": \"حذف كل الإجابات المسجّلة والعلامات والإحصاءات؟\",\n  \"Delete this note?\": \"حذف هذه الملاحظة؟\",\n  \"Delete this row and its links?\": \"حذف هذا الصف وروابطه؟\",\n  \"Deleted\": \"تم الحذف\",\n  \"Done for today — daily limit reached\": \"انتهى اليوم — بلغت الحد اليومي\",\n  \"Enter a pattern first\": \"أدخل النمط أولاً\",\n  \"Existing note loaded\": \"حُمّلت الملاحظة الموجودة\",\n  \"Flag removed\": \"أُزيلت العلامة\",\n  \"Flagged 🚩\": \"تم التعليم 🚩\",\n  \"Introductions will show again\": \"ستظهر التعريفات مجدداً\",\n  \"Keep at least one exercise\": \"أبقِ تمريناً واحداً على الأقل\",\n  \"Keep at least one language\": \"أبقِ لغة واحدة على الأقل\",\n  \"Level {n} unlocked\": \"فُتح المستوى {n}\",\n  \"Log cleared\": \"مُسح السجل\",\n  \"Next session starts with a fresh queue\": \"ستبدأ الجلسة القادمة بطابور جديد\",\n  \"No mistakes recorded yet 🎉\": \"لا أخطاء مسجّلة بعد 🎉\",\n  \"No sentences in this language\": \"لا جمل بهذه اللغة\",\n  \"Not a glossary file\": \"ليس ملف جدول مصطلحات\",\n  \"Not a valid backup file\": \"ليس ملف نسخة احتياطية صالحاً\",\n  \"Note deleted\": \"حُذفت الملاحظة\",\n  \"Note saved ✓\": \"حُفظت الملاحظة ✓\",\n  \"Nothing to practice\": \"لا شيء للتدرّب عليه\",\n  \"Pick at least one language\": \"اختر لغة واحدة على الأقل\",\n  \"Progress saved ✓\": \"حُفظ التقدّم ✓\",\n  \"Remove the imported pack for this language?\": \"إزالة الحزمة المستوردة لهذه اللغة؟\",\n  \"Remove your custom CSS?\": \"إزالة CSS المخصص؟\",\n  \"Restored — reload the page\": \"تمت الاستعادة — أعد تحميل الصفحة\",\n  \"Select groups of one language\": \"اختر مجموعات من لغة واحدة\",\n  \"Select one language to copy as text\": \"اختر لغة واحدة للنسخ كنص\",\n  \"Storage full — library not saved\": \"التخزين ممتلئ — لم تُحفظ المكتبة\",\n  \"Tags updated\": \"حُدّثت الوسوم\",\n  \"Values reset\": \"أُعيدت القيم\",\n  \"Write the word first\": \"اكتب الكلمة أولاً\",\n  \"Imported {n} sentences\": \"استُوردت {n} جملة\",\n  \"{n} duplicates skipped\": \"تم تخطّي {n} مكرّرة\",\n  \"Updated · {n} new\": \"تم التحديث · {n} جديدة\",\n  \"Up to date\": \"محدَّث\",\n  \"Undone:\": \"تم التراجع:\",\n  \"Applied ✓\": \"تم التطبيق ✓\",\n  \"Empty — nothing applied.\": \"فارغ — لم يُطبَّق شيء.\",\n  \"Removed.\": \"أُزيل.\",\n  \"Table copied\": \"نُسخ الجدول\",\n  \"Copy failed\": \"فشل النسخ\",\n  \"Copied — paste it into an AI chat\": \"تم النسخ — الصقه في محادثة ذكاء اصطناعي\",\n  \"Brief copied — paste it into an AI chat\": \"نُسخ الملخص — الصقه في محادثة ذكاء اصطناعي\",\n  \"Code copied ✓\": \"نُسخ الكود ✓\",\n  \"CSS copied\": \"نُسخ CSS\",\n  \"Linked\": \"تم الربط\",\n  \"Link removed\": \"أُزيل الربط\",\n  \"Tap another form…\": \"اضغط صيغة أخرى…\",\n  \"Link to…\": \"اربط مع…\",\n  \"Unlink all\": \"فك كل الروابط\",\n  \"Qualifier\": \"الوصف\",\n  \"Language changed to {L}\": \"تغيرت اللغة إلى {L}\",\n  \"Library text restored\": \"استُعيد نص المكتبة\",\n  \"Translation updated\": \"حُدّثت الترجمة\",\n  \"No change\": \"لا تغيير\",\n  \"Nothing was edited\": \"لم يُعدَّل شيء\",\n  \"Back\": \"رجوع\",\n  \"Welcome\": \"أهلاً\",\n  \"Hello\": \"مرحباً\",\n  \"Notes hidden\": \"الملاحظات مخفية\",\n  \"Highlights only\": \"الإبراز فقط\",\n  \"Highlights + notes list\": \"الإبراز + قائمة الملاحظات\",\n  \"Level {n}a\": \"المستوى {n}أ\",\n  \"Level {n}b\": \"المستوى {n}ب\",\n  \"Level {n}c\": \"المستوى {n}ج\",\n  \"chunk {n}/{n}\": \"الدفعة {n}/{n}\",\n  \"due {n}\": \"مستحق {n}\",\n  \"learning {n}\": \"قيد التعلّم {n}\",\n  \"Again\": \"مرة أخرى\",\n  \"Good\": \"جيد\",\n  \"OK\": \"حسناً\",\n  \"Edit note\": \"تعديل الملاحظة\",\n  \"What does it mean / how is it used?\": \"ماذا تعني / كيف تُستخدم؟\",\n  \"Undo\": \"تراجع\",\n  \"{L} (side translation)\": \"{L} (ترجمة جانبية)\",\n  \"Add a column\": \"إضافة عمود\",\n  \"No language matches.\": \"لا لغة مطابقة.\",\n  \"Your language is not listed?\": \"لغتك غير موجودة؟\",\n  \"Use\": \"استخدم\",\n  \"link\": \"اربط\",\n  \"Tap a word. Then tap the first and last letter of the part you want. Need two parts of the same word (like both ends of ي-غادر-ون)? Press “＋ another part”.\": \"اضغط كلمة، ثم اضغط أول وآخر حرف من الجزء الذي تريده. تحتاج جزأين من الكلمة نفسها (مثل طرفي ي-غادر-ون)؟ اضغط «＋ جزء آخر».\",\n  \"Parts cannot overlap\": \"لا يمكن أن تتداخل الأجزاء\",\n  \"Tap the letters of the next part\": \"اضغط حروف الجزء التالي\",\n  \"Redone:\": \"تمت الإعادة:\",\n  \"Remove the downloaded pack for this language?\": \"إزالة الحزمة المنزَّلة لهذه اللغة؟\",\n  \"No interface languages published yet.\": \"لا توجد لغات واجهة منشورة بعد.\",\n  \"Known-words test\": \"اختبار الكلمات المعروفة\"\n },\n \"names\": {\n  \"English\": \"الإنجليزية\",\n  \"Afrikaans\": \"الأفريكانية\",\n  \"Albanian\": \"الألبانية\",\n  \"Basque\": \"الباسكية\",\n  \"Bosnian\": \"البوسنية\",\n  \"Catalan\": \"الكتالونية\",\n  \"Croatian\": \"الكرواتية\",\n  \"Czech\": \"التشيكية\",\n  \"Danish\": \"الدنماركية\",\n  \"Dutch\": \"الهولندية\",\n  \"Esperanto\": \"الإسبرانتو\",\n  \"Estonian\": \"الإستونية\",\n  \"Finnish\": \"الفنلندية\",\n  \"French\": \"الفرنسية\",\n  \"Galician\": \"الجاليكية\",\n  \"German\": \"الألمانية\",\n  \"Haitian Creole\": \"الكريولية الهايتية\",\n  \"Hausa\": \"الهوسا\",\n  \"Hungarian\": \"المجرية\",\n  \"Icelandic\": \"الأيسلندية\",\n  \"Igbo\": \"الإيبو\",\n  \"Indonesian\": \"الإندونيسية\",\n  \"Irish\": \"الأيرلندية\",\n  \"Italian\": \"الإيطالية\",\n  \"Javanese\": \"الجاوية\",\n  \"Kinyarwanda\": \"الكينيارواندا\",\n  \"Latin\": \"اللاتينية\",\n  \"Latvian\": \"اللاتفية\",\n  \"Lithuanian\": \"الليتوانية\",\n  \"Luxembourgish\": \"اللوكسمبورغية\",\n  \"Malagasy\": \"الملغاشية\",\n  \"Malay\": \"الماليزية\",\n  \"Maltese\": \"المالطية\",\n  \"Maori\": \"الماورية\",\n  \"Norwegian\": \"النرويجية\",\n  \"Chichewa\": \"التشيتشيوا\",\n  \"Oromo\": \"الأورومو\",\n  \"Polish\": \"البولندية\",\n  \"Portuguese\": \"البرتغالية\",\n  \"Romanian\": \"الرومانية\",\n  \"Samoan\": \"الساموية\",\n  \"Shona\": \"الشونا\",\n  \"Slovak\": \"السلوفاكية\",\n  \"Slovenian\": \"السلوفينية\",\n  \"Somali\": \"الصومالية\",\n  \"Sesotho\": \"السيسوتو\",\n  \"Spanish\": \"الإسبانية\",\n  \"Swahili\": \"السواحيلية\",\n  \"Swedish\": \"السويدية\",\n  \"Tagalog\": \"التاغالوغية\",\n  \"Cebuano\": \"السيبوانية\",\n  \"Turkish\": \"التركية\",\n  \"Uzbek\": \"الأوزبكية\",\n  \"Azerbaijani\": \"الأذرية\",\n  \"Vietnamese\": \"الفيتنامية\",\n  \"Welsh\": \"الويلزية\",\n  \"Xhosa\": \"الكوسا\",\n  \"Yoruba\": \"اليوروبا\",\n  \"Zulu\": \"الزولو\",\n  \"Russian\": \"الروسية\",\n  \"Ukrainian\": \"الأوكرانية\",\n  \"Bulgarian\": \"البلغارية\",\n  \"Serbian\": \"الصربية\",\n  \"Macedonian\": \"المقدونية\",\n  \"Belarusian\": \"البيلاروسية\",\n  \"Kazakh\": \"الكازاخية\",\n  \"Kyrgyz\": \"القرغيزية\",\n  \"Mongolian\": \"المنغولية\",\n  \"Tajik\": \"الطاجيكية\",\n  \"Tatar\": \"التتارية\",\n  \"Greek\": \"اليونانية\",\n  \"Armenian\": \"الأرمنية\",\n  \"Georgian\": \"الجورجية\",\n  \"Arabic\": \"العربية\",\n  \"Persian\": \"الفارسية\",\n  \"Urdu\": \"الأردية\",\n  \"Pashto\": \"البشتو\",\n  \"Kurdish (Sorani)\": \"الكردية (سوراني)\",\n  \"Sindhi\": \"السندية\",\n  \"Uyghur\": \"الأويغورية\",\n  \"Hebrew\": \"العبرية\",\n  \"Yiddish\": \"اليديشية\",\n  \"Divehi\": \"الديفيهية\",\n  \"Hindi\": \"الهندية\",\n  \"Bengali\": \"البنغالية\",\n  \"Tamil\": \"التاميلية\",\n  \"Telugu\": \"التيلوغوية\",\n  \"Marathi\": \"الماراثية\",\n  \"Gujarati\": \"الغوجاراتية\",\n  \"Kannada\": \"الكانادية\",\n  \"Malayalam\": \"المالايالامية\",\n  \"Punjabi\": \"البنجابية\",\n  \"Nepali\": \"النيبالية\",\n  \"Sinhala\": \"السنهالية\",\n  \"Odia\": \"الأوديا\",\n  \"Sanskrit\": \"السنسكريتية\",\n  \"Chinese\": \"الصينية\",\n  \"Cantonese\": \"الكانتونية\",\n  \"Japanese\": \"اليابانية\",\n  \"Thai\": \"التايلاندية\",\n  \"Korean\": \"الكورية\",\n  \"Lao\": \"اللاوية\",\n  \"Khmer\": \"الخميرية\",\n  \"Burmese\": \"البورمية\",\n  \"Amharic\": \"الأمهرية\"\n }\n}"};   // the prompt, the script and an example pack, shipped inside the app so they can be downloaded offline
+function installUiFile(file){
+  const marks = t=>(String(t).match(/\{n\}|\{L\}/g) || []).sort().join();
+  const rd = new FileReader();
+  rd.onload = ()=>{
+    try {
+      const j = JSON.parse(rd.result), raw = (j && j.strings) || j;
+      if (!raw || typeof raw !== 'object' || Array.isArray(raw)) throw new Error('shape');
+      let code = String((j && j.lang) || ((file.name.match(/^([A-Za-z-]+)\.json$/) || [])[1]) || '').toLowerCase();
+      const okCode = c=>/^[a-z]{2,3}(-[a-z0-9]+)?$/.test(c);
+      if (!okCode(code)){ code = (prompt('Language code of this file (for example fr)', '') || '').trim().toLowerCase(); if (!okCode(code)){ toast('Not added: no language code'); return; } }
+      if (code === 'en'){ toast('English is built in'); return; }
+      const strings = {}; let bad = 0;
+      Object.keys(raw).forEach(k=>{ const v = raw[k]; if (typeof v === 'string' && v.trim()){ if (marks(k) === marks(v)) strings[k] = v; else bad++; } });
+      const n = Object.keys(strings).length; if (!n) throw new Error('empty');
+      UI_PACKS[code] = { strings, names:(j && j.names) || {}, rev:'file' };
+      saveLS(LS.uiPacks, UI_PACKS); uiPackReset(); setUiLang(code);
+      toast(n + ' texts added' + (bad ? ' · ' + bad + ' skipped (broken {n} / {L})' : ''));
+    } catch(e){ toast('That file is not an interface language (a JSON with “strings”)'); }
+  };
+  rd.readAsText(file);
+}
+function openAiTrSheet(){
+  openSheet((sh, close)=>{
+    sh.innerHTML = `<h3>Make an interface translation</h3>
+      <div class="hint">1. Download the three files. 2. Send them to any AI chat and ask for the language, for example “give me fr.json”. 3. Save its answer as a file (<b>fr.json</b>) and tap “Add from a file”.</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+        <button class="btn btn-ghost" data-f="PROMPT.md">⬇ PROMPT.md · the instructions</button>
+        <button class="btn btn-ghost" data-f="translate_ui.py">⬇ translate_ui.py · the script</button>
+        <button class="btn btn-ghost" data-f="ar.json">⬇ ar.json · an example (format + the English texts)</button>
+        <button class="btn btn-green" id="aiAll">⬇ All three</button>
+      </div>
+      <div class="hint" style="margin-top:14px">Language code to ask for:</div>
+      <div style="display:flex;gap:8px"><input class="field" id="aiCode" placeholder="fr" style="width:90px" autocapitalize="off" spellcheck="false"><button class="btn btn-ghost" id="aiCopy" style="flex:1">📋 Copy the request</button></div>
+      <div class="hint" style="margin-top:14px">Have an API key? Skip the chat: put the three files next to <b>en.json</b> (in the repository it is <b>ui/</b>), set <b>API_BASE</b>, <b>API_KEY</b> and <b>MODEL</b>, and run <b>python3 translate_ui.py fr</b>.</div>
+      <div style="margin-top:10px"><button class="btn btn-ghost" id="aiClose" style="width:100%">Close</button></div>`;
+    const get = name=>download(name, AI_TR_FILES[name], name.endsWith('.json') ? 'application/json' : 'text/plain');
+    sh.querySelectorAll('[data-f]').forEach(b=>{ b.onclick = ()=>get(b.getAttribute('data-f')); });
+    sh.querySelector('#aiAll').onclick = ()=>Object.keys(AI_TR_FILES).forEach((n, i)=>setTimeout(()=>get(n), i * 400));
+    sh.querySelector('#aiCopy').onclick = ()=>{
+      const c = (sh.querySelector('#aiCode').value || '').trim().toLowerCase() || 'fr';
+      copyText('Follow PROMPT.md and translate the interface into the language with the code "' + c + '". ar.json shows the exact output format, and its keys are the English source texts: keep every key, change only the values. Give me the result as one complete JSON file named ' + c + '.json.').then(ok=>toast(ok ? 'Request copied: paste it with the three files' : 'Copy failed'));
+    };
+    sh.querySelector('#aiClose').onclick = close;
+  });
+}
 function uiSettingsEl(){
   const d = document.createElement('div');
   d.innerHTML = `<div class="sectionhead">Interface language</div>
-    <div class="hint">The language of the menus and buttons. Translations are downloaded from the app's repository, then work offline. Sentences you study are not affected.</div>
+    <div class="hint">The language of the menus and buttons. Translations are downloaded from the app's repository (or added from a file), then work offline. Sentences you study are not affected.</div>
     <select class="field" id="uiSel"></select>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
       <button class="btn btn-ghost btn-sm" id="uiGet">⬇ Get interface languages</button>
+      <button class="btn btn-ghost btn-sm" id="uiFile">📂 Add from a file</button>
+      <button class="btn btn-ghost btn-sm" id="uiAi">🛠 Make a translation (AI)</button>
       <button class="btn btn-redg btn-sm" id="uiDel" hidden>Remove this language</button>
     </div>`;
   const sel = d.querySelector('#uiSel');
@@ -5522,6 +6589,21 @@ function uiSettingsEl(){
   const del = d.querySelector('#uiDel'); del.hidden = !UI_PACKS[UI_LANG];
   del.onclick = ()=>{ if (!confirm('Remove the downloaded pack for this language?')) return; delete UI_PACKS[UI_LANG]; saveLS(LS.uiPacks, UI_PACKS); setUiLang('en'); };
   d.querySelector('#uiGet').onclick = openUiStore;
+  d.querySelector('#uiAi').onclick = openAiTrSheet;
+  d.querySelector('#uiFile').onclick = ()=>{
+    const inp = document.createElement('input'); inp.type = 'file'; inp.accept = '.json,application/json';
+    inp.onchange = ()=>{ if (inp.files && inp.files[0]) installUiFile(inp.files[0]); };
+    inp.click();
+  };
+  return d;
+}
+function tashkilSettingsEl(){
+  const d = document.createElement('div');
+  d.innerHTML = '<div class="sectionhead">Arabic</div>';
+  const r = document.createElement('div'); r.className = 'rowcb';
+  r.innerHTML = `<span class="cb${SHOW_TASHKIL ? ' on' : ''}">✓</span><div class="body"><div class="en">Tashkīl (vowel marks)</div><div class="hint" style="margin:2px 0 0">Show the vowel marks on Arabic text. The same switch is a button in every Arabic lesson.</div></div>`;
+  r.onclick = ()=>{ SHOW_TASHKIL = !SHOW_TASHKIL; saveTashkil(); render(true); };
+  d.appendChild(r);
   return d;
 }
 function introAgainEl(){
@@ -5535,14 +6617,15 @@ function betaSettingsEl(){
   d.innerHTML = `<div class="sectionhead">Advanced (beta)</div>
     <div class="hint">Unfinished features. They are off until you turn them on.</div><div id="bRows"></div><div id="bMore"></div>`;
   const rows = d.querySelector('#bRows');
-  [['anki', 'Review system (Anki style)', 'Finished sentences come back on a schedule (Again / Good) with daily limits per deck.'],
+  [['anki', 'Spaced repetition (Anki mode)', 'Decides WHEN a finished sentence comes back: on a schedule (Again / Good) with daily limits per deck. Independent of Grading.'],
    ['known', 'Known-words test', 'Tell the app which words you already know, so it does not explain them again.'],
-   ['gloss', 'Glossary', 'A table of ideas × languages (tags in your language, masculine/feminine forms, links between forms).']].forEach(([k, t, s])=>{
+   ['gloss', 'Glossary', 'A table of ideas × languages (tags in your language, masculine/feminine forms, links between forms).'],
+   ['phon', 'Sound guide (phonology)', 'A short wiki-style page about the sounds of each language, written as a markdown file in the repository (phonology/<code>.md) and shown like on GitHub. Plus your own notes.']].forEach(([k, t, s])=>{
     const r = document.createElement('div'); r.className = 'rowcb';
     r.innerHTML = `<span class="cb${BETA[k] ? ' on' : ''}">✓</span><div class="body"><div class="en">${t}</div><div class="hint" style="margin:2px 0 0">${s}</div></div>`;
     r.onclick = ()=>{
       BETA[k] = !BETA[k]; saveLS(LS.beta, BETA); GL_IDX = null;
-      if (k === 'anki' && !BETA.anki){ ANKI_ON = false; saveLS(LS.anki, false); }
+      if (k === 'anki'){ ANKI_ON = !!BETA.anki; saveLS(LS.anki, ANKI_ON); }     // one switch: on = the scheduler runs
       render(true);
     };
     rows.appendChild(r);
@@ -5783,8 +6866,8 @@ function renderKnown(){
 }
 
 /* ---------- first-start introduction ---------- */
-function newOb(){ return { step:0, native:UI_LANG !== 'en' ? UI_LANG : (KNOWN !== 'en' ? KNOWN : 'en'), learn:new Set(ACTIVE), q:'', grade:GRADE_MODE, anki:!!ANKI_ON, theme:THEME }; }
-const OB_STEPS = 7;
+function newOb(){ return { step:0, native:UI_LANG !== 'en' ? UI_LANG : (KNOWN !== 'en' ? KNOWN : 'en'), learn:new Set(ACTIVE), q:'', grade:GRADE_MODE, anki:!!ANKI_ON, fun:FUN_ON, theme:THEME }; }
+function obTotal(){ return BETA.known ? 8 : 7; }   // the known-words step exists only while that feature is on in Settings
 function obLangGrid(ob, multi, box){
   const codes = Object.keys(LANGS).sort((a, b)=>LANGS[a].name.localeCompare(LANGS[b].name));
   const all = (multi ? [] : ['en']).concat(codes);
@@ -5794,10 +6877,10 @@ function obLangGrid(ob, multi, box){
   list.forEach(c=>{
     const on = multi ? ob.learn.has(c) : ob.native === c;
     const b = document.createElement('button'); b.type = 'button'; b.className = 'langopt' + (on ? ' on' : '');
-    b.innerHTML = `${esc(LG(c).name)}<small>${esc(LG(c).native || '')}${!multi && hasUiPack(c) ? ' · interface ✓' : ''}${multi && presentCodes().includes(c) ? ' · in your library' : ''}</small>`;
+    b.innerHTML = `${esc(LG(c).name)}<small>${esc(LG(c).native || '')}${multi && presentCodes().includes(c) ? ' · in your library' : ''}</small>`;
     b.onclick = ()=>{
       if (multi){ if (ob.learn.has(c)) ob.learn.delete(c); else ob.learn.add(c); b.classList.toggle('on'); }
-      else { ob.native = c; box.querySelectorAll('.langopt').forEach(x=>x.classList.remove('on')); b.classList.add('on'); const n = document.getElementById('obNote'); if (n) n.textContent = (c !== 'en' && !hasUiPack(c)) ? 'If the repository has the menus in this language they are downloaded when you finish. Otherwise the app stays in English (Settings → Interface language).' : ''; }
+      else { ob.native = c; box.querySelectorAll('.langopt').forEach(x=>x.classList.remove('on')); b.classList.add('on'); }
     };
     box.appendChild(b);
   });
@@ -5806,99 +6889,134 @@ function obLangGrid(ob, multi, box){
 function presentCodes(){ return langsPresent().map(p=>p.code); }
 function finishOnboarding(){
   const ob = state.ob;
-  if (ob.native !== 'en' && hasUiPack(ob.native)) { UI_LANG = ob.native; saveLS(LS.ui, UI_LANG); applyUiLang(); }
-  else if (ob.native !== 'en'){ const c0 = ob.native; fetchUiPack(c0).then(()=>setUiLang(c0)).catch(()=>{}); }
-  else if (ob.native === 'en' && UI_LANG !== 'en'){ UI_LANG = 'en'; saveLS(LS.ui, 'en'); applyUiLang(); }
   const present = presentCodes(), want = [...ob.learn].filter(c=>c !== ob.native || c === 'en' ? true : true);
   const have = want.filter(c=>present.includes(c)), missing = want.filter(c=>!present.includes(c));
   if (have.length){ ACTIVE = have; saveLS(LS.langs, ACTIVE); }
   if (ob.native === 'en') KNOWN = 'en';
   else { const o = EN_IDX[ACTIVE[0]] ? langOption(ob.native) : { ok:false }; KNOWN = (present.includes(ob.native) && o.ok) ? ob.native : 'en'; }
   if (SIDE === KNOWN) SIDE = ''; saveLS(LS.known, KNOWN); saveLS(LS.side, SIDE);
-  GRADE_MODE = ob.grade; saveLS(LS.grade, GRADE_MODE);
+  GRADE_MODE = ob.grade; saveLS(LS.grade, GRADE_MODE); FUN_ON = !!ob.fun; saveLS(LS.fun, FUN_ON);
   ANKI_ON = ob.anki; saveLS(LS.anki, ANKI_ON);
   if (ob.anki) BETA.anki = true; if (ob.kw) BETA.known = true; saveLS(LS.beta, BETA);
   applyTheme(ob.theme); saveLS(LS.theme, ob.theme); setCssOn('');
-  ONB_DONE = true; saveLS(LS.onb, true); ONB2_DONE = true; saveLS(LS.onb2, true); saveLS(LS.tour, 'pending');
+  ONB_DONE = true; saveLS(LS.onb, true); markIntroSeen(); if (!ob.updated) saveLS(LS.tour, 'pending');
   state.ob = null;
   if (missing.length){ state.obBack = true; state.store.q = LG(missing[0]).name; state.al.tab = 'store'; state.screen = 'addlang'; render(); if (state.store.status !== 'ok') loadCatalog(); toast('Get ' + missing.map(c=>LG(c).name).join(', ') + ' from “Ready-made”'); }
   else { state.screen = 'home'; render(); }
 }
 function renderOnboard(){
   const f = document.createElement('div'), ob = state.ob || (state.ob = newOb());
-  const dots = Array.from({ length:OB_STEPS }, (_, i)=>`<i style="flex:1;height:5px;border-radius:3px;background:${i <= ob.step ? 'var(--accent,var(--green))' : 'var(--line)'}"></i>`).join('');
+  const dots = Array.from({ length:obTotal() }, (_, i)=>`<i style="flex:1;height:5px;border-radius:3px;background:${i <= ob.step ? 'var(--accent,var(--green))' : 'var(--line)'}"></i>`).join('');
   f.innerHTML = `<div class="topbar"><div style="display:flex;gap:5px;flex:1">${dots}</div><button class="linkbtn" id="obSkip">Skip</button></div><div class="wrap obstep" id="obBody"></div>
-    <div class="footer"><div class="footer-inner"><div class="footer-row">${ob.step > 0 ? '<button class="btn btn-ghost" id="obBack" style="flex:0 0 auto">←</button>' : ''}<button class="btn btn-green" id="obNext">${ob.step === OB_STEPS - 1 ? 'Finish' : 'Next'}</button></div></div></div>`;
+    <div class="footer"><div class="footer-inner"><div class="footer-row">${ob.step > 0 ? '<button class="btn btn-ghost" id="obBack" style="flex:0 0 auto">←</button>' : ''}<button class="btn btn-green" id="obNext">${ob.step === obTotal() - 1 ? 'Finish' : 'Next'}</button></div></div></div>`;
   const q = s=>f.querySelector(s), body = q('#obBody');
+  if (ob.step === obTotal() - 1 && INTRO_SEEN_VER < INTRO_VERSION) markIntroSeen();   // seen = reached the last part
   if (ob.step === 0){
+    body.innerHTML = `<div class="hero"><h1>🌐</h1><p>Interface language</p></div><div class="langgrid" id="obGrid" style="max-height:none"></div><div class="hint" id="obNote"></div>`;
+    if (!ob.uiCat && !ob.uiLoading){
+      ob.uiLoading = true;
+      loadUiCatalog().then(l=>{ ob.uiCat = l; }).catch(()=>{ ob.uiCat = []; ob.uiErr = true; })
+        .then(()=>{ ob.uiLoading = false; if (state.screen === 'onboard' && state.ob === ob && ob.step === 0) render(true); });
+    }
+    const codes = ['en'].concat([...new Set(Object.keys(UI_PACKS).concat((ob.uiCat || []).map(x=>x.code)))].filter(c=>c !== 'en').sort((x, y)=>LG(x).name.localeCompare(LG(y).name)));
+    const grid = body.querySelector('#obGrid');
+    codes.forEach(c=>{
+      const have = c === 'en' || hasUiPack(c);
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'langopt' + (UI_LANG === c ? ' on' : '');
+      b.innerHTML = `${esc(LG(c).native || LG(c).name)}<small>${esc(LG(c).name)}${have ? '' : ' · ⬇'}</small>`;
+      b.onclick = async ()=>{
+        if (!have){
+          b.disabled = true; const cat = (ob.uiCat || []).find(x=>x.code === c);
+          try { await fetchUiPack(c, cat && cat.path, cat && cat.rev); } catch(e){ toast("Couldn't download. Check your connection and try again."); b.disabled = false; return; }
+        }
+        ob.native = c; setUiLang(c);
+      };
+      grid.appendChild(b);
+    });
+    if (ob.uiLoading) body.querySelector('#obNote').textContent = '…';
+    else if (ob.uiErr) body.querySelector('#obNote').textContent = 'More languages need an internet connection.';
+  } else if (ob.step === 1){
     body.innerHTML = `<div class="hero"><h1>Welcome 👋</h1><p>Learn real sentences.</p></div>
       <div class="obtiles"><div class="obtile"><span class="big">📖</span>See a sentence</div><div class="obtile"><span class="big">🧩</span>Build &amp; translate</div><div class="obtile"><span class="big">⭐</span>Rate yourself</div></div>
       <div class="obtiles"><div class="obtile"><span class="big">📈</span>Levels grow</div><div class="obtile"><span class="big">✎</span>Notes make words yours</div><div class="obtile"><span class="big">⚙</span>All changeable later</div></div>`;
-  } else if (ob.step === 1){
+  } else if (ob.step === 2){
     body.innerHTML = `<div class="hero"><h1>Your language</h1><p>The language you speak. Sentences are explained in it when your library has that translation; otherwise in English.</p></div>
-      <input class="field" id="obQ" placeholder="Search" value="${esc(ob.q)}"><div class="langgrid" id="obGrid"></div><div class="hint" id="obNote"></div>`;
+      <input class="field" id="obQ" placeholder="Search" value="${esc(ob.q)}"><div class="langgrid" id="obGrid"></div>`;
     obLangGrid(ob, false, body.querySelector('#obGrid'));
     body.querySelector('#obQ').oninput = e=>{ ob.q = e.target.value; obLangGrid(ob, false, body.querySelector('#obGrid')); };
-    body.querySelector('#obNote').textContent = (ob.native !== 'en' && !hasUiPack(ob.native)) ? 'If the repository has the menus in this language they are downloaded when you finish.' : '';
-  } else if (ob.step === 2){
+  } else if (ob.step === 3){
     body.innerHTML = `<div class="hero"><h1>What do you want to learn?</h1><p>Pick one or more. Languages that are not in your library yet are fetched from the ready-made list when you finish.</p></div>
       <input class="field" id="obQ" placeholder="Search" value="${esc(ob.q)}"><div class="langgrid" id="obGrid"></div>`;
     obLangGrid(ob, true, body.querySelector('#obGrid'));
     body.querySelector('#obQ').oninput = e=>{ ob.q = e.target.value; obLangGrid(ob, true, body.querySelector('#obGrid')); };
-  } else if (ob.step === 3){
+  } else if (ob.step === 4){
     body.innerHTML = `<div class="hero"><h1>How do you like to study?</h1></div>
       <div class="sectionhead">Answers</div><div id="obGrade"></div>
       <div class="sectionhead">Review</div><div id="obAnki"></div>
+      <div class="sectionhead">Practice style</div><div id="obFun"></div>
       <div class="sectionhead">Look</div><div class="themegrid" id="obTheme"></div>`;
     const row = (host, on, t, s, fn)=>{ const r = document.createElement('div'); r.className = 'rowcb'; r.innerHTML = `<span class="cb${on ? ' on' : ''}">✓</span><div class="body"><div class="en">${t}</div><div class="hint" style="margin:2px 0 0">${s}</div></div>`; r.onclick = fn; host.appendChild(r); };
     const paint = ()=>{
       const g = q('#obGrade'); g.innerHTML = '';
-      row(g, ob.grade === 'self', 'Rate myself', 'You press right or wrong after seeing the answer (Anki style).', ()=>{ ob.grade = 'self'; paint(); });
+      row(g, ob.grade === 'self', 'Rate myself', 'You press right or wrong after seeing the answer.', ()=>{ ob.grade = 'self'; paint(); });
       row(g, ob.grade === 'auto', 'Automatic', 'The app decides if the answer is right.', ()=>{ ob.grade = 'auto'; paint(); });
       const a = q('#obAnki'); a.innerHTML = '';
-      row(a, ob.anki, 'Spaced repetition (Anki mode)', 'Sentences you finished come back after growing intervals.', ()=>{ ob.anki = !ob.anki; paint(); });
+      row(a, ob.anki, 'Spaced repetition (Anki mode) · beta', 'Beta (unfinished). Sentences you finished come back after growing intervals.', ()=>{ ob.anki = !ob.anki; paint(); });
+      const fu = q('#obFun'); fu.innerHTML = '';
+      row(fu, ob.fun, 'Duolingo style', 'Celebrations while you practise: “+XP” pop, combo flame, confetti. Off = plain numbers only.', ()=>{ ob.fun = !ob.fun; paint(); });
       const th = q('#obTheme'); th.innerHTML = '';
       THEMES.forEach(t=>{ const b = document.createElement('button'); b.type = 'button'; b.className = 'themecard' + (t.id === ob.theme ? ' on' : ''); b.innerHTML = `<span class="tsw">${t.sw.map(c=>`<i style="background:${c}"></i>`).join('')}</span><b>${esc(t.name)}</b>`; b.onclick = ()=>{ ob.theme = t.id; applyTheme(t.id); paint(); }; th.appendChild(b); });
     };
     paint();
-  } else if (ob.step === 4){
+  } else if (ob.step === 5){
     body.innerHTML = `<div class="hero"><h1>Inside a lesson</h1></div>
       <div class="obphone">
         <div class="obbar"><span class="iconbtn obx" style="position:relative">✕<i class="obn">1</i></span><div class="progress"><i style="width:40%"></i></div><span class="pill" style="position:relative">⭐ 12<i class="obn">2</i></span></div>
         <div class="obtools">
-          <span class="flagbtn">🚩<i class="obn">3</i></span><span class="flagbtn notebtn">🔤<i class="obn">4</i></span><span class="flagbtn notebtn">✎<i class="obn">5</i></span><span class="flagbtn notebtn nv-hl">👁<i class="obn">6</i></span><span class="flagbtn notebtn gradebtn">Self<i class="obn">7</i></span>
+          <span class="flagbtn">🚩<i class="obn">3</i></span><span class="flagbtn notebtn">🔤<i class="obn">4</i></span><span class="flagbtn notebtn">✎<i class="obn">5</i></span><span class="flagbtn notebtn nv-hl">👁<i class="obn">6</i></span><span class="flagbtn notebtn">تَ<i class="obn">7</i></span><span class="flagbtn notebtn gradebtn">Self<i class="obn">8</i></span>
         </div>
         <div class="obchips"><span>I</span><span>am</span><span>here</span></div>
       </div>
       <div class="oblegend">
         <div><i class="obn">1</i>✕ Finish</div><div><i class="obn">2</i>⭐ Points</div>
-        <div><i class="obn">3</i>🚩 Not sure</div><div><i class="obn">4</i>🔤 Edit sentence</div>
+        <div><i class="obn">3</i>🚩 Bookmark, to ask a teacher later</div><div><i class="obn">4</i>🔤 Edit sentence (if you know something is wrong)</div>
         <div><i class="obn">5</i>✎ Add note</div><div><i class="obn">6</i>👁 Show notes</div>
-        <div><i class="obn">7</i>Self / Auto grading</div><div>🧩 Tap words in order</div>
+        <div><i class="obn">7</i>تَ Tashkīl on / off (Arabic)</div><div><i class="obn">8</i>Self / Auto grading</div><div style="grid-column:1/-1">🧩 Tap words in order</div>
       </div>`;
-  } else if (ob.step === 5){
+  } else if (ob.step === 6){
     body.innerHTML = `<div class="hero"><h1>The main page</h1></div>
       <div class="obmock">
-        <div class="obtopm"><span class="titlebtn" style="position:relative"><span class="t">Arabic</span><span class="caret">▾</span><i class="obn">1</i></span><span class="pill">🔥 3</span><span class="pill">⭐ 40</span></div>
-        <div class="deck" style="position:relative"><div class="deck-ico">1</div><div class="deck-body"><div class="deck-title">Lesson 1</div><div class="gbar"><i style="width:30%"></i></div></div><div class="deck-meta">25<br>sent.</div><i class="obn">2</i></div>
-        <div style="margin-top:12px"><span class="btn btn-ghost btn-sm obsetm">⚙ Settings<i class="obn">3</i></span></div>
+        <div class="obtopm"><span class="titlebtn" style="position:relative"><span class="t">Arabic</span><span class="caret">▾</span><i class="obn l">1</i></span><span class="pill">🔥 3</span><span class="pill">⭐ 40</span></div>
+        <div class="statgrid two" style="position:relative"><div class="statcard"><b>1240</b><span>⭐ Total</span></div><div class="statcard"><b>85<small>/500</small></b><span>Known</span></div><i class="obn l">2</i></div>
+        <div class="lvcard" style="position:relative"><div class="lvinfo"><b>Arabic · Level 1A</b><span>chunk 1/24 · 3/6</span><div class="gbar"><i style="width:15%"></i></div></div><span class="btn btn-green btn-sm">▶ Continue</span><i class="obn">3</i></div>
+        <div style="margin-top:12px;display:flex;gap:8px"><span class="btn btn-green btn-sm" style="position:relative">📚 Library<i class="obn">4</i></span><span class="btn btn-amber btn-sm on obsetm">⚙ Settings<i class="obn">5</i></span></div>
       </div>
-      <div class="oblegend" style="grid-template-columns:1fr"><div><i class="obn">1</i>▾ Switch or add a language</div><div><i class="obn">2</i>👆 Tap a card = open the lesson</div><div><i class="obn">3</i>⚙ Themes, grading, this introduction</div></div>
+      <div class="oblegend" style="grid-template-columns:1fr">
+        <div><i class="obn">1</i>▾ Switch or add a language</div>
+        <div><i class="obn">2</i>⭐ Total stars (today's stars are in the top bar) · sentences you know</div>
+        <div><i class="obn">3</i>▶ Learn here. Levels grow with you</div>
+        <div><i class="obn">4</i>📚 Library: your decks (Anki style). Tap one to practise freely, without levels. ⋯ edits its sentences</div>
+        <div><i class="obn">5</i>⚙ Settings, themes, this introduction</div>
+      </div>
       <div class="sectionhead">After Finish</div>
-      <div class="obflow"><div class="st"><b>⬇</b>Get your language</div><span class="ar">→</span><div class="st"><b>←</b>Press back</div><span class="ar">→</span><div class="st"><b>👆</b>Tap a lesson</div></div>`;
+      <div class="obflow"><div class="st"><b>⬇</b>Get your language</div><span class="ar">→</span><div class="st"><b>←</b>Press back</div><span class="ar">→</span><div class="st"><b>▶</b>Press Continue</div></div>`;
   } else {
-    body.innerHTML = `<div class="hero"><h1>Do you already know some words?</h1><p>If you learned some of the language elsewhere, tell the app which words so it does not explain them again. It takes a minute and you can do it any time from Settings.</p></div>
-      <button class="btn btn-blue" id="obKw">✅ Take the quick test after finishing</button>
-      <div class="hint" style="margin-top:10px">Or just press Finish and start.</div>`;
-    q('#obKw').onclick = ()=>{ ob.kw = !ob.kw; q('#obKw').textContent = ob.kw ? '✅ I will take the test' : '✅ Take the quick test after finishing'; };
+    body.innerHTML = `<div class="hero"><h1>Do you already know some words?</h1><p>Tell the app which words you know, so it does not explain them again. It takes a minute.</p></div>
+      <button class="btn btn-blue" id="obKw">✅ Take the test now</button>
+      <div class="hint" style="margin-top:10px">Or press Finish and do it later from Settings.</div>`;
+    q('#obKw').onclick = ()=>{ finishOnboarding(); if (state.screen === 'home'){ state.kwBack = 'home'; state.screen = 'known'; render(); } else toast('Add your language first, then take the test from Settings'); };
+  }
+  if (ob.updated){
+    const news = Object.keys(INTRO_NEWS).map(Number).filter(v=>v > (ob.fromVer == null ? INTRO_SEEN_VER : ob.fromVer) && v <= INTRO_VERSION).sort((x, y)=>x - y).map(v=>INTRO_NEWS[v]).join(' ');
+    body.insertAdjacentHTML('afterbegin', `<div class="obnews"><b>✨ We changed something in the introduction</b>${news ? '<br>' + esc(news) : ''}</div>`);
   }
   q('#obNext').onclick = ()=>{
-    if (ob.step === 2 && !ob.learn.size){ toast('Pick at least one language'); return; }
-    if (ob.step === OB_STEPS - 1){ const kw = ob.kw; finishOnboarding(); if (kw && state.screen === 'home'){ state.kwBack = 'home'; state.screen = 'known'; render(); } return; }
+    if (ob.step === 3 && !ob.learn.size){ toast('Pick at least one language'); return; }
+    if (ob.step === obTotal() - 1){ finishOnboarding(); return; }
     ob.step++; ob.q = ''; render();
   };
   if (q('#obBack')) q('#obBack').onclick = ()=>{ ob.step--; ob.q = ''; render(); };
-  q('#obSkip').onclick = ()=>{ ONB_DONE = true; saveLS(LS.onb, true); ONB2_DONE = true; saveLS(LS.onb2, true); state.ob = null; state.screen = 'home'; render(); };
+  q('#obSkip').onclick = ()=>{ if (ob.updated) markIntroSeen(); state.ob = null; state.screen = 'home'; render(); };
   return f;
 }
 
@@ -5908,7 +7026,9 @@ function maybeTour(){
   if (loadLS(LS.tour, '') !== 'pending' || state.screen !== 'home' || state.ob || document.getElementById('tourLayer')) return;
   const all = [
     { sel:'#titleBtn', t:'Languages', d:'Tap here to switch or add a language.' },
-    { sel:'#decklist .deck', t:'Lesson', d:'Tap a card to open its lesson.' },
+    { sel:'.lvcard', t:'Learn here', d:'Press Continue. The levels grow with you.' },
+    { sel:'.statgrid', t:'Your numbers', d:'Total stars and the sentences you know. Today’s stars are at the top.' },
+    { sel:'#libBtn', t:'Library', d:'Your decks, Anki style. Tap one to practise freely without levels; ⋯ edits its sentences.' },
     { sel:'#setBtn', t:'Settings', d:'Themes, grading, exercises, and this introduction again.' }
   ];
   const steps = all.filter(x=>document.querySelector(x.sel));
@@ -5995,7 +7115,8 @@ function boot(){
     }
   } catch(e){}
   buildNoteIdx(); rebuildSeen();
-  if (!ONB2_DONE){ state.ob = newOb(); state.screen = 'onboard'; }   // everyone who has not seen the v2 introduction sees it once; Settings → Introduction replays it
+  if (!ONB2_DONE){ state.ob = newOb(); state.screen = 'onboard'; }
+  else if (INTRO_SEEN_VER < INTRO_VERSION){ state.ob = newOb(); state.ob.updated = true; state.ob.fromVer = INTRO_SEEN_VER; state.ob.step = 1; state.screen = 'onboard'; }   // changed since the user saw it: show it again with a note   // everyone who has not seen the v2 introduction sees it once; Settings → Introduction replays it
   if (STATS.lastDay && STATS.lastDay !== todayStr()){
     const y = new Date(Date.now()-864e5).toISOString().slice(0,10);
     if (STATS.lastDay !== y) STATS.streak = 0;
