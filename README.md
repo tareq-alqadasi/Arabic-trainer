@@ -14,8 +14,11 @@
 
 ## V2.6 : 
 ### [pronunciation]:
-- [لكل لغة ملخص wiki تجويدي]
-+ integrate the TTS NG (sherpa) into the website (مثل ما في تصطيب شيربا)
+- [لكل لغة ملخص wiki تجويدي] + احالة لمصادر سماعية
++ integrate the TTS NG (sherpa) into the website (مثل ما في تصطيب شيربا) :
++ + تبسيط النظام اكثر
+  + + ليش مودل واحد للغة ؟
+    + +اضافة نظام تقييم من المستخدمين الأخرين (كيعرف المتعلم الجديد اي المودلات اقرب للواقع)
 
 ## V2.7:
 [custom css making tool built-in web]
