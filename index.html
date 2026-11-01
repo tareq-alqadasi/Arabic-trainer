@@ -487,6 +487,11 @@ html[data-theme="zen"] .selbar{border-top:0;box-shadow:0 -10px 30px rgba(80,70,4
 html[dir=rtl] .choice,html[dir=rtl] .titlebtn,html[dir=rtl] .attemptrow .meta{text-align:start}
 html[dir=rtl] :is(.fl:not(.rtl),.translit,.cmp-text:not(.rtl),.chip,.choice:not(.rtl),.typein,.code,.cssbox,.sidetr,.en,.intro-en){unicode-bidi:plaintext}
 html[dir=rtl] .nt{unicode-bidi:isolate}
+/* text keeps the direction of ITS language, not of the interface language */
+.ltr{direction:ltr}
+html[dir] :is(.fl,.chip,.choice,.cmp-text,.typein,.intro-en,.en,.sidetr).ltr{direction:ltr;unicode-bidi:isolate}
+html[dir] :is(.choice,.cmp-text).ltr{text-align:left}
+html[dir=rtl] .answerzone.ltr .placeholder{direction:rtl;width:100%}
 html[dir=rtl] .dd{left:12px;right:12px}
 html[dir=rtl] .deck-meta{text-align:start}
 .alTabs{display:flex;gap:6px;margin:8px 0 12px;border-bottom:2px solid var(--line)}
@@ -598,6 +603,23 @@ html[dir=rtl] .deck-meta{text-align:start}
 .md img{max-width:100%}
 .md hr{border:0;border-top:1px solid var(--line);margin:16px 0}
 .md a{color:var(--accent,var(--blue))}
+/* ---- Voice (TTS) ---- */
+.tts-btn.off{opacity:.55}
+.tts-btn.lock{opacity:.4}
+.tts-btn.busy{animation:ttspulse .9s ease-in-out infinite}
+@keyframes ttspulse{0%,100%{opacity:1}50%{opacity:.35}}
+.ttsnote{color:var(--red-t,#a30000);font-weight:800;font-size:13px;letter-spacing:.4px;text-transform:uppercase;text-align:center;margin:4px 0 12px}
+.ttsgrp{background:var(--blue);color:#fff;border-radius:var(--r);font-weight:800;font-size:14px;letter-spacing:.6px;text-transform:uppercase;text-align:center;padding:11px 12px;margin:16px 0 8px}
+.ttsmod{display:flex;align-items:center;gap:8px;border:2px solid var(--blue);border-radius:12px;padding:6px 6px 6px 14px;margin-bottom:8px;background:var(--card,#fff);cursor:pointer}
+.ttsmod .nm{flex:1;min-width:0;color:var(--blue-d);font-weight:700;font-size:15px;word-break:break-all}
+.ttsmod .sp{font-size:11px;font-weight:700;color:var(--ink3)}
+.ttsmod.sel{background:var(--blue)}
+.ttsmod.sel .nm,.ttsmod.sel .sp{color:#fff}
+.dgrow{border:1.5px solid var(--line2,#ddd);border-radius:12px;padding:8px 12px;margin-top:8px;font-size:14px;word-break:break-word}
+.dgrow b{font-weight:800}.dgrow span{float:right;font-size:12px;opacity:.6}
+.dgrow.ok{border-color:var(--green)}.dgrow.bad{border-color:var(--red,#c33);background:rgba(200,50,50,.07)}
+.dghint{margin-top:4px;font-weight:700;color:var(--red-t,#a30000)}.dgrow.info .dghint{color:inherit;font-weight:400;opacity:.8}
+pre.ttslog{font-size:11px;line-height:1.35;white-space:pre-wrap;word-break:break-all;max-height:160px;overflow:auto;background:rgba(0,0,0,.05);border-radius:10px;padding:8px;margin:0}
 </style>
 </head>
 <body>
@@ -772,7 +794,7 @@ function toks(text, lang){
   return LG(lang).noSpace ? Array.from(t.replace(/\s+/g,'')) : t.split(/\s+/).filter(Boolean);
 }
 function joinToks(arr, lang){ return arr.join(LG(lang).noSpace ? '' : ' '); }
-function flc(lang){ const L = LG(lang); return 'fl' + (L.rtl?' rtl':'') + (L.arf?' arf':''); }
+function flc(lang){ const L = LG(lang); return 'fl' + (L.rtl ? ' rtl' : ' ltr') + (L.arf ? ' arf' : ''); }
 function normFl(s, lang){
   const L = LG(lang);
   if (L.arf) return normAr(s);
@@ -1903,32 +1925,96 @@ function chunkPool(lang, L, ci){
   const p = levelSorted(lang, L), ly = chunkLayout(p.length);
   return p.slice(ci*ly.size, (ci+1)*ly.size);
 }
-function normalizeLevel(lang){
-  const v = lv(lang), mx = maxLevel(lang); let ch = false;
-  while (v.level <= mx && !levelPool(lang, v.level).length){ v.level++; v.sub = 0; v.chunk = 0; v.done = {}; ch = true; }
-  if (v.level <= mx){
-    const cc = chunkCount(lang, v.level);
-    if (v.chunk >= cc){ v.chunk = 0; v.done = {}; ch = true; }
-    if (!chunkPool(lang, v.level, v.chunk).length){ v.chunk = 0; ch = true; }
+/* Chunked level progression — a rule, not a list.
+   Inside a level every chunk goes through a, b, c. Let a, b, c be how many chunks have finished each stage (c ≤ b ≤ a ≤ N).
+   A step is allowed when:
+     • a:  fewer than `cap` chunks are waiting in stage a            (a − b < cap, default cap = 2: "always two chunks in a")
+     • b:  a chunk is waiting for b, and `cap` of them are waiting     (a − b ≥ cap) — or no new chunk is left (a = N)
+     • c:  a chunk has finished b                                      (c < b)
+     • never the same chunk twice in a row (a_n → b_n, b_n → c_n)      (skipped only if nothing else exists, e.g. a level of one chunk)
+   Among the allowed steps take the shortest column (smallest count); tie → a, c, b.
+   Result: 1a 2a 1b 3a 1c 2b 4a 2c 3b 5a 3c 4b …  and the end of the level finishes on its own. Levels follow one another. */
+let STAGE_LAG = loadLS('arTrainer:lag', 1);       // cap = this + 1 chunks waiting in stage a
+const PIPE_ORDER = [0, 2, 1];                      // tie-break: a, then c, then b
+function pipeUnits(lang){
+  const out = [], mx = maxLevel(lang);
+  for (let L = 1; L <= mx; L++){
+    const n = levelPool(lang, L).length; if (!n) continue;
+    const cc = chunkLayout(n).cnt;
+    for (let c = 0; c < cc; c++) out.push({ L, c, key:L + '.' + c });
   }
+  return out;
+}
+function pipeInit(lang){                          // first time (or old saves): derive each chunk's finished stages from level / chunk / sub
+  const v = lv(lang); if (v.stg) return;
+  const U = pipeUnits(lang); v.stg = {};
+  let cur = U.findIndex(u=>u.L > v.level || (u.L === v.level && u.c >= v.chunk)); if (cur < 0) cur = U.length;
+  U.forEach((u, j)=>{ v.stg[u.key] = j < cur ? 3 : (j === cur ? Math.min(2, v.sub || 0) : 0); });
+  v.p = v.sub || 0;
+}
+// state: a, b, c = chunks that finished stage a / b / c (they pass in order); last = stage just done (-1 none)
+function pipeOpts(N, G, a, b, c, last){           // allowed next steps, best first
+  const cap = G + 1, lastChunk = last === 0 ? a - 1 : last === 1 ? b - 1 : last === 2 ? c - 1 : -2, cand = [];
+  PIPE_ORDER.forEach((st, ord)=>{
+    let chunk;
+    if (st === 0){ if (a >= N || a - b >= cap) return; chunk = a; }
+    else if (st === 1){ if (b >= a || (a < N && a - b < cap)) return; chunk = b; }
+    else { if (c >= b) return; chunk = c; }
+    cand.push({ st, n:st === 0 ? a : st === 1 ? b : c, ord, same:chunk === lastChunk });
+  });
+  const ok = cand.filter(x=>!x.same);
+  return (ok.length ? ok : cand).sort((x, y)=>(x.n - y.n) || (x.ord - y.ord));
+}
+function pipeSelect(lang, startP){
+  const v = lv(lang), st = u=>v.stg[u.key] || 0, all = pipeUnits(lang);
+  const open = all.find(u=>st(u) < 3); if (!open) return false;
+  const LU = all.filter(u=>u.L === open.L), N = LU.length, G = Math.max(1, parseInt(STAGE_LAG, 10) || 1);
+  let mono = true; for (let i = 1; i < N; i++) if (st(LU[i]) > st(LU[i - 1])) mono = false;
+  if (mono){
+    const a = LU.filter(u=>st(u) >= 1).length, b = LU.filter(u=>st(u) >= 2).length, c = LU.filter(u=>st(u) >= 3).length;
+    let last = -1; const lu = v.lk && LU.find(u=>u.key === v.lk);
+    if (lu && v.ls != null && st(lu) === v.ls + 1) last = v.ls;
+    for (const ig of [false, true]){
+      let blockedA = false;                       // Anki: today's new-sentence limit reached → stage a waits, b and c go on
+      if (a < N && ANKI_ON && !ig){ const pool = chunkPool(lang, LU[a].L, LU[a].c); blockedA = !!pool.length && srsNewLeft(pool[0].uid) <= 0; }
+      const pick = pipeOpts(N, G, a, b, c, last).find(o=>!(o.st === 0 && blockedA));
+      if (pick){ const u = LU[pick.st === 0 ? a : pick.st === 1 ? b : c]; v.level = u.L; v.chunk = u.c; v.sub = pick.st; v.p = pick.st; v.done = {}; return true; }
+    }
+  }
+  for (const u of LU){ const s = st(u); if (s < 3){ v.level = u.L; v.chunk = u.c; v.sub = s; v.p = s; v.done = {}; return true; } }   // unexpected state (library edited): simply continue
+  return false;
+}
+function normalizeLevel(lang){
+  const v = lv(lang); pipeInit(lang);
+  const U = pipeUnits(lang), keys = new Set(U.map(u=>u.key)); let ch = false;
+  Object.keys(v.stg).forEach(k=>{ if (!keys.has(k)){ delete v.stg[k]; ch = true; } });
+  U.forEach(u=>{ if (v.stg[u.key] == null){ v.stg[u.key] = 0; ch = true; } });
+  if (!U.length || U.every(u=>v.stg[u.key] >= 3)){
+    const mx = maxLevel(lang); if (v.level <= mx){ v.level = mx + 1; ch = true; }
+    if (ch) saveLS(LS.levels, LEVELS);
+    return 'complete';
+  }
+  const cur = U.find(u=>u.L === v.level && u.c === v.chunk);
+  if (!cur || (v.stg[cur.key] || 0) !== v.sub){ pipeSelect(lang, v.p || 0); ch = true; }
   if (ch) saveLS(LS.levels, LEVELS);
-  return v.level > mx ? 'complete' : 'ok';
+  return 'ok';
 }
 function curChunk(lang){ const v = lv(lang); return chunkPool(lang, v.level, v.chunk); }
 function levelPending(lang){ const v = lv(lang); return curChunk(lang).filter(s=>!v.done[s.uid]); }
 function advanceIfDone(lang){
   const v = lv(lang);
   if (levelPending(lang).length) return false;
-  const before = v.level;
-  v.sub++; v.done = {};
-  if (v.sub > 2){
-    v.sub = 0; v.chunk++;
-    if (v.chunk >= chunkCount(lang, v.level)){ v.chunk = 0; v.level++; }
-  }
-  const st = normalizeLevel(lang); saveLS(LS.levels, LEVELS);
+  pipeInit(lang);
+  const key = v.level + '.' + v.chunk, was = { level:v.level, sub:v.sub };
+  v.lk = key; v.ls = v.sub;                       // what was just done (rule 1 needs it)
+  v.stg[key] = Math.max(v.stg[key] || 0, v.sub + 1);
+  v.done = {};
+  const more = pipeSelect(lang, 0);
+  const st = more ? 'ok' : normalizeLevel(lang);
+  saveLS(LS.levels, LEVELS);
   if (st === 'complete') toast('All levels completed');
-  else if (v.level !== before){ toast('Level ' + v.level + ' unlocked'); funBurst(); }
-  else if (v.sub === 0){ toast('Chunk done ✓ · next ' + (v.chunk+1) + '/' + chunkCount(lang, v.level)); funBurst(); }
+  else if (v.sub === 0 && v.level !== was.level){ toast('Level ' + v.level + ' unlocked'); funBurst(); }
+  else if (was.sub === 2){ toast('Chunk done ✓'); funBurst(); }
   return true;
 }
 function fillLevelQueue(){
@@ -1946,7 +2032,7 @@ function fillLevelQueue(){
   // review mix: sentences already met (not in this chunk), unknown ones first; any enabled exercise type
   const last = lastMap(), cur = new Set(curChunk(lang).map(x=>x.uid));
   const seen = langSentences(lang).filter(x=>!cur.has(x.uid) && last.has(x.uid));
-  const n = ANKI_ON ? 0 : Math.min(seen.length, Math.max(3, Math.ceil(q.length*0.5)));   // Anki mode: reviews come from the scheduler
+  const n = 0;   // no extra review cards: the staggered stages (b, c) and the Anki scheduler do the repeating
   const unk = shuffle(seen.filter(x=>last.get(x.uid) === false));
   const ok = shuffle(seen.filter(x=>last.get(x.uid) === true));
   const picks = unk.concat(ok).slice(0, n);
@@ -2166,6 +2252,7 @@ function sessRestore(s){
   return true;
 }
 function exitSession(){
+  ttsLeave();
   if (state.sess) state.sess.ended = true;
   undoDropAnswers();               // callers that started the session must not open the lesson afterwards
   const from = state.sess ? state.sess.from : 'home';
@@ -3999,6 +4086,13 @@ function repeatSettingsEl(){
   cs.innerHTML = [4, 6, 8, 10, 12, 16, 20].map(n=>`<option value="${n}"${n === CHUNK_TARGET ? ' selected' : ''}>${n}</option>`).join('');
   cs.onchange = ()=>{ CHUNK_TARGET = parseInt(cs.value, 10) || 6; saveLS('arTrainer:chunk', CHUNK_TARGET); ACTIVE.forEach(c=>{ try { normalizeLevel(c); } catch(e){} }); toast('Chunk size: ' + CHUNK_TARGET); };
   d.appendChild(cs);
+  const hl = document.createElement('div'); hl.className = 'hint'; hl.style.marginTop = '14px';
+  hl.textContent = 'Inside a level the chunks are interleaved (a1 a2 b1 a3 c1 b2 a4 c2 b3 …): always 2 chunks wait in stage a, the shortest of the three columns is filled, and a chunk never gets its next stage straight after the previous one. Chunks kept waiting in stage a:';
+  d.appendChild(hl);
+  const ls = document.createElement('select'); ls.className = 'field'; ls.style.width = '120px';
+  ls.innerHTML = [1, 2, 3, 4].map(n=>`<option value="${n}"${n === (parseInt(STAGE_LAG, 10) || 1) ? ' selected' : ''}>${n + 1}</option>`).join('');
+  ls.onchange = ()=>{ STAGE_LAG = parseInt(ls.value, 10) || 1; saveLS('arTrainer:lag', STAGE_LAG); toast('Chunks waiting in stage a: ' + (STAGE_LAG + 1)); };
+  d.appendChild(ls);
   const h1 = document.createElement('div'); h1.className = 'hint'; h1.style.marginTop = '14px';
   h1.textContent = 'A sentence never comes straight back. Cards that must pass between two appearances of the same sentence:';
   d.appendChild(h1);
@@ -4501,10 +4595,10 @@ const SRS_FIELDS = [
 // "Again 10m / Good 3d" for the card on screen (only cards the scheduler will record)
 function ankiPreview(){
   const s = state.sess, c = state.cur;
-  if (!ankiActive(s) || !c) return null;
+  if (!ANKI_ON || !s || !c) return null;
   const uid = c.sent.uid, o = srsOptsFor(uid), card = srsStore().cards[uid];
-  if (c.kind === 'srs' && card){ const pv = srsPreview(card, Date.now(), o); return { again:srsFmt(pv.again), good:srsFmt(pv.good) }; }
-  if (c.kind === 'new' && lv(s.lang).sub === 2 && !card)
+  if (card){ const pv = srsPreview(card, Date.now(), o); return { again:srsFmt(pv.again), good:srsFmt(pv.good) }; }
+  if (ankiActive(s) && c.kind === 'new' && lv(s.lang).sub === 2 && !card)
     return { again:o.learnSteps.length ? srsFmt(o.learnSteps[0] * SRS_MIN) : srsFmt(o.graduate * SRS_DAY), good:srsFmt(o.graduate * SRS_DAY) };
   return null;
 }
@@ -4949,6 +5043,7 @@ const app = document.getElementById('app');
 function render(keep){
   if (!keep) window.scrollTo(0,0);
   if (state.screen !== 'home') state.ddOpen = false;
+  if (state.screen !== 'lesson') ttsLeave();
   app.innerHTML = '';
   const m = { home:renderHome, lesson:renderLesson, group:renderGroup, stats:renderStats, flags:renderFlags, addlang:renderAddLang, settings:renderSettings, store:renderStore, notes:renderNotes, deckopts:renderDeckOpts, onboard:renderOnboard, library:renderLibrary, phon:renderPhon, known:renderKnown, gloss:renderGloss, insights:renderInsights };
   app.appendChild((m[state.screen] || renderHome)());
@@ -4992,7 +5087,7 @@ document.addEventListener('click', e=>{
   const tb = document.getElementById('titleBtn'); if (tb) tb.classList.remove('open');
 }, true);
 
-function kcls(lang){ return lang === 'en' ? '' : flc(lang); }
+function kcls(lang){ return lang === 'en' ? 'ltr' : flc(lang); }
 function knHTML(s){ const k = kn(s); return flHTML(knText(s), k.lang); }
 function knText(s){ const k = kn(s); return k.sent ? displayFl(k.sent) : k.text; }
 function sideHTML(s, note){
@@ -5014,7 +5109,8 @@ function levelCardHTML(c){
   }
   const ch = curChunk(c), dn = ch.length - levelPending(c).length, cc = chunkCount(c, v.level);
   const frac = ch.length ? dn/ch.length : 0;
-  const pct = Math.round(((v.chunk*3 + v.sub + frac)/(cc*3))*100);
+  const U = pipeUnits(c), tot = U.length*3; let sum = 0; U.forEach(u=>{ sum += (v.stg && v.stg[u.key]) || 0; });
+  const pct = tot ? Math.round((sum + frac)/tot*100) : 0;
   return `<div class="lvcard"><div class="lvinfo"><b>${esc(L.name)} · Level ${v.level}${SUBS[v.sub]}</b>
     <span>${levelWords(v.level)} words · chunk ${v.chunk+1}/${cc} · ${SUB_DESC[v.sub]} · ${dn}/${ch.length}${ANKI_ON ? ' · due ' + (c0 => c0.review + c0.learning)(srsDueCounts(c, Date.now())) : ''}</span>
     <div class="gbar"><i style="width:${pct}%"></i></div></div>
@@ -5393,6 +5489,7 @@ function renderLesson(){
   const f = document.createElement('div');
   const s = state.sess, ex = state.ex, L = LG(ex.lang);
   const pct = sessPct();
+  setTimeout(ttsAuto, 0);                       // voice: auto-play once per card/phase
 
   const top = document.createElement('div');
   top.className = 'topbar';
@@ -5457,7 +5554,7 @@ function renderLesson(){
     tashB.textContent = '\u062A\u064E';
     tashB.onclick = ()=>{ SHOW_TASHKIL = !SHOW_TASHKIL; saveTashkil(); toast(SHOW_TASHKIL ? 'Tashkīl on' : 'Tashkīl off'); render(true); };
   }
-  tools.appendChild(trB); tools.appendChild(addN); if (showN) tools.appendChild(showN); if (tashB) tools.appendChild(tashB); tools.appendChild(gradeB); tools.appendChild(flag);
+  const spkB = ttsBtn(ex); if (spkB) tools.appendChild(spkB); tools.appendChild(trB); tools.appendChild(addN); if (showN) tools.appendChild(showN); if (tashB) tools.appendChild(tashB); tools.appendChild(gradeB); tools.appendChild(flag);
   head.appendChild(tools);
   wrap.appendChild(head);
 
@@ -5502,7 +5599,7 @@ function buildBankUI(){
   const rtl = !!LG(aLang).rtl;
   const box = document.createElement('div');
   const zone = document.createElement('div');
-  zone.className = 'answerzone' + (rtl?' rtl':'') + (state.answer.length?' filled':'');
+  zone.className = 'answerzone' + (rtl ? ' rtl' : ' ltr') + (state.answer.length ? ' filled' : '');
   if (!state.answer.length){
     zone.innerHTML = `<div class="placeholder">Tap the words below…</div>`;
   } else {
@@ -5524,7 +5621,7 @@ function buildBankUI(){
   }
   box.appendChild(zone);
   const bank = document.createElement('div');
-  bank.className = 'bank' + (rtl?' rtl':'');
+  bank.className = 'bank' + (rtl ? ' rtl' : ' ltr');
   ex.bank.forEach((tok, i)=>{
     const c = document.createElement('button');
     c.className = 'chip ' + cls + (state.usedBank[i]?' used':'');
@@ -5543,6 +5640,7 @@ function buildTypeUI(){
   ta.className = 'typein';
   ta.placeholder = 'Type the English translation…';
   ta.autocomplete = 'off'; ta.autocapitalize = 'off'; ta.spellcheck = false;
+  ta.dir = (state.ex && state.ex.kLang && LG(state.ex.kLang).rtl) ? 'rtl' : 'ltr';
   ta.value = state.answer || '';
   ta.disabled = !!state.feedback;
   ta.oninput = ()=>{ state.answer = ta.value; syncFooter(); };
@@ -5558,7 +5656,7 @@ function buildChoiceUI(){
   const aLang = ex.answerLang === 'fl' ? ex.lang : ex.kLang;
   ex.options.forEach(opt=>{
     const b = document.createElement('button');
-    b.className = 'choice' + (aLang === 'en' ? '' : ' ' + flc(aLang));
+    b.className = 'choice ' + kcls(aLang);
     const os = ex.answerLang === 'en' && ex.optSent ? ex.optSent[opt] : null;
     b.innerHTML = `<div>${flHTML(displayFlFromText(opt, aLang), aLang)}</div>${os ? sideHTML(os, false) : ''}`;
     if (state.answer === opt) b.classList.add('sel');
@@ -5600,9 +5698,9 @@ function buildIntro(){
   const aw = s.target.split(/\s+/).filter(Boolean), tw = (s.transliteration||'').split(/\s+/).filter(Boolean);
   let body;
   if (tw.length && tw.length === aw.length){
-    body = `<div class="iwrap${L.rtl?' rtl':''}">${aw.map((w,i)=>`<div class="iw"><div class="w ${flc(ex.lang)}">${flHTML(displayWord(w, ex.lang), ex.lang)}</div><div class="translit">${esc(tw[i])}</div></div>`).join('')}</div>`;
+    body = `<div class="iwrap${L.rtl ? ' rtl' : ' ltr'}">${aw.map((w,i)=>`<div class="iw"><div class="w ${flc(ex.lang)}">${flHTML(displayWord(w, ex.lang), ex.lang)}</div><div class="translit">${esc(tw[i])}</div></div>`).join('')}</div>`;
   } else {
-    body = `<div class="iwrap${L.rtl?' rtl':''}"><div class="iw"><div class="w ${flc(ex.lang)}">${flHTML(displayFl(s), ex.lang)}</div>${s.transliteration ? `<div class="translit">${esc(s.transliteration)}</div>` : ''}</div></div>`;
+    body = `<div class="iwrap${L.rtl ? ' rtl' : ' ltr'}"><div class="iw"><div class="w ${flc(ex.lang)}">${flHTML(displayFl(s), ex.lang)}</div>${s.transliteration ? `<div class="translit">${esc(s.transliteration)}</div>` : ''}</div></div>`;
   }
   box.innerHTML = `<div class="introtag">New · you will see it once</div>${body}${notesStripHTML(s.target, ex.lang)}<div class="intro-en">${knBlock(s, 21, true)}</div>`;
   return box;
@@ -5752,14 +5850,16 @@ function rate(userSaysCorrect){
     s.queue.splice(at, 0, { sent:ex.sent, forced:ex.type });
     dbg('retry', 'wrong → "' + short(ex.sent.target, 20) + '" comes back as ' + ex.type + ' after ' + at + ' card(s)', { uid:ex.sent.uid, at });
   }
-  if (ankiActive(s) && state.cur){
-    const kd = state.cur.kind, u = ex.sent.uid, sub = lv(s.lang).sub;
-    if (kd === 'srs'){
+  if (ANKI_ON && state.cur){
+    // Anki rule: a sentence that has a review card is rescheduled from EVERY answer, whatever the reason it was shown
+    // (due review, retry after a mistake, a level stage, library / group / flag practice …) — showing it early restarts its interval.
+    const kd = state.cur.kind, u = ex.sent.uid, lvlMode = s.mode === 'level', sub = lvlMode ? lv(s.lang).sub : -1;
+    if (lvlMode && kd === 'new' && sub === 0){ srsNoteNew(u); dbg('anki', 'new sentence started today (counts for the deck limit)', { uid:u }); }
+    if (srsStore().cards[u]){
       const cd = srsAnswer(u, userSaysCorrect);
-      dbg('anki', 'review recorded: ' + (userSaysCorrect ? 'Good' : 'Again') + ' → ' + (cd.st === 'r' ? 'review, next in ' + cd.iv + ' day(s)' : 'learning, due in ' + srsFmt(cd.due - Date.now())), { uid:u, card:cd });
-    } else if (kd === 'new'){
-      if (sub === 0){ srsNoteNew(u); dbg('anki', 'new sentence started today (counts for the deck limit)', { uid:u }); }
-      if (sub === 2){ const cd = srsGraduate(u, userSaysCorrect); dbg('anki', 'sentence finished its level cycle → enters spaced review (' + (cd.st === 'r' ? 'first review in ' + cd.iv + ' day(s)' : 'learning steps') + ')', { uid:u, card:cd }); }
+      dbg('anki', (kd === 'srs' ? 'review' : 'extra appearance (' + cardKind(state.cur) + ')') + ' counted: ' + (userSaysCorrect ? 'Good' : 'Again') + ' → ' + (cd.st === 'r' ? 'review, next in ' + cd.iv + ' day(s)' : 'learning, due in ' + srsFmt(cd.due - Date.now())), { uid:u, card:cd });
+    } else if (lvlMode && kd === 'new' && sub === 2){
+      const cd = srsGraduate(u, userSaysCorrect); dbg('anki', 'sentence finished its level cycle → enters spaced review (' + (cd.st === 'r' ? 'first review in ' + cd.iv + ' day(s)' : 'learning steps') + ')', { uid:u, card:cd });
     }
   }
   if (s.mode === 'level' && state.cur && state.cur.kind === 'new'){
@@ -6076,6 +6176,579 @@ document.getElementById('dataInput').addEventListener('change', async e=>{
   try { location.reload(); } catch(err){ toast('Restored — reload the page'); }
 });
 
+/* ==================== VOICE (TTS) — k2-fsa "text-to-speech" Hugging Face Space (sherpa-onnx) ====================
+   One model per language (like SherpaTTS). The model runs on the Space; the page only sends the sentence and plays the wav.
+   Every sentence is kept on this device (Cache Storage) after the first time, so repeats are instant and offline.
+   Hooks: renderLesson (🔊 button + auto-play) — all practice modes (natural levels, library/group/flags, Anki) use it. */
+Object.assign(LS, { tts:'arTrainer:tts' });
+const TTS_SERVER = 'https://k2-fsa-text-to-speech.hf.space';
+const TTS_CACHE = 'arTrainer-tts-v1';
+const TTS_SUP = 'csukuangfj2/sherpa-onnx-supertonic-3-tts-int8-2026-05-11|10 speakers';
+
+/* app language code -> the Space's language labels (exact strings of the Space's language radio) */
+const TTS_LANGMAP = {
+  en:['English'], ar:['Arabic'], af:['Afrikaans'], bn:['Bengali'], eu:['Basque'], bg:['Bulgarian'], ca:['Catalan'], hr:['Croatian'],
+  cs:['Czech'], da:['Danish'], nl:['Dutch'], et:['Estonian'], fi:['Finnish'], fr:['French'], ka:['Georgian'], de:['German'],
+  el:['Greek'], gu:['Gujarati'], hi:['Hindi'], hu:['Hungarian'], is:['Icelandic'], id:['Indonesian'], ga:['Irish'], it:['Italian'],
+  ja:['Japanese'], kk:['Kazakh'], ko:['Korean'], lv:['Latvian'], lt:['Lithuanian'], lb:['Luxembourgish'], mt:['Maltese'],
+  ne:['Nepali'], no:['Norwegian'], fa:['Persian', 'Persian+English'], pl:['Polish'], pt:['Portuguese'], ro:['Romanian'],
+  ru:['Russian'], sr:['Serbian'], sk:['Slovak'], sl:['Slovenian'], es:['Spanish'], sw:['Swahili'], sv:['Swedish'], th:['Thai'],
+  tr:['Turkish'], uk:['Ukrainian'], ur:['Urdu'], vi:['Vietnamese'], cy:['Welsh'],
+  zh:['Chinese (Mandarin, 普通话)', 'Chinese+English'], yue:['Cantonese (粤语)']
+};
+/* the Space's model lists (model.py). Tokens: P:=csukuangfj/vits-piper-  C:=…vits-coqui-  M:=…vits-mimic3-  K:=csukuangfj/  K2:=csukuangfj2/
+   P2:=csukuangfj2/vits-piper-  S=Supertonic  =literal.  "|N" = N speakers.  The list is refreshed from the server when the picker opens. */
+const TTS_CAT = {
+  'English':'K:kokoro-en-v0_19|11 owensong/Inflect-Nano-v2|1 owensong/Inflect-Micro-v2|1 K2:kitten-mini-en-v0_1-fp16|8 K2:kitten-nano-en-v0_2-fp16|8 K2:kitten-nano-en-v0_1-fp16|8 P:en_US-glados-high|1 P:en_US-glados|1 P:en_GB-southern_english_male-medium|8 P:en_GB-southern_english_female-medium|6 P:en_US-bryce-medium|1 P:en_US-john-medium|1 P:en_US-norman-medium|1 P:en_US-miro-high|1 C:en-ljspeech|1 C:en-ljspeech-neon|1 C:en-vctk|109 P:en_GB-miro-high|1 P:en_GB-dii-high|1 P:en_GB-sweetbbak-amy|1 P:en_US-amy-low|1 P:en_US-amy-medium|1 P:en_US-arctic-medium|18 P:en_US-danny-low|1 P:en_US-hfc_male-medium|1 P:en_US-hfc_female-medium|1 P:en_US-joe-medium|1 P:en_US-kathleen-low|1 P:en_US-kusal-medium|1 P:en_US-l2arctic-medium|24 P:en_US-lessac-high|1 P:en_US-lessac-low|1 P:en_US-lessac-medium|1 P:en_US-libritts-high|904 P:en_US-libritts_r-medium|904 P:en_US-ljspeech-high|1 P:en_US-ljspeech-medium|1 P:en_US-ryan-high|1 P:en_US-ryan-low|1 P:en_US-ryan-medium|1 P:en_GB-alan-low|1 P:en_GB-alan-medium|1 P:en_GB-cori-high|1 P:en_GB-cori-medium|1 P:en_GB-jenny_dioco-medium|1 P:en_GB-northern_english_male-medium|1 P:en_GB-semaine-medium|4 P:en_GB-southern_english_female-low|1 P:en_GB-vctk-medium|109 K:vits-vctk|109 K:vits-ljs|1 S',
+  'German':'P:de_DE-glados-low|1 P:de_DE-glados-medium|1 P:de_DE-glados-high|1 C:de-css10|1 P:de_DE-eva_k-x_low|1 P:de_DE-dii-high|1 P:de_DE-miro-high|1 P:de_DE-karlsson-low|1 P:de_DE-kerstin-low|1 P:de_DE-pavoque-low|1 P:de_DE-ramona-low|1 P:de_DE-thorsten-low|1 P:de_DE-thorsten-medium|1 P:de_DE-thorsten-high|1 P:de_DE-thorsten_emotional-medium|8 S',
+  'Spanish':'P:es_ES-glados-medium P:es_AR-daniela-high P:es_ES-carlfm-x_low P:es_ES-davefx-medium P:es_ES-miro-high P:es_ES-sharvard-medium P:es_MX-ald-medium P:es_MX-claude-high M:es_ES-m-ailabs_low S',
+  'French':'C:fr-css10 P:fr_FR-upmc-medium P:fr_FR-tom-medium|1 P:fr_FR-siwis-low P:fr_FR-miro-high P:fr_FR-siwis-medium P:fr_FR-tjiho-model1 P:fr_FR-tjiho-model2 P:fr_FR-tjiho-model3 S',
+  'Ukrainian':'P:uk_UA-lada-x_low C:uk-mai S',
+  'Russian':'P:ru_RU-denis-medium P:ru_RU-dmitri-medium P:ru_RU-irina-medium P:ru_RU-ruslan-medium S',
+  'Arabic':'K:nabra-82m-arabic-int8|1 P:ar_JO-kareem-low P:ar_JO-kareem-medium P:ar_JO-SA_miro-high S',
+  'Catalan':'P:ca_ES-upc_ona-x_low P:ca_ES-upc_ona-medium P:ca_ES-upc_pau-x_low',
+  'Czech':'P:cs_CZ-jirka-low P:cs_CZ-jirka-medium C:cs-cv S',
+  'Danish':'C:da-cv P:da_DK-talesyntese-medium S',
+  'Greek':'P:el_GR-rapunzelina-low S',
+  'Finnish':'C:fi-css10 P:fi_FI-harri-low P:fi_FI-harri-medium M:fi_FI-harri-tapani-ylilammi_low S',
+  'Hindi':'P:hi_IN-pratham-medium P:hi_IN-priyamvada-medium P:hi_IN-rohan-medium S',
+  'Indonesian':'P:id_ID-news_tts-medium S',
+  'Hungarian':'P:hu_HU-anna-medium P:hu_HU-berta-medium P:hu_HU-imre-medium M:hu_HU-diana-majlinger_low S',
+  'Icelandic':'P:is_IS-bui-medium P:is_IS-salka-medium P:is_IS-steinn-medium P:is_IS-ugla-medium',
+  'Italian':'P:it_IT-riccardo-x_low P:it_IT-paola-medium P:it_IT-miro-high P:it_IT-dii-high S',
+  'Georgian':'P:ka_GE-natia-medium',
+  'Kazakh':'P:kk_KZ-iseke-x_low P:kk_KZ-issai-high P:kk_KZ-raya-x_low',
+  'Luxembourgish':'P:lb_LU-marylux-medium',
+  'Nepali':'P:ne_NP-google-medium P:ne_NP-google-x_low M:ne_NP-ne-google_low',
+  'Dutch':'C:nl-css10 P:nl_BE-nathalie-medium P:nl_BE-nathalie-x_low P:nl_BE-rdh-medium P:nl_BE-rdh-x_low P:nl_NL-miro-high P:nl_NL-dii-high P2:nl_NL-alex-medium|1 S',
+  'Norwegian':'P:no_NO-talesyntese-medium',
+  'Polish':'C:pl-mai_female P:pl_PL-darkman-medium P:pl_PL-gosia-medium P:pl_PL-mc_speech-medium P2:pl_PL-bass-high|1 M:pl_PL-m-ailabs_low S',
+  'Portuguese':'C:pt-cv P:pt_BR-edresson-low P:pt_BR-faber-medium P:pt_PT-tugao-medium P:pt_PT-miro-high P:pt_PT-dii-high P:pt_BR-miro-high P:pt_BR-dii-high S',
+  'Romanian':'C:ro-cv P:ro_RO-mihai-medium S',
+  'Slovak':'C:sk-cv P:sk_SK-lili-medium S',
+  'Serbian':'P:sr_RS-serbski_institut-medium',
+  'Swedish':'C:sv-cv P:sv_SE-nst-medium P2:sv_SE-alma-medium|1 S',
+  'Swahili':'P:sw_CD-lanfrica-medium',
+  'Turkish':'P:tr_TR-dfki-medium P:tr_TR-fahrettin-medium P:tr_TR-fettah-medium|1 S',
+  'Vietnamese':'P:vi_VN-25hours_single-low P:vi_VN-vais1000-medium P:vi_VN-vivos-x_low M:vi_VN-vais1000_low S',
+  'Bulgarian':'C:bg-cv S', 'Estonian':'C:et-cv S', 'Irish':'C:ga-cv', 'Croatian':'C:hr-cv S', 'Lithuanian':'C:lt-cv S',
+  'Latvian':'P:lv_LV-aivars-medium C:lv-cv S', 'Maltese':'C:mt-cv', 'Slovenian':'P:sl_SI-artur-medium C:sl-cv S',
+  'Bengali':'C:bn-custom_female M:bn-multi_low',
+  'Thai':'K:vits-mms-tha',
+  'Persian':'P:fa_IR-amir-medium P:fa_IR-ganji-medium P:fa_IR-ganji_adabi-medium P:fa_IR-gyro-medium P:fa_IR-reza_ibrahim-medium M:fa-haaniye_low',
+  'Korean':'M:ko_KO-kss_low S', 'Afrikaans':'M:af_ZA-google-nwu_low', 'Gujarati':'M:gu_IN-cmu-indic_low',
+  'Welsh':'P:cy_GB-gwryw_gogleddol-medium|1', 'Basque':'P2:eu_ES-antton-medium|1 P2:eu_ES-maider-medium|1',
+  'Urdu':'P2:ur_PK-fasih-medium|1', 'Japanese':'S',
+  'Chinese (Mandarin, 普通话)':'P2:zh_CN-chaowen-medium|1 P2:zh_CN-xiao_ya-medium|1 K:matcha-icefall-zh-baker|1 K:vits-zh-hf-fanchen-wnj|1 K:vits-zh-hf-fanchen-C|187 K:sherpa-onnx-vits-zh-ll|5 K:vits-zh-hf-keqing|804 K:vits-zh-hf-theresa|804 K:vits-zh-hf-eula|804 K:vits-zh-hf-echo|804 K:vits-zh-hf-bronya|804 K:vits-zh-hf-doom|804 K:vits-zh-hf-zenyatta|804 K:vits-zh-hf-abyssinvoker|804 K:vits-zh-hf-fanchen-ZhiHuiLaoZhe|1 K:vits-zh-hf-fanchen-ZhiHuiLaoZhe_new|1 K:vits-zh-hf-fanchen-unity|1 K:vits-zh-aishell3|174 P:zh_CN-huayan-medium|1',
+  'Chinese+English':'=csukuangfj/matcha-icefall-zh-en|1 K:kokoro-multi-lang-v1_1|103 K:kokoro-multi-lang-v1_0|53 =csukuangfj/vits-melo-tts-zh_en|1',
+  'Persian+English':'K:matcha-tts-fa_en-khadijah|1 K:matcha-tts-fa_en-musa|1 =csukuangfj/vits-piper-fa_en-rezahedayatfar-ibrahimwalk-medium|1',
+  'Cantonese (粤语)':'K:vits-cantonese-hf-xiaomaiiwn'
+};
+const TTS_PRE = { 'P':'csukuangfj/vits-piper-', 'P2':'csukuangfj2/vits-piper-', 'C':'csukuangfj/vits-coqui-', 'M':'csukuangfj/vits-mimic3-', 'K':'csukuangfj/', 'K2':'csukuangfj2/' };
+function ttsExp(tok){
+  if (tok === 'S') return TTS_SUP;
+  if (tok[0] === '=') return tok.slice(1);
+  let pre = '', rest = tok;
+  const m = tok.match(/^(P2|P|C|M|K2|K):(.*)$/);
+  if (m){ pre = TTS_PRE[m[1]]; rest = m[2]; }
+  const q = rest.indexOf('|');
+  if (q < 0) return pre + rest;
+  const n = parseInt(rest.slice(q + 1), 10) || 1;
+  return pre + rest.slice(0, q) + '|' + n + (n === 1 ? ' speaker' : ' speakers');
+}
+const TTS_KEYS = {};                                   // label -> [exact dropdown values]
+Object.keys(TTS_CAT).forEach(l=>{ TTS_KEYS[l] = TTS_CAT[l].split(/\s+/).filter(Boolean).map(ttsExp); });
+let TTS_LIVE = {}, TTS_LIVE_TRIED = new Set();          // lists fetched from the running Space (override the built-in ones)
+
+/* ---------- settings ---------- */
+let TTS = Object.assign({ on:true, q:true, a:true, i:true, pre:true, server:TTS_SERVER, langs:{} }, loadLS(LS.tts, {}));
+if (!TTS.langs || typeof TTS.langs !== 'object') TTS.langs = {};
+if (!TTS.server) TTS.server = TTS_SERVER;
+function ttsSave(){ saveLS(LS.tts, TTS); }
+function ttsCfg(lang){ const c = TTS.on && TTS.langs[lang]; return c && c.model && c.label ? c : null; }
+
+/* ---------- models ---------- */
+function ttsInfo(label, key){
+  const bar = key.indexOf('|'), repo = bar < 0 ? key : key.slice(0, bar), spk = bar < 0 ? 1 : (parseInt(key.slice(bar + 1), 10) || 1);
+  let nm = repo.split('/').pop(), fam = 'Other VITS';
+  if (/vits-piper-/.test(repo)){ fam = 'Piper'; nm = nm.replace('vits-piper-', ''); }
+  else if (/vits-coqui-/.test(repo)){ fam = 'Coqui'; nm = nm.replace('vits-coqui-', ''); }
+  else if (/vits-mimic3-/.test(repo)){ fam = 'Mimic3'; nm = nm.replace('vits-mimic3-', ''); }
+  else if (/vits-mms-/.test(repo)){ fam = 'MMS'; nm = nm.replace('vits-mms-', ''); }
+  else if (/kokoro|nabra/.test(repo)) fam = 'Kokoro';
+  else if (/matcha/.test(repo)) fam = 'Matcha';
+  else if (/kitten/.test(repo)) fam = 'Kitten';
+  else if (/supertonic/.test(repo)){ fam = 'Supertonic'; nm = 'supertonic-3'; }
+  else if (/inflect/i.test(repo)) fam = 'Inflect';
+  return { label, key, fam, name:nm, spk };
+}
+function ttsModelsFor(code){
+  const out = [];
+  (TTS_LANGMAP[code] || []).forEach(label=>{ (TTS_LIVE[label] || TTS_KEYS[label] || []).forEach(k=>out.push(ttsInfo(label, k))); });
+  return out;
+}
+
+/* ---------- text that is spoken ---------- */
+function ttsText(s){
+  let t = s.target;
+  if (s.lang === 'ar' && s.transliteration){ try { t = addTashkil(s.target, s.transliteration) || s.target; } catch(e){} }   // vowel marks help the Arabic models, even when they are hidden on screen
+  return String(t || '').replace(/\s+/g, ' ').trim();
+}
+
+/* ---------- server (Gradio 5 "call" API of the Space) ---------- */
+const sleepMs = ms=>new Promise(r=>setTimeout(r, ms));
+function ttsTimeout(p, ms){                     // no AbortController: its signal cannot cross postMessage in some embedded browsers
+  return new Promise((res, rej)=>{
+    const to = setTimeout(()=>{ const e = new Error('timeout'); e.name = 'AbortError'; rej(e); }, ms);
+    p.then(v=>{ clearTimeout(to); res(v); }, e=>{ clearTimeout(to); rej(e); });
+  });
+}
+const TTS_LOG = [];
+function ttsLog(msg){ TTS_LOG.push(new Date().toTimeString().slice(0, 8) + ' ' + msg); if (TTS_LOG.length > 60) TTS_LOG.shift(); try { dbg('tts', msg); } catch(e){} }
+async function ttsFetch(url, opt, tag){
+  const t0 = performance.now(), sh = url.replace(/^https?:\/\//, '').slice(0, 72), ms = ()=>Math.round(performance.now() - t0) + ' ms';
+  try { const r = await fetch(url, opt); ttsLog((tag || 'GET') + ' ' + sh + ' → ' + r.status + ' · ' + ms()); return r; }
+  catch(e){ ttsLog((tag || 'GET') + ' ' + sh + ' ✗ ' + ((e && e.message) || e) + ' · ' + ms()); throw e; }
+}
+function ttsIsNet(e){ return !!e && (e.name === 'TypeError' || /failed to fetch|networkerror|load failed|network request failed|fetch failed/i.test(e.message || '')); }
+function ttsEnv(){
+  let origin = '?'; try { origin = String(window.origin); } catch(e){}
+  let framed = false; try { framed = window.top !== window; } catch(e){ framed = true; }
+  return { proto:location.protocol, host:location.host, origin, secure:!!window.isSecureContext, framed, online:navigator.onLine !== false, caches:typeof caches !== 'undefined' };
+}
+function ttsEnvHint(){
+  const e = ttsEnv();
+  if (e.framed) return ' This page runs inside another page (a chat artifact or an embedded viewer); those normally block outside servers — open the file in its own browser tab or host it.';
+  if (e.proto === 'file:') return ' The page is opened from a file; if the server refuses it, host the page (for example on GitHub Pages).';
+  if (!e.online) return ' The device reports that it is offline.';
+  return '';
+}
+async function ttsRaw(api, data, o){
+  o = o || {};
+  const base = String(TTS.server || TTS_SERVER).replace(/\/+$/, '');
+  const tries = o.tries || 3; let last = null;
+  const once = async ()=>{
+    const r1 = await ttsFetch(base + '/gradio_api/call/' + api, { method:'POST', headers:{ 'Content-Type':'application/json' }, body:JSON.stringify(o.session ? { data, session_hash:o.session } : { data }) }, 'POST');
+    if (!r1.ok){ const e = new Error(r1.status >= 500 ? 'The voice server is waking up — try again in a minute' : 'Voice server answered ' + r1.status); e.retry = r1.status >= 500; throw e; }
+    const j = await r1.json();
+    if (!j || !j.event_id) throw new Error('Unexpected answer from the voice server');
+    const r2 = await ttsFetch(base + '/gradio_api/call/' + api + '/' + j.event_id, undefined, 'GET');
+    if (!r2.ok) throw new Error('Voice server answered ' + r2.status);
+    const txt = await r2.text();
+    let ev = '', out = null, err = null;
+    txt.split(/\r?\n/).forEach(line=>{
+      if (line.indexOf('event:') === 0) ev = line.slice(6).trim();
+      else if (line.indexOf('data:') === 0){
+        const d = line.slice(5).trim();
+        if (ev === 'complete'){ try { out = JSON.parse(d); } catch(e){} }
+        else if (ev === 'error') err = d;
+      }
+    });
+    if (err !== null) throw new Error('The voice server could not make this audio' + (err && err !== 'null' ? ': ' + err.slice(0, 120) : ' (model still loading? try again)'));
+    if (!Array.isArray(out)) throw new Error('Empty answer from the voice server');
+    return { out, base };
+  };
+  for (let a = 0; a < tries; a++){
+    try { return await ttsTimeout(once(), o.ms || 150000); }
+    catch(e){
+      last = e;
+      if (e && e.name === 'AbortError') throw new Error('The voice server took too long');
+      const net = ttsIsNet(e);                                 // fetch() failed: offline, blocked, CORS, or the Space is asleep
+      if ((net || e.retry) && a < tries - 1){ await sleepMs(4000); continue; }
+      if (net) throw new Error('Cannot reach the voice server.' + ttsEnvHint() + ' Settings ▸ Voice ▸ Diagnose shows exactly which step fails.');
+      throw e;
+    }
+  }
+  throw last || new Error('Voice error');
+}
+async function ttsSynth(cfg, text){
+  let res = null;
+  for (let k = 0; k < 2 && !res; k++){
+    const ss = ttsSession(cfg.label); await ss.ready;
+    if (TTS_LIVE[cfg.label] && TTS_LIVE[cfg.label].indexOf(cfg.model) < 0) throw new Error('This model is no longer offered by the server — choose another one');
+    try { res = await ttsRaw('process', [cfg.label, cfg.model, text, String(cfg.sid || 0), cfg.speed || 1], { session:ss.id }); }
+    catch(e){ if (k === 0 && /could not make this audio/.test(e.message)){ delete TTS_SESS[cfg.label]; continue; } throw e; }   // session expired on the server: open a new one once
+  }
+  const { out, base } = res;
+  const html = String(out[1] || '');
+  if (/result_item_error/.test(html)) throw new Error(html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 140) || 'Voice error');
+  if (/To ensure this space is responsive/.test(html)) throw new Error('Sentence too long for the voice server');
+  const f = out[0];
+  let url = f && (f.url || (f.path ? base + '/gradio_api/file=' + f.path : ''));
+  if (!url) throw new Error('No audio returned');
+  if (/^https:/.test(base)) url = url.replace(/^http:\/\//, 'https://');
+  const r = await ttsFetch(url, undefined, 'GET');
+  if (!r.ok) throw new Error('Audio download failed (' + r.status + ')');
+  const b = await r.blob();
+  if (!b.size) throw new Error('Empty audio');
+  dbg('tts', 'audio ready · ' + cfg.model.split('|')[0].split('/').pop() + ' · ' + short(text, 24), { bytes:b.size });
+  return b;
+}
+/* The Space checks the chosen model against the model dropdown of the caller's SESSION (the page of the Space fills it when you pick a
+   language). A bare API call only knows the first list (voice cloning) and is refused — so every language gets its own session,
+   opened by the Space's own "update_model_dropdown" call; that call also gives the current list of models. */
+const TTS_SESS = {};
+function ttsSession(label){
+  let s = TTS_SESS[label];
+  if (s) return s;
+  s = TTS_SESS[label] = { id:'s' + Math.random().toString(36).slice(2, 12) + Date.now().toString(36) };
+  s.ready = ttsRaw('update_model_dropdown', [label], { tries:2, ms:60000, session:s.id }).then(({ out })=>{
+    const u = out[0], ch = u && (u.choices || (u.value && u.value.choices));
+    if (Array.isArray(ch)){
+      const keys = ch.map(c=>Array.isArray(c) ? c[1] : c).filter(x=>typeof x === 'string' && x.indexOf('voice cloning') < 0);
+      if (keys.length) TTS_LIVE[label] = keys;
+    }
+  }).catch(e=>{ if (TTS_SESS[label] === s) delete TTS_SESS[label]; throw e; });
+  s.ready.catch(()=>{});
+  return s;
+}
+async function ttsLiveLabel(label){
+  if (TTS_LIVE_TRIED.has(label)) return;
+  TTS_LIVE_TRIED.add(label);
+  try { await ttsSession(label).ready; } catch(e){ dbg('tts', 'live list failed for ' + label + ': ' + e.message); }
+}
+
+/* ---------- audio store (Cache Storage, + a small in-memory layer) ---------- */
+const TTS_MEM = new Map(), TTS_FLIGHT = new Map();
+let TTS_RUN = 0; const TTS_WAIT = [];
+function ttsAcquire(){ return new Promise(res=>{ const go = ()=>{ if (TTS_RUN < 2){ TTS_RUN++; res(); } else TTS_WAIT.push(go); }; go(); }); }
+function ttsRelease(){ TTS_RUN--; const n = TTS_WAIT.shift(); if (n) n(); }
+function ttsKey(cfg, text){ const s = cfg.model + '|' + (cfg.sid || 0) + '|' + (cfg.speed || 1) + '|' + text; return 'https://tts.invalid/' + h32(s, 2166136261) + h32(s, 5381); }
+async function ttsCacheGet(key){
+  if (TTS_MEM.has(key)) return TTS_MEM.get(key);
+  try { const c = await caches.open(TTS_CACHE), r = await c.match(key); if (r){ const b = await r.blob(); TTS_MEM.set(key, b); return b; } } catch(e){}
+  return null;
+}
+async function ttsCachePut(key, blob){
+  TTS_MEM.set(key, blob); if (TTS_MEM.size > 60) TTS_MEM.delete(TTS_MEM.keys().next().value);
+  try { const c = await caches.open(TTS_CACHE); await c.put(key, new Response(blob, { headers:{ 'Content-Type':blob.type || 'audio/wav' } })); } catch(e){}
+}
+async function ttsCacheCount(){ try { const c = await caches.open(TTS_CACHE); return (await c.keys()).length; } catch(e){ return 0; } }
+async function ttsCacheClear(){ TTS_MEM.clear(); try { await caches.delete(TTS_CACHE); } catch(e){} }
+async function ttsGet(cfg, text){
+  const key = ttsKey(cfg, text), hit = await ttsCacheGet(key);
+  if (hit) return hit;
+  if (TTS_FLIGHT.has(key)) return TTS_FLIGHT.get(key);
+  const p = (async ()=>{
+    await ttsAcquire();
+    try { const b = await ttsSynth(cfg, text); await ttsCachePut(key, b); return b; }
+    finally { ttsRelease(); }
+  })();
+  TTS_FLIGHT.set(key, p);
+  p.then(()=>TTS_FLIGHT.delete(key), ()=>TTS_FLIGHT.delete(key));
+  return p;
+}
+
+/* ---------- player ---------- */
+const TTS_EL = new Audio();
+let TTS_TOK = 0, TTS_URL = '', TTS_ERR_T = 0, TTS_LASTKEY = '';
+(function(){                                                // one tap anywhere "unlocks" the element (iOS needs it for later auto-play)
+  const un = ()=>{ document.removeEventListener('pointerdown', un, true); try { TTS_EL.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA='; const p = TTS_EL.play(); if (p && p.catch) p.catch(()=>{}); } catch(e){} };
+  document.addEventListener('pointerdown', un, true);
+})();
+function ttsBusy(on){ document.querySelectorAll('.tts-btn').forEach(b=>b.classList.toggle('busy', !!on)); }
+function ttsStop(){
+  TTS_TOK++;
+  try { TTS_EL.pause(); TTS_EL.currentTime = 0; } catch(e){}
+  if (TTS_URL){ try { URL.revokeObjectURL(TTS_URL); } catch(e){} TTS_URL = ''; }
+  ttsBusy(false);
+}
+function ttsLeave(){ ttsStop(); TTS_LASTKEY = ''; }
+function ttsErr(e, quiet){
+  const m = (e && e.message) || 'Voice error';
+  dbg('tts', 'error: ' + m);
+  if (quiet && Date.now() - TTS_ERR_T < 20000) return;
+  TTS_ERR_T = Date.now(); toast('🔊 ' + m);
+}
+async function ttsSpeak(cfg, text, btn, quiet){
+  if (!cfg || !text) return;
+  ttsStop(); const tok = TTS_TOK;
+  ttsBusy(true);
+  try {
+    const blob = await ttsGet(cfg, text);
+    if (tok !== TTS_TOK) return;
+    setTimeout(ttsPrefetch, 300);
+    const url = URL.createObjectURL(blob); TTS_URL = url;
+    TTS_EL.src = url;
+    await TTS_EL.play();
+  } catch(e){
+    if (tok !== TTS_TOK) return;
+    if (e && e.name === 'NotAllowedError') ttsErr(new Error('Tap 🔊 to listen (the browser blocked auto-play)'), true);
+    else ttsErr(e, quiet);
+  } finally { if (tok === TTS_TOK) ttsBusy(false); }
+}
+
+/* ---------- lesson hooks ---------- */
+function ttsLocked(ex){ return !state.feedback && ex.type !== 'intro' && ex.answerLang === 'fl'; }   // would give the answer away
+function ttsBtn(ex){
+  const lang = ex.lang;
+  if (!TTS.on || !TTS_LANGMAP[lang]) return null;
+  const b = document.createElement('button');
+  const cfg = ttsCfg(lang), lock = !!cfg && ttsLocked(ex);
+  b.className = 'flagbtn notebtn tts-btn' + (cfg ? '' : ' off') + (lock ? ' lock' : '');
+  b.textContent = '🔊';
+  b.title = cfg ? (lock ? 'Plays after you check your answer' : 'Listen') : 'Choose a voice for ' + LG(lang).name;
+  b.onclick = ()=>{
+    const c = ttsCfg(lang);
+    if (!c){ ttsOpenVoices(lang); return; }
+    if (ttsLocked(state.ex)){ toast('Plays after you check your answer'); return; }
+    ttsSpeak(c, ttsText(state.ex.sent), b);
+  };
+  return b;
+}
+function ttsAuto(){
+  if (state.screen !== 'lesson' || !state.ex || !state.sess || !state.ex.sent) return;
+  const ex = state.ex, s = ex.sent;
+  const ph = ex.type === 'intro' ? 'i' : (state.feedback ? 'a' : 'q');
+  const key = s.uid + ':' + ph + ':' + state.session;
+  if (key === TTS_LASTKEY) return;
+  TTS_LASTKEY = key; ttsStop();
+  const c = ttsCfg(ex.lang);
+  if (c){
+    const text = ttsText(s);
+    const want = ph === 'i' ? TTS.i : (ph === 'q' ? (TTS.q && ex.promptLang === 'fl') : (TTS.a && ex.answerLang === 'fl'));
+    if (want) ttsSpeak(c, text, null, true);
+    else if (ph === 'q' && TTS.a && ex.answerLang === 'fl') ttsGet(c, text).catch(()=>{});   // the answer will be spoken after "Check": have it ready
+  }
+  setTimeout(ttsPrefetch, 800);
+}
+let TTS_PRE_BUSY = false;
+async function ttsPrefetch(){
+  if (!TTS.on || !TTS.pre || TTS_PRE_BUSY || !state.sess || !state.sess.queue) return;
+  TTS_PRE_BUSY = true;
+  try {
+    let n = 0;
+    for (const it of state.sess.queue.slice(0, 6)){
+      if (n >= 2) break;
+      const s = it && it.sent; if (!s) continue;
+      const c = ttsCfg(s.lang); if (!c) continue;
+      n++;
+      try { await ttsGet(c, ttsText(s)); } catch(e){ break; }
+    }
+  } finally { TTS_PRE_BUSY = false; }
+}
+
+/* ---------- diagnostics: the whole chain, step by step, with a reason and a remedy for every failure ---------- */
+function ttsErr2(msg, hint){ const e = new Error(msg); if (hint) e.hint = hint; return e; }
+async function ttsDiagnose(onStep){
+  const R = [], server = String(TTS.server || TTS_SERVER).replace(/\/+$/, ''), env = ttsEnv();
+  const step = async (name, fn)=>{
+    const t0 = performance.now(); let r;
+    try { r = Object.assign({ ok:true }, (await ttsTimeout(fn(), 60000)) || {}); }
+    catch(e){ r = { ok:false, msg:(e && e.name === 'AbortError') ? 'no answer within 60 s' : ((e && e.message) || String(e)), hint:e && e.hint }; }
+    r.name = name; r.ms = Math.round(performance.now() - t0); R.push(r); onStep(r); return r;
+  };
+  await step('This page', async ()=>({ info:true, msg:env.proto + '//' + (env.host || '') + ' · origin ' + env.origin + ' · ' + (env.secure ? 'secure' : 'not secure') + ' · ' + (env.framed ? 'inside another page' : 'own tab') + ' · ' + (env.online ? 'online' : 'offline') + ' · ' + (env.caches ? 'audio store ok' : 'no audio store'),
+    hint:env.framed ? 'Embedded pages (chat artifacts) normally cannot call outside servers.' : (env.proto === 'file:' ? 'A page opened from a file has the origin "null": the server must accept every origin.' : '') }));
+  const ctl = await step('Outside connection (control)', async ()=>{
+    try { await ttsFetch('https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js', { mode:'no-cors' }, 'GET*'); return { msg:'works' }; }
+    catch(e){ throw ttsErr2(e.message || 'failed', 'No outside request works from this page, so it is sandboxed (typical for a chat artifact) or the device is offline. Open the file in a normal browser tab, or host it (GitHub Pages).'); }
+  });
+  await step('Space status (huggingface.co)', async ()=>{
+    let r; try { r = await ttsFetch('https://huggingface.co/api/spaces/k2-fsa/text-to-speech', undefined, 'GET'); }
+    catch(e){ throw ttsErr2(e.message || 'failed', ctl.ok ? 'huggingface.co refuses this page (CORS) or is blocked on this network.' : 'See the control line above.'); }
+    if (!r.ok) throw ttsErr2('answered ' + r.status);
+    const j = await r.json(), s = j && j.runtime && j.runtime.stage;
+    if (s && s !== 'RUNNING') throw ttsErr2('Space is ' + s, 'The Space is not running (sleeping or rebuilding). The first request wakes it — wait 1–3 minutes, then run the tests again.');
+    return { msg:'Space is ' + (s || 'unknown') };
+  });
+  const reach = await step('Voice server reachable', async ()=>{
+    try { await ttsFetch(server + '/', { mode:'no-cors' }, 'GET*'); return { msg:server }; }
+    catch(e){ throw ttsErr2(e.message || 'failed', ctl.ok ? 'The server cannot be reached: it is down, asleep, or the address in Settings is wrong.' : 'See the control line above.'); }
+  });
+  await step('Voice server accepts this page (CORS)', async ()=>{
+    let r; try { r = await ttsFetch(server + '/config', undefined, 'GET'); }
+    catch(e){ throw ttsErr2(e.message || 'failed', reach.ok ? 'The server answers, but refuses this page (CORS). A page served over https (GitHub Pages) is normally accepted; a local file or an embedded page may not be.' : 'Not reachable (previous line).'); }
+    if (!r.ok) throw ttsErr2('answered ' + r.status);
+    const j = await r.json();
+    return { msg:'Gradio ' + (j.version || '?') + (j.api_prefix ? ' · ' + j.api_prefix : '') };
+  });
+  let lang = ACTIVE.find(c=>ttsCfg(c)) || Object.keys(TTS.langs).find(c=>TTS.langs[c] && TTS.langs[c].model);
+  const cfg = lang ? TTS.langs[lang] : { label:'English', model:'csukuangfj/vits-piper-en_US-amy-low|1 speaker', sid:0, speed:1 };
+  const text = lang ? ttsSample(lang) : 'Hello, this is a test.';
+  await step('Model list · ' + cfg.label, async ()=>{
+    const { out } = await ttsRaw('update_model_dropdown', [cfg.label], { tries:1, ms:45000, session:'dg' + Math.random().toString(36).slice(2, 10) });
+    const u = out[0], ch = u && (u.choices || (u.value && u.value.choices)), keys = Array.isArray(ch) ? ch.map(c=>Array.isArray(c) ? c[1] : c) : [];
+    if (!keys.length) throw ttsErr2('the server returned no models', 'The Space may have changed its interface. Send this report.');
+    if (keys.indexOf(cfg.model) < 0) throw ttsErr2(keys.length + ' models, but yours is not among them', 'Open Voices and choose another model for this language.');
+    return { msg:keys.length + ' models · yours is in the list' };
+  });
+  let blob = null;
+  await step('Make a test sentence', async ()=>{ blob = await ttsSynth(cfg, text); return { msg:cfg.model.split('|')[0].split('/').pop() + ' · ' + Math.round(blob.size / 1024) + ' KB' }; });
+  await step('Decode the audio', async ()=>{
+    if (!blob) throw ttsErr2('no audio from the previous step');
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return { info:true, msg:'skipped (no Web Audio here)' };
+    const ac = new AC();
+    try { const buf = await ac.decodeAudioData(await blob.arrayBuffer()); return { msg:buf.duration.toFixed(1) + ' s · ' + buf.sampleRate + ' Hz' }; }
+    catch(e){ throw ttsErr2('the browser cannot decode it', 'The server sent something that is not audio (an error page?).'); }
+    finally { try { ac.close(); } catch(e){} }
+  });
+  await step('Play it', async ()=>{
+    if (!blob) throw ttsErr2('no audio from the previous steps');
+    ttsStop(); TTS_URL = URL.createObjectURL(blob); TTS_EL.src = TTS_URL;
+    try { await TTS_EL.play(); } catch(e){ throw ttsErr2(e.name || 'play failed', e.name === 'NotAllowedError' ? 'The browser wants a tap first: press "Run again".' : 'The browser refused to play it.'); }
+    return { msg:'playing now' };
+  });
+  await step('Saved audio store', async ()=>{
+    if (typeof caches === 'undefined') throw ttsErr2('not available here', 'Audio is still played, but sentences are only kept until the page closes (needs an https page).');
+    const k = 'https://tts.invalid/diag', c = await caches.open(TTS_CACHE);
+    await c.put(k, new Response(new Blob(['x']))); const hit = await c.match(k); await c.delete(k);
+    if (!hit) throw ttsErr2('written but not read back');
+    return { msg:'write + read ok' };
+  });
+  return R;
+}
+function ttsReport(R){
+  const env = ttsEnv();
+  return ['Voice diagnostics · ' + new Date().toISOString(), 'Server: ' + (TTS.server || TTS_SERVER), 'Page: ' + env.proto + '//' + (env.host || '') + ' · origin ' + env.origin + ' · framed ' + env.framed, 'Browser: ' + navigator.userAgent, ''].concat(
+    R.map(r=>(r.info ? 'i  ' : (r.ok ? 'OK ' : 'ERR')) + ' ' + r.name + ' (' + r.ms + ' ms)' + (r.msg ? ' — ' + r.msg : '') + (!r.ok && r.hint ? '\n      → ' + r.hint : '')),
+    ['', 'Recent requests:'], TTS_LOG).join('\n');
+}
+function ttsOpenDiag(){
+  openSheet((sh, close)=>{
+    sh.innerHTML = `<h3>Voice diagnostics</h3>
+      <div class="hint">Checks the whole chain step by step. A failed line says why and what to do. "Copy report" gives the full text to send.</div>
+      <div id="dgList"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><button class="btn btn-green btn-sm" id="dgRun">▶ Run again</button><button class="btn btn-ghost btn-sm" id="dgCopy">Copy report</button><button class="btn btn-ghost btn-sm" id="dgClose">Close</button></div>
+      <div class="hint" style="margin:14px 0 4px">Recent requests</div><pre class="ttslog" id="dgLog"></pre>`;
+    const $ = q=>sh.querySelector(q); let R = [], busy = false;
+    const logUp = ()=>{ $('#dgLog').textContent = TTS_LOG.slice(-25).join('\n') || '(nothing yet)'; };
+    const row = r=>{
+      const d = document.createElement('div'); d.className = 'dgrow ' + (r.info ? 'info' : (r.ok ? 'ok' : 'bad'));
+      d.innerHTML = `<b>${r.info ? 'ℹ' : (r.ok ? '✓' : '✗')} ${esc(r.name)}</b><span>${r.ms} ms</span>${r.msg ? `<div>${esc(r.msg)}</div>` : ''}${!r.ok && r.hint ? `<div class="dghint">→ ${esc(r.hint)}</div>` : (r.info && r.hint ? `<div class="dghint">${esc(r.hint)}</div>` : '')}`;
+      return d;
+    };
+    const run = async ()=>{
+      if (busy) return; busy = true; R = [];
+      const list = $('#dgList'); list.innerHTML = '<div class="dgrow info"><b>⏳ running…</b></div>';
+      try { R = await ttsDiagnose(r=>{ if (!document.body.contains(sh)) return; if (list.firstChild && /running/.test(list.firstChild.textContent)) list.innerHTML = ''; list.appendChild(row(r)); logUp(); }); }
+      catch(e){ list.appendChild(row({ ok:false, name:'Diagnostics crashed', msg:e.message, ms:0 })); }
+      busy = false; logUp();
+    };
+    $('#dgRun').onclick = run;
+    $('#dgClose').onclick = ()=>{ ttsStop(); close(); };
+    $('#dgCopy').onclick = async ()=>{
+      const txt = ttsReport(R);
+      try { await navigator.clipboard.writeText(txt); toast('Report copied'); }
+      catch(e){ const ta = document.createElement('textarea'); ta.value = txt; ta.style.cssText = 'position:fixed;left:0;top:0;opacity:0'; document.body.appendChild(ta); ta.select(); let ok = false; try { ok = document.execCommand('copy'); } catch(e2){} ta.remove(); toast(ok ? 'Report copied' : 'Could not copy — select the text below'); if (!ok) $('#dgLog').textContent = txt; }
+    };
+    run();
+  });
+}
+
+/* ---------- Voices sheet (like SherpaTTS "Download language" + "Try models") ---------- */
+const TTS_FAM = ['Piper', 'Coqui', 'Mimic3', 'MMS', 'Kokoro', 'Matcha', 'Kitten', 'Inflect', 'Supertonic', 'Other VITS'];
+function ttsSample(lang){
+  try { const l = langSentences(lang); if (l.length) return ttsText(l[0]); } catch(e){}
+  return LG(lang).hello || 'Hello';
+}
+function ttsOpenVoices(lang0){
+  const codes = Object.keys(TTS_LANGMAP);
+  const act = ACTIVE.filter(c=>TTS_LANGMAP[c]);
+  const rest = codes.filter(c=>act.indexOf(c) < 0).sort((a, b)=>LG(a).name.localeCompare(LG(b).name));
+  let lang = lang0 && TTS_LANGMAP[lang0] ? lang0 : (act[0] || 'en');
+  openSheet((sh, close)=>{
+    sh.innerHTML = `<h3>Voices</h3>
+      <div class="ttsnote">Only 1 model per language!</div>
+      <select class="field" id="tvLang"></select>
+      <div class="hint" id="tvCur" style="margin-top:8px"></div>
+      <div style="display:flex;gap:8px">
+        <div style="flex:1"><div class="hint" style="margin:0 0 4px">Speaker (multi-speaker models)</div><input class="field" id="tvSpk" type="number" min="0" step="1"></div>
+        <div style="flex:1"><div class="hint" style="margin:0 0 4px">Speed</div><input class="field" id="tvSpd" type="number" min="0.5" max="2" step="0.1"></div>
+      </div>
+      <div class="hint" style="margin:10px 0 4px">Test sentence</div>
+      <input class="field" id="tvTxt" autocomplete="off">
+      <div style="display:flex;gap:8px;align-items:center;margin-top:10px"><button class="btn btn-ghost btn-sm" id="tvOff">No voice for this language</button><span class="hint" id="tvLive" style="margin:0"></span></div>
+      <div id="tvList"></div>
+      <div class="sheet-actions"><button class="btn btn-green" id="tvDone">Done</button></div>`;
+    const $ = q=>sh.querySelector(q);
+    const sel = $('#tvLang'), spk = $('#tvSpk'), spd = $('#tvSpd'), txt = $('#tvTxt');
+    const opt = c=>`<option value="${c}">${esc(LG(c).name)}${TTS.langs[c] ? ' ✓' : ''}</option>`;
+    const fillSel = ()=>{
+      sel.innerHTML = (act.length ? `<optgroup label="Learning">${act.map(opt).join('')}</optgroup>` : '') + `<optgroup label="Other languages">${rest.map(opt).join('')}</optgroup>`;
+      sel.value = lang;
+    };
+    const nums = ()=>({ spd:Math.min(2, Math.max(0.5, parseFloat(spd.value) || 1)), spk:Math.max(0, parseInt(spk.value, 10) || 0) });
+    const loadFields = ()=>{
+      const c = TTS.langs[lang];
+      spk.value = c ? (c.sid || 0) : 0; spd.value = c ? (c.speed || 1) : 1;
+      txt.value = ttsSample(lang); txt.dir = LG(lang).rtl ? 'rtl' : 'ltr';
+    };
+    const drawList = ()=>{
+      const list = $('#tvList'); list.innerHTML = '';
+      const ms = ttsModelsFor(lang), cur = TTS.langs[lang];
+      TTS_FAM.forEach(fm=>{
+        const g = ms.filter(m=>m.fam === fm); if (!g.length) return;
+        const h = document.createElement('div'); h.className = 'ttsgrp'; h.textContent = fm + ' models'; list.appendChild(h);
+        g.forEach(m=>{
+          const r = document.createElement('div');
+          r.className = 'ttsmod' + (cur && cur.model === m.key && cur.label === m.label ? ' sel' : '');
+          r.innerHTML = `<div class="nm">${esc(m.name)}${m.spk > 1 ? ` <span class="sp">· ${m.spk} speakers</span>` : ''}</div>`;
+          const pb = document.createElement('button'); pb.className = 'btn btn-ghost btn-sm tts-btn'; pb.textContent = '▶'; pb.title = 'Try this model';
+          pb.onclick = e=>{ e.stopPropagation(); const n = nums(); ttsSpeak({ label:m.label, model:m.key, sid:Math.min(n.spk, m.spk - 1), speed:n.spd }, txt.value.trim() || 'Hello', pb); };
+          r.onclick = ()=>{ const n = nums(); TTS.langs[lang] = { label:m.label, model:m.key, sid:Math.min(n.spk, m.spk - 1), speed:n.spd }; ttsSave(); fillSel(); drawList(); toast('Voice set · ' + m.name); };
+          r.appendChild(pb); list.appendChild(r);
+        });
+      });
+      if (!ms.length) list.innerHTML = '<div class="empty">No voices for this language.</div>';
+      const cm = cur && ms.find(m=>m.key === cur.model && m.label === cur.label);
+      $('#tvCur').textContent = cur ? 'Now: ' + (cm ? cm.name : cur.model.split('|')[0].split('/').pop()) + ' · speaker ' + (cur.sid || 0) + ' · speed ' + (cur.speed || 1) : 'No voice selected — this language stays silent.';
+    };
+    const live = async ()=>{
+      const L = lang, labels = TTS_LANGMAP[L].filter(l=>!TTS_LIVE_TRIED.has(l));
+      if (!labels.length) return;
+      $('#tvLive').textContent = 'Checking the server…';
+      await Promise.all(labels.map(ttsLiveLabel));
+      if (!document.body.contains(sh)) return;
+      if (L === lang){ drawList(); $('#tvLive').textContent = labels.some(l=>TTS_LIVE[l]) ? 'List updated from the server' : ''; }
+    };
+    const upd = ()=>{                                        // speaker / speed edited while a voice is chosen
+      const c = TTS.langs[lang]; if (!c) return;
+      const cm = ttsModelsFor(lang).find(m=>m.key === c.model && m.label === c.label), n = nums();
+      c.sid = Math.min(n.spk, (cm ? cm.spk : 1) - 1); c.speed = n.spd; ttsSave(); drawList();
+    };
+    sel.onchange = ()=>{ lang = sel.value; loadFields(); drawList(); live(); };
+    spk.onchange = upd; spd.onchange = upd;
+    $('#tvOff').onclick = ()=>{ delete TTS.langs[lang]; ttsSave(); fillSel(); drawList(); toast('Voice removed for ' + LG(lang).name); };
+    $('#tvDone').onclick = ()=>{ ttsStop(); close(); if (state.screen === 'settings' || state.screen === 'lesson') render(true); };
+    fillSel(); loadFields(); drawList(); live();
+  });
+}
+
+/* ---------- Settings section ---------- */
+function ttsSettingsEl(){
+  const d = document.createElement('div');
+  d.innerHTML = '<div class="sectionhead">Voice (TTS)</div>';
+  const row = (on, t, s, fn)=>{
+    const r = document.createElement('div'); r.className = 'rowcb';
+    r.innerHTML = `<span class="cb${on ? ' on' : ''}">✓</span><div class="body"><div class="en">${esc(t)}</div><div class="hint" style="margin:2px 0 0">${esc(s)}</div></div>`;
+    r.onclick = fn; d.appendChild(r);
+  };
+  const flip = k=>()=>{ TTS[k] = !TTS[k]; ttsSave(); render(true); };
+  row(TTS.on, 'Speak sentences', 'Natural voices from the k2-fsa text-to-speech Space. Needs internet the first time; each sentence is kept on this device afterwards.', flip('on'));
+  row(TTS.q, 'Auto-play on the question', 'When the sentence is shown in the language you learn (match, choose or build the translation, type the English).', flip('q'));
+  row(TTS.a, 'Auto-play on the answer', 'After you check, when the answer is in the language you learn. Before that the 🔊 button stays locked so it cannot give the answer away.', flip('a'));
+  row(TTS.i, 'Auto-play on the introduction card', 'When a new sentence is introduced.', flip('i'));
+  row(TTS.pre, 'Prepare the next cards', 'While you practise, fetches the audio of the next sentences in the queue.', flip('pre'));
+  const box = document.createElement('div'); box.style.cssText = 'padding:12px 0';
+  const have = Object.keys(TTS.langs).filter(c=>TTS.langs[c] && TTS.langs[c].model);
+  box.innerHTML = `<div class="ttsnote" style="margin-top:0">Only 1 model per language!</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-blue btn-sm" id="tsVoices">🔊 Voices · try models</button><button class="btn btn-ghost btn-sm" id="tsClear">Clear saved audio</button><button class="btn btn-ghost btn-sm" id="tsDiag">🧪 Diagnose voice</button></div>
+    <div class="hint" id="tsCount" style="margin:8px 0 0"></div>
+    <div class="hint" style="margin:10px 0 0">${have.length ? have.map(c=>esc(LG(c).name) + ' — ' + esc(TTS.langs[c].model.split('|')[0].split('/').pop().replace(/^vits-(piper|coqui|mimic3|mms)-/, ''))).join('<br>') : 'No voice chosen yet.'}</div>
+    <div class="hint" style="margin:12px 0 4px">Voice server (change only if you copied the Space)</div>
+    <input class="field" id="tsSrv" autocomplete="off" spellcheck="false">`;
+  const srv = box.querySelector('#tsSrv'); srv.value = TTS.server;
+  srv.onchange = ()=>{ TTS.server = srv.value.trim().replace(/\/+$/, '') || TTS_SERVER; srv.value = TTS.server; TTS_LIVE = {}; TTS_LIVE_TRIED = new Set(); Object.keys(TTS_SESS).forEach(k=>delete TTS_SESS[k]); ttsSave(); toast('Voice server saved'); };
+  box.querySelector('#tsVoices').onclick = ()=>ttsOpenVoices();
+  box.querySelector('#tsDiag').onclick = ()=>ttsOpenDiag();
+  box.querySelector('#tsClear').onclick = async ()=>{ await ttsCacheClear(); box.querySelector('#tsCount').textContent = 'Saved audio: 0 sentences'; toast('Saved audio cleared'); };
+  ttsCacheCount().then(n=>{ const e = box.querySelector('#tsCount'); if (e) e.textContent = 'Saved audio: ' + n + ' sentence' + (n === 1 ? '' : 's'); });
+  d.appendChild(box);
+  return d;
+}
+
 /* ==================== SETTINGS ==================== */
 let SET_OPEN = new Set();                              // titles of the open Settings sections (kept while the screen redraws)
 function accordionize(wrap){
@@ -6097,7 +6770,7 @@ function accordionize(wrap){
   tools.innerHTML = '<button class="linkbtn" id="accAll">Expand all</button><button class="linkbtn" id="accNone">Collapse all</button>';
   wrap.appendChild(tools);
   const accs = [];
-  const SET_ORDER = ['Languages', 'Interface language', 'Appearance', 'Custom CSS', 'Exercise types', 'Grading', 'Repetition & chunks', 'Hints', 'Practice style', 'Arabic', 'Notes', 'Introduction card', 'Saved queue', 'Introduction', 'Data', 'Advanced (beta)', 'Developer', 'Levels (debug)'];
+  const SET_ORDER = ['Languages', 'Interface language', 'Appearance', 'Custom CSS', 'Exercise types', 'Grading', 'Repetition & chunks', 'Hints', 'Practice style', 'Arabic', 'Voice (TTS)', 'Notes', 'Introduction card', 'Saved queue', 'Introduction', 'Data', 'Advanced (beta)', 'Developer', 'Levels (debug)'];
   const ord = t=>{ const i = SET_ORDER.indexOf(t); return i < 0 ? 99 : i; };
   groups.sort((x, y)=>ord(x.title) - ord(y.title));
   groups.forEach((g, i)=>{
@@ -6212,7 +6885,7 @@ function renderSettings(){
   dt.querySelector('#expData').onclick = exportData;
   dt.querySelector('#impData').onclick = ()=>document.getElementById('dataInput').click();
   wrap.insertBefore(appearanceEl(), wrap.firstChild); wrap.insertBefore(customCssEl(), wrap.children[1]); wrap.insertBefore(funSettingsEl(), wrap.children[2]); wrap.insertBefore(introAgainEl(), wrap.children[3]); 
-  wrap.appendChild(tashkilSettingsEl()); wrap.appendChild(gradingSettingsEl()); wrap.appendChild(repeatSettingsEl()); wrap.appendChild(resumeSettingsEl()); wrap.appendChild(notesSettingsEl()); wrap.appendChild(uiSettingsEl()); wrap.appendChild(betaSettingsEl()); wrap.appendChild(introSettingsEl()); wrap.appendChild(debugSettingsEl());
+  wrap.appendChild(tashkilSettingsEl()); wrap.appendChild(ttsSettingsEl()); wrap.appendChild(gradingSettingsEl()); wrap.appendChild(repeatSettingsEl()); wrap.appendChild(resumeSettingsEl()); wrap.appendChild(notesSettingsEl()); wrap.appendChild(uiSettingsEl()); wrap.appendChild(betaSettingsEl()); wrap.appendChild(introSettingsEl()); wrap.appendChild(debugSettingsEl());
   wrap.appendChild(dbg); wrap.appendChild(dt);
   accordionize(wrap);
   f.querySelector('#backBtn').onclick = ()=>{ state.screen = 'home'; render(); };
