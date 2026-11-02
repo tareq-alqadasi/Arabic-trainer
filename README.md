@@ -10,31 +10,27 @@
 
 ## planning : 
 + (settings intro/explanition):
-   + practical highlighted UI tour instead :
+   + practical(the user can click and should - therefore the order is important - ) highlighted UI tour instead of the current intro :
     + 1 تحميل اللعة
     + 2 بدء التمرين
     + 3 تجربة الملاحظات : كتابة وعرض وبلاغة
-4 الإعدادات :١ المظهر ٢ الtts ٣ اعادة عرض المقدمة
+    + 4 الإعدادات :١ المظهر ٢ الtts ٣ اعادة عرض المقدمة
    + ازالة اختيار اللغات بعد الواجهة (لغة الواجهة هي لغة الترجمة واللغة الهدف يختارها لاحقا)
 + grammar terms glossary 
-+ known words test
++ تبسيط نظام الTTS
 
 
 ## V2.6 : 
 ### [pronunciation]:
-- [لكل لغة ملخص wiki تجويدي] + احالة لمصادر سماعية
-+ integrate the TTS NG (sherpa) into the website (مثل ما في تصطيب شيربا) :
-  + تبسيط النظام اكثر
-  + ليش مودل واحد للغة ؟
- 
++ a template for the phonolgy wiki containing adding a recommended audio input source 
++ TTS :
   + التقييم فكرته مختلفة
 اولا للتراكيب يعني المستخدم يختار لغة وثم يقدر يختار افضل مودل لهذه اللغة (وفق تقييمات مستخدمين اخرين) ثم للمتكلم قائمة منسدلة بها الرقم و والتقييم وثم السرعة يظهر hint للسرعة المقترحه (متوسط السرعات عند باقي المستخدمين لنفس المودل ونفس المتكلم مع نفس اللغة)
 ثانيا لتكن upvotes مثل reddit لأن الخمس نجوم نظام فضفاض لا ضابط له
 ثالثا يجب ان يكون هذا كله online يعني يتحدث ببيانات المستخدمين الأخرين (قل لي كيف سينضبط هذا على github page)
 ### other :
 + intro 
-+ known words twst
-  
+
 
 ## V2.7:
 [custom css making tool built-in web]
