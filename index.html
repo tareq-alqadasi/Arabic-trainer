@@ -2173,6 +2173,14 @@ function introDone(){
   render();
 }
 function nextCard(){
+  const s = state.sess;
+  if (s && s.mode === 'level' && BETA.known && KW_OPT.inline){
+    s.kwN = (s.kwN || 0) + 1;
+    if (s.kwN > 1 && (s.kwN - 1) % KW_OPT.every === 0 && kwInline(nextCard0)) return;
+  }
+  nextCard0();
+}
+function nextCard0(){
   const s = state.sess; if (!s.recent) s.recent = [];
   if (ankiActive(s)){                                    // 1. spaced-review cards that are due
     const n0 = Math.min(gapN(), poolSize(s) - 1);
@@ -7468,7 +7476,7 @@ let ONB2_DONE = loadLS(LS.onb2, false);          // the introduction has been se
 Object.assign(LS, { beta:'arTrainer:beta' });
 let INTRO_SEEN_VER = loadLS(LS.onbVer, ONB2_DONE ? 2 : 0);          // the introduction version the user last saw
 function markIntroSeen(){ ONB2_DONE = true; saveLS(LS.onb2, true); INTRO_SEEN_VER = INTRO_VERSION; saveLS(LS.onbVer, INTRO_VERSION); }
-let BETA = Object.assign({ gloss:false, phon:false, anki:!!ANKI_ON, known:false }, loadLS(LS.beta, {}));
+let BETA = Object.assign({ gloss:false, phon:false, anki:!!ANKI_ON, known:true }, loadLS(LS.beta, {}));
 if (!BETA.anki && ANKI_ON){ ANKI_ON = false; saveLS(LS.anki, false); }
 if (BETA.anki && !ANKI_ON){ BETA.anki = false; saveLS(LS.beta, BETA); }          // older versions had two switches (unlock + on): keep it simple, on = both   // Anki review exists only while its beta switch is on   // advanced / beta features, off by default
 let TAG_LANG = loadLS(LS.tagLang, '');           // language the tags are displayed in ('' = as written)
@@ -7715,6 +7723,7 @@ function betaSettingsEl(){
   if (BETA.gloss){
     more.insertAdjacentHTML('beforeend', `<div class="hint" style="margin-top:10px">Show note tags (noun, verb…) in this language. Fill the translations in the Glossary table.</div><select class="field" id="tgSel"></select><div style="margin-top:8px"><button class="btn btn-ghost btn-sm" id="glOpen">📖 Open the glossary</button></div>`);
   }
+  if (BETA.known) more.appendChild(kwOptEl());
   const kw = more.querySelector('#kwOpen'); if (kw) kw.onclick = ()=>{ state.kwBack = 'settings'; state.screen = 'known'; render(); };
   const tg = more.querySelector('#tgSel');
   if (tg){
@@ -7884,7 +7893,28 @@ function renderGloss(){
 }
 
 /* ---------- known-words test ---------- */
-state.kw = { lang:'', page:0, sel:new Set(), cache:{} };
+state.kw = { lang:'', sel:new Set(), cache:{}, sub:'' };
+const KW_SHOWN = loadLS('arTrainer:kwShown', {});       // lang -> words already put in front of you (picked or not): never shown again
+let KW_OPT = Object.assign({ groups:false, inline:true, every:15, size:10 }, loadLS('arTrainer:kwOpt', {}));
+function kwShownSet(l){ const a = KW_SHOWN[l]; return a instanceof Set ? a : (KW_SHOWN[l] = new Set(a || [])); }
+function kwSaveShown(){ const o = {}; for (const k of Object.keys(KW_SHOWN)) o[k] = [...kwShownSet(k)]; saveLS('arTrainer:kwShown', o); }
+function kwSaveOpt(){ saveLS('arTrainer:kwOpt', KW_OPT); }
+const KW_LEVELS = [['A1', 100], ['A2', 300], ['B1', 700], ['B2', 1500], ['C', 1e9]];   // frequency-rank bands inside your own library (CEFR-like)
+const KW_PAGE = 40;
+const KW_GROUPS = {   // closed word classes; a seed list — extend freely
+  de:{ 'Pronouns':'ich du er sie es wir ihr mich dich ihn uns euch mir dir ihm ihnen mein dein sein unser euer dieser jener', 'Auxiliary & modal verbs':'sein haben werden können müssen wollen sollen dürfen mögen ist sind war waren hat habe haben hatte wird werden kann muss will soll darf bin bist', 'Prepositions':'in an auf aus bei mit nach von zu für um durch gegen ohne über unter vor zwischen', 'Conjunctions':'und oder aber denn weil dass wenn als ob', 'Numbers':'eins zwei drei vier fünf sechs sieben acht neun zehn' },
+  fr:{ 'Pronouns':'je tu il elle nous vous ils elles me te se lui leur moi toi mon ton son notre votre ce cela', 'Auxiliary & modal verbs':'être avoir pouvoir devoir vouloir est sont suis es ai as a avons avez ont peut doit veut', 'Prepositions':'à de en dans sur sous avec sans pour par chez vers entre', 'Conjunctions':'et ou mais donc car que si quand comme', 'Numbers':'un deux trois quatre cinq six sept huit neuf dix' },
+  es:{ 'Pronouns':'yo tú él ella nosotros vosotros ellos ellas me te se lo la le mi tu su nuestro este eso', 'Auxiliary & modal verbs':'ser estar haber poder deber querer es son soy eres está están he has ha hemos han puede debe quiere', 'Prepositions':'a de en con sin para por sobre entre hacia desde hasta', 'Conjunctions':'y o pero porque que si cuando como', 'Numbers':'uno dos tres cuatro cinco seis siete ocho nueve diez' },
+  en:{ 'Pronouns':'i you he she it we they me him her us them my your his our their this that', 'Auxiliary & modal verbs':'be am is are was were been have has had do does did can could will would shall should may might must', 'Prepositions':'in on at to from with without for by of about over under between', 'Conjunctions':'and or but because if when while that', 'Numbers':'one two three four five six seven eight nine ten' },
+  ar:{ 'Pronouns':'انا انت هو هي نحن هم هذا هذه ذلك', 'Prepositions':'في على من الى عن مع ب ل ك', 'Conjunctions':'و او لكن لان ان اذا', 'Numbers':'واحد اثنان ثلاثة اربعة خمسة ستة سبعة ثمانية تسعة عشرة' }
+};
+const KW_GMAP = {};
+function kwGroupMap(lang){
+  if (KW_GMAP[lang]) return KW_GMAP[lang];
+  const m = {}, g = KW_GROUPS[lang] || {};
+  for (const name of Object.keys(g)) for (const w of g[name].split(' ')){ const n = noteNorm(w, lang); if (n && !m[n]) m[n] = name; }
+  return KW_GMAP[lang] = m;
+}
 function vocabFor(lang){
   const c = state.kw.cache[lang]; if (c) return c;
   const df = new Map();
@@ -7895,53 +7925,100 @@ function vocabFor(lang){
       const e = df.get(n); if (e) e.n++; else df.set(n, { norm:n, disp:w, n:1, ex:s.english });
     }
   }
+  const all = [...df.values()].sort((a, b)=>(b.n - a.n) || (a.norm.length - b.norm.length));
+  all.forEach((e, i)=>{ e.lv = KW_LEVELS.find(l=>i < l[1])[0]; });          // level is fixed by rank in the whole library, so it does not drift
   const seen = SEEN_WORDS[lang];
-  const list = [...df.values()].filter(e=>!(seen && seen.has(e.norm)) && !noteCovers(e.norm, lang));
-  list.sort((a, b)=>(b.n - a.n) || (a.norm.length - b.norm.length));
-  return state.kw.cache[lang] = list;
+  return state.kw.cache[lang] = all.filter(e=>!(seen && seen.has(e.norm)) && !noteCovers(e.norm, lang));
 }
-const KW_PAGE = 40;
+function kwUnseen(lang){ const sh = kwShownSet(lang); return vocabFor(lang).filter(w=>!sh.has(w.norm)); }
+function kwPage(lang, n, sub){            // sub: '' = automatic, 'g:<group>', 'l:<level>'
+  let u = kwUnseen(lang), title = ''; const gm = kwGroupMap(lang);
+  if (!sub && KW_OPT.groups){ const first = Object.keys(KW_GROUPS[lang] || {}).find(g=>u.some(w=>gm[w.norm] === g)); if (first) sub = 'g:' + first; }
+  if (sub.startsWith('g:')){ u = u.filter(w=>gm[w.norm] === sub.slice(2)); title = sub.slice(2); }
+  else if (sub.startsWith('l:')){ u = u.filter(w=>w.lv === sub.slice(2)); title = 'Level ' + sub.slice(2); }
+  else { if (KW_OPT.groups) u = u.filter(w=>!gm[w.norm]); const lv0 = u[0] && u[0].lv; u = u.filter(w=>w.lv === lv0); title = lv0 ? 'Level ' + lv0 : ''; }
+  return { words:u.slice(0, n), title, left:u.length };
+}
+function kwCommit(lang, page, sel){       // picked → note tagged "known"; every word on the page → never asked again
+  let n = 0; const sh = kwShownSet(lang);
+  for (const w of page){
+    sh.add(w.norm);
+    if (sel.has(w.norm) && !findNote(lang, w.norm)){ NOTES.push({ id:nid(), lang, type:'word', text:w.norm, note:'', tags:['known'], auto:true, created:Date.now() }); n++; }
+  }
+  if (n) saveNotes(); kwSaveShown(); state.kw.cache = {};
+  return n;
+}
+function kwGrid(box, page, lang, sel, onChange){
+  page.forEach(w=>{
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'kwchip ' + flc(lang) + (sel.has(w.norm) ? ' on' : '');
+    b.textContent = displayWord(w.disp, lang); b.title = w.ex;
+    b.onclick = ()=>{ if (sel.has(w.norm)) sel.delete(w.norm); else sel.add(w.norm); b.classList.toggle('on', sel.has(w.norm)); onChange(); };
+    box.appendChild(b);
+  });
+}
 function renderKnown(){
   const f = document.createElement('div'), k = state.kw;
   if (!k.lang || !ACTIVE.includes(k.lang)) k.lang = ACTIVE[0];
-  const list = vocabFor(k.lang), total = langSentences(k.lang).length;
-  const start = k.page * KW_PAGE, page = list.slice(start, start + KW_PAGE);
+  const un = kwUnseen(k.lang), gm = kwGroupMap(k.lang), pg = kwPage(k.lang, KW_PAGE, k.sub), page = pg.words;
+  const chip = (id, label, n)=>`<button class="btn btn-sm ${(k.sub === id) ? 'btn-green' : 'btn-ghost'}" data-sub="${esc(id)}" style="margin:2px">${esc(label)} · ${n}</button>`;
+  const lvChips = KW_LEVELS.map(l=>[l[0], un.filter(w=>w.lv === l[0]).length]).filter(x=>x[1]).map(x=>chip('l:' + x[0], x[0], x[1])).join('');
+  const gChips = KW_OPT.groups ? Object.keys(KW_GROUPS[k.lang] || {}).map(g=>[g, un.filter(w=>gm[w.norm] === g).length]).filter(x=>x[1]).map(x=>chip('g:' + x[0], x[0], x[1])).join('') : '';
   f.innerHTML = `<div class="topbar"><button class="iconbtn" id="backBtn">←</button><div style="font-weight:800;font-size:19px;flex:1">Known words</div></div>
     <div class="wrap statwrap">
       ${ACTIVE.length > 1 ? `<select class="field" id="kwLang" style="margin-top:8px">${ACTIVE.map(c=>`<option value="${c}"${c === k.lang ? ' selected' : ''}>${esc(LG(c).name)}</option>`).join('')}</select>` : ''}
-      <div class="hint" style="margin-top:8px">Tap the words you <b>already know</b> from outside this app. They are saved as notes tagged “known” (not highlighted), so sentences made of known words skip their introduction card. Most frequent words first.</div>
-      <div class="hint"><b>${list.length}</b> words not yet known · ${total} sentences · page ${k.page + 1}/${Math.max(1, Math.ceil(list.length / KW_PAGE))}</div>
-      <div class="kwgrid" id="kwGrid"></div>
-      <div id="kwEmpty"></div>
+      <div class="hint" style="margin-top:8px">Tap the words you <b>already know</b>. They are saved as notes tagged “known”. Words shown here and <b>not</b> tapped count as unknown and will not be offered again.</div>
+      <div class="hint"><b>${un.length}</b> words left to check · ${esc(pg.title)}</div>
+      <div>${chip('', 'Auto', un.length)}${lvChips}${gChips}</div>
+      <div class="kwgrid" id="kwGrid"></div><div id="kwEmpty"></div>
     </div>
     <div class="selbar"><div class="selbar-inner"><div class="selcount" id="kwCnt"></div><div class="selbtns">
       <button class="btn btn-ghost btn-sm" id="kwAll">Select all</button>
       <button class="btn btn-ghost btn-sm" id="kwNone">Clear</button>
       <button class="btn btn-green btn-sm" id="kwSave">Save & next</button></div></div></div>`;
-  const q = s=>f.querySelector(s), grid = q('#kwGrid');
-  const cnt = ()=>{ q('#kwCnt').textContent = k.sel.size + ' of ' + page.length + ' selected on this page'; };
+  const q = s=>f.querySelector(s);
+  const cnt = ()=>{ q('#kwCnt').textContent = k.sel.size + ' of ' + page.length + ' selected'; };
   if (!page.length) q('#kwEmpty').innerHTML = '<div class="empty">No more words to check 🎉</div>';
-  page.forEach(w=>{
-    const b = document.createElement('button'); b.type = 'button'; b.className = 'kwchip ' + flc(k.lang) + (k.sel.has(w.norm) ? ' on' : '');
-    b.textContent = displayWord(w.disp, k.lang); b.title = w.ex + ' · ×' + w.n;
-    b.onclick = ()=>{ if (k.sel.has(w.norm)) k.sel.delete(w.norm); else k.sel.add(w.norm); b.classList.toggle('on', k.sel.has(w.norm)); cnt(); };
-    grid.appendChild(b);
-  });
-  cnt();
+  kwGrid(q('#kwGrid'), page, k.lang, k.sel, cnt); cnt();
+  f.querySelectorAll('[data-sub]').forEach(b=>b.onclick = ()=>{ k.sub = b.dataset.sub; k.sel.clear(); render(); });
   q('#kwAll').onclick = ()=>{ page.forEach(w=>k.sel.add(w.norm)); render(true); };
   q('#kwNone').onclick = ()=>{ k.sel.clear(); render(true); };
-  q('#kwSave').onclick = ()=>{
-    const chosen = page.filter(w=>k.sel.has(w.norm)); let n = 0;
-    for (const w of chosen){ if (findNote(k.lang, w.norm)) continue; NOTES.push({ id:nid(), lang:k.lang, type:'word', text:w.norm, note:'', tags:['known'], auto:true, created:Date.now() }); n++; }
-    if (n){ saveNotes(); }
-    k.sel.clear(); k.cache = {}; k.page = 0;                 // known words vanish from the list, so the next page starts at the top
-    toast(n ? n + ' words saved as known' : 'Nothing selected — next words');
-    if (!n){ k.page = Math.min(k.page + 1, 9999); }
-    render();
-  };
+  q('#kwSave').onclick = ()=>{ const n = kwCommit(k.lang, page, k.sel); k.sel.clear(); toast(n ? n + ' words saved as known' : 'Next words'); render(); };
   q('#backBtn').onclick = ()=>{ k.sel.clear(); state.screen = state.kwBack || 'home'; state.kwBack = null; render(); };
-  const ls = q('#kwLang'); if (ls) ls.onchange = ()=>{ k.lang = ls.value; k.page = 0; k.sel.clear(); render(); };
+  const ls = q('#kwLang'); if (ls) ls.onchange = ()=>{ k.lang = ls.value; k.sub = ''; k.sel.clear(); render(); };
   return f;
+}
+function kwInline(done){                  // a small page dropped into practice; nothing is stored except the answers
+  const lang = state.sess.lang, pg = kwPage(lang, KW_OPT.size, '');
+  if (!pg.words.length) return false;
+  let fin = false; const sel = new Set();
+  const finish = ()=>{ if (fin) return; fin = true; obs.disconnect(); done(); };
+  const obs = new MutationObserver(()=>{ if (!document.getElementById('overlay')) finish(); });
+  obs.observe(document.body, { childList:true });
+  openSheet((sh, close)=>{
+    sh.innerHTML = `<h3>Quick check ${pg.title ? '· ' + esc(pg.title) : ''}</h3><div class="hint">Tap the words you already know. Others are skipped for good.</div><div class="kwgrid" id="ikGrid"></div>
+      <div class="sheet-actions"><button class="btn btn-ghost" id="ikSkip">Skip</button><button class="btn btn-green" id="ikOk">Save & continue</button></div>`;
+    kwGrid(sh.querySelector('#ikGrid'), pg.words, lang, sel, ()=>{});
+    sh.querySelector('#ikSkip').onclick = close;
+    sh.querySelector('#ikOk').onclick = ()=>{ const n = kwCommit(lang, pg.words, sel); if (n) toast(n + ' words saved as known'); close(); };
+  });
+  return true;
+}
+function kwOptEl(){
+  const d = document.createElement('div');
+  d.innerHTML = '<div class="sectionhead">Known-words test options</div>';
+  const row = (t, s, get, set)=>{ const r = document.createElement('div'); r.className = 'rowcb';
+    r.innerHTML = `<span class="cb${get() ? ' on' : ''}">✓</span><div class="body"><div class="en">${t}</div><div class="hint" style="margin:2px 0 0">${s}</div></div>`;
+    r.onclick = ()=>{ set(!get()); kwSaveOpt(); render(true); }; d.appendChild(r); };
+  row('Word-group subtests', 'Pronouns, auxiliaries, prepositions, conjunctions, numbers… each shown alone on its own page.', ()=>KW_OPT.groups, v=>KW_OPT.groups = v);
+  row('Spread the test through practice', 'Every few cards a small page of not-yet-asked words appears, instead of one long test up front.', ()=>KW_OPT.inline, v=>KW_OPT.inline = v);
+  if (KW_OPT.inline){
+    const sel = (label, vals, key)=>{ const w = document.createElement('div'); w.className = 'hint'; w.style.marginTop = '8px'; w.textContent = label + ' ';
+      const s = document.createElement('select'); s.className = 'field'; s.style.width = '100px';
+      s.innerHTML = vals.map(n=>`<option value="${n}"${n === KW_OPT[key] ? ' selected' : ''}>${n}</option>`).join('');
+      s.onchange = ()=>{ KW_OPT[key] = +s.value; kwSaveOpt(); }; w.appendChild(s); d.appendChild(w); };
+    sel('A page every', [8, 10, 15, 20, 30, 50], 'every'); sel('cards, with words per page:', [5, 8, 10, 12, 15, 20], 'size');
+  }
+  return d;
 }
 
 /* ---------- first-start introduction ---------- */
