@@ -9,7 +9,13 @@
   
 
 ## planning : 
-+ (settings intro/explanition)
++ (settings intro/explanition):
+   + practical highlighted UI tour instead :
+    + 1 تحميل اللعة
+    + 2 بدء التمرين
+    + 3 تجربة الملاحظات : كتابة وعرض وبلاغة
+4 الإعدادات :١ المظهر ٢ الtts ٣ اعادة عرض المقدمة
+   + ازالة اختيار اللغات بعد الواجهة (لغة الواجهة هي لغة الترجمة واللغة الهدف يختارها لاحقا)
 + grammar terms glossary 
 + known words test
 
@@ -36,3 +42,4 @@ by استقراء التعديلات الي يسويها الذكاء الاصط
   [تمرين محادثة باللغة وفق المستوى]
   
 [phrase book]
++ االمستخدمين يضيفوا ملفات : لغات|Uı|themes
