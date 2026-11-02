@@ -552,6 +552,9 @@ html[dir=rtl] .deck-meta{text-align:start}
 #tourLayer{position:fixed;inset:0;z-index:300}
 #tourLayer .tourshade{position:absolute;inset:0}
 #tourLayer .tourring{position:absolute;border-radius:18px;box-shadow:0 0 0 9999px rgba(10,24,10,.74);outline:6px solid rgba(255,255,255,.45);transition:all .25s ease;pointer-events:none}
+#tourLayer.guide{pointer-events:none}
+#tourLayer.guide .tourring{box-shadow:0 0 0 9999px rgba(10,24,10,.45)}
+#tourLayer.guide .tourtip{pointer-events:auto}
 #tourLayer .tourtip{position:absolute;left:50%;transform:translateX(-50%);width:calc(100% - 32px);max-width:420px;background:var(--green,#58cc02);color:#fff;border-radius:22px;padding:16px 18px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
 #tourLayer .tt{display:block;font-size:20px;font-weight:800;margin-bottom:4px}
 #tourLayer .td{margin:0 0 12px;font-size:15px;line-height:1.4;font-weight:600}
@@ -5144,7 +5147,6 @@ function sessMeta(){
 }
 function renderHome(){
   state.obBack = false;
-  setTimeout(maybeTour, 400);
   const f = document.createElement('div');
   const groups = activeGroups();
   const items = activeItems();
@@ -5494,7 +5496,7 @@ function renderGroup(){
   return f;
 }
 
-function renderLesson(){ const f = renderLesson0(); setTimeout(maybeTourLesson, 700); return f; }
+function renderLesson(){ const f = renderLesson0(); return f; }
 function renderLesson0(){
   const f = document.createElement('div');
   const s = state.sess, ex = state.ex, L = LG(ex.lang);
@@ -7107,7 +7109,7 @@ function ttsProfileImport(text){
 
 /* ---------- Settings section ---------- */
 function ttsSettingsEl(){
-  const d = document.createElement('div');
+  const d = document.createElement('div'); d.id = 'ttsSec';
   d.innerHTML = '<div class="sectionhead">Voice (TTS)</div>';
   const row = (on, t, s, fn)=>{
     const r = document.createElement('div'); r.className = 'rowcb';
@@ -7300,7 +7302,7 @@ function renderSettings(){
   dt.querySelector('#expData').onclick = exportData;
   dt.querySelector('#impData').onclick = ()=>document.getElementById('dataInput').click();
   wrap.insertBefore(appearanceEl(), wrap.firstChild); wrap.insertBefore(customCssEl(), wrap.children[1]); wrap.insertBefore(funSettingsEl(), wrap.children[2]); wrap.insertBefore(introAgainEl(), wrap.children[3]); 
-  wrap.appendChild(tashkilSettingsEl()); wrap.appendChild(ttsSettingsEl()); wrap.appendChild(gradingSettingsEl()); wrap.appendChild(repeatSettingsEl()); wrap.appendChild(resumeSettingsEl()); wrap.appendChild(notesSettingsEl()); wrap.appendChild(uiSettingsEl()); wrap.appendChild(betaSettingsEl()); wrap.appendChild(introSettingsEl()); wrap.appendChild(debugSettingsEl());
+  wrap.appendChild(tashkilSettingsEl()); wrap.appendChild(ttsSettingsEl()); wrap.appendChild(phonEl()); wrap.appendChild(gradingSettingsEl()); wrap.appendChild(repeatSettingsEl()); wrap.appendChild(resumeSettingsEl()); wrap.appendChild(notesSettingsEl()); wrap.appendChild(uiSettingsEl()); wrap.appendChild(betaSettingsEl()); wrap.appendChild(introSettingsEl()); wrap.appendChild(debugSettingsEl());
   wrap.appendChild(dbg); wrap.appendChild(dt);
   accordionize(wrap);
   f.querySelector('#backBtn').onclick = ()=>{ state.screen = 'home'; render(); };
@@ -7696,8 +7698,8 @@ function tashkilSettingsEl(){
 }
 function introAgainEl(){
   const d = document.createElement('div');
-  d.innerHTML = `<div class="sectionhead">Introduction</div><button class="btn btn-ghost btn-sm" id="onbAgain">▶ Show the introduction</button>`;
-  d.querySelector('#onbAgain').onclick = ()=>{ state.ob = newOb(); state.screen = 'onboard'; render(); };
+  d.innerHTML = `<div class="sectionhead">Introduction</div><button class="btn btn-ghost btn-sm" id="onbAgain">▶ Show the tour again</button>`;
+  d.querySelector('#onbAgain').onclick = ()=>{ guideStart(); };
   return d;
 }
 function betaSettingsEl(){
@@ -8024,7 +8026,7 @@ function kwOptEl(){
 
 /* ---------- first-start introduction ---------- */
 function newOb(){ return { step:0, native:UI_LANG !== 'en' ? UI_LANG : (KNOWN !== 'en' ? KNOWN : 'en'), learn:new Set(ACTIVE), q:'', grade:GRADE_MODE, anki:!!ANKI_ON, fun:FUN_ON, theme:THEME }; }
-function obTotal(){ return BETA.known ? 6 : 5; }   // the known-words step exists only while that feature is on in Settings
+function obTotal(){ return 1; }   // the known-words step exists only while that feature is on in Settings
 function obLangGrid(ob, multi, box){
   const codes = Object.keys(LANGS).sort((a, b)=>LANGS[a].name.localeCompare(LANGS[b].name));
   const all = (multi ? [] : ['en']).concat(codes);
@@ -8056,7 +8058,7 @@ function finishOnboarding(){
   ANKI_ON = ob.anki; saveLS(LS.anki, ANKI_ON);
   if (ob.anki) BETA.anki = true; if (ob.kw) BETA.known = true; saveLS(LS.beta, BETA);
   applyTheme(ob.theme); saveLS(LS.theme, ob.theme); setCssOn('');
-  ONB_DONE = true; saveLS(LS.onb, true); markIntroSeen(); if (!ob.updated){ saveLS(LS.tour, 'pending'); saveLS('arTrainer:tour2', 'pending'); }
+  ONB_DONE = true; saveLS(LS.onb, true); markIntroSeen(); GUIDE_I = 0; saveLS(GUIDE_KEY, 0);
   state.ob = null;
   if (missing.length){ state.obBack = true; state.store.q = LG(missing[0]).name; state.al.tab = 'store'; state.screen = 'addlang'; render(); if (state.store.status !== 'ok') loadCatalog(); toast('Get ' + missing.map(c=>LG(c).name).join(', ') + ' from “Ready-made”'); }
   else { state.screen = 'home'; render(); }
@@ -8065,7 +8067,7 @@ function renderOnboard(){
   const f = document.createElement('div'), ob = state.ob || (state.ob = newOb());
   const dots = Array.from({ length:obTotal() }, (_, i)=>`<i style="flex:1;height:5px;border-radius:3px;background:${i <= ob.step ? 'var(--accent,var(--green))' : 'var(--line)'}"></i>`).join('');
   f.innerHTML = `<div class="topbar"><div style="display:flex;gap:5px;flex:1">${dots}</div><button class="linkbtn" id="obSkip">Skip</button></div><div class="wrap obstep" id="obBody"></div>
-    <div class="footer"><div class="footer-inner"><div class="footer-row">${ob.step > 0 ? '<button class="btn btn-ghost" id="obBack" style="flex:0 0 auto">←</button>' : ''}<button class="btn btn-green" id="obNext">${ob.step === obTotal() - 1 ? 'Finish' : 'Next'}</button></div></div></div>`;
+    <div class="footer"><div class="footer-inner"><div class="footer-row">${ob.step > 0 ? '<button class="btn btn-ghost" id="obBack" style="flex:0 0 auto">←</button>' : ''}<button class="btn btn-green" id="obNext">Start the tour</button></div></div></div>`;
   const q = s=>f.querySelector(s), body = q('#obBody');
   const sid = [0, 1, 4, 5, 6, 7][ob.step];          // steps 2 (native language) and 3 (target language) are gone: the interface language is the translation language, and the target is chosen later
   if (ob.step === obTotal() - 1 && INTRO_SEEN_VER < INTRO_VERSION) markIntroSeen();   // seen = reached the last part
@@ -8178,6 +8180,83 @@ function renderOnboard(){
 }
 
 
+
+/* ---------- guided tour: the user really clicks, in this order ---------- */
+const GUIDE_KEY = 'arTrainer:guide';
+let GUIDE_I = loadLS(GUIDE_KEY, 'done'), guideLayer = null, guideShown = -1;
+const GUIDE = [
+  { sel:'#titleBtn', t:'1 · Load a language', d:'Tap the title to open the language list.' },
+  { sel:'#ddAdd', t:'1 · Load a language', d:'Tap “Add language”.' },
+  { sel:'.deck button.btn-green:not([disabled])', t:'1 · Load a language', d:'Tap Get on the language you want to learn (the translation language is your interface language).' },
+  { sel:'#backBtn', t:'1 · Load a language', d:'Go back to the main page.' },
+  { sel:'.lvcard [data-lv]', t:'2 · Start practising', d:'Tap Continue to begin a lesson.' },
+  { sel:'[title="Add a note"]', t:'3 · Notes: write', d:'Tap ✎ to write a note on this sentence. Save it, then come back.' },
+  { sel:'.notebtn[class*="nv-"]', t:'3 · Notes: show', d:'Tap 👁 to change how notes appear in the sentence.' },
+  { sel:'.flagbtn:not(.notebtn)', t:'3 · Notes: report', d:'Tap 🚩 to flag a sentence you are unsure about or that looks wrong.' },
+  { sel:'#quitBtn', t:'Finish the lesson', d:'Tap ✕ to leave the lesson.' },
+  { sel:'#setBtn', t:'4 · Settings', d:'Tap Settings.' },
+  { sel:'.themegrid', t:'4 · Appearance', d:'Pick a theme (tap one).' },
+  { sel:'#ttsSec', t:'4 · Text-to-speech', d:'Voices for listening are set here. Tap this section.' },
+  { sel:'#onbAgain', info:true, t:'4 · Show the tour again', d:'This button replays the tour any time. That was all!' }
+];
+function guideSet(i){ GUIDE_I = i; saveLS(GUIDE_KEY, i); guideShown = -1; }
+function guideStart(){ guideSet(0); state.screen = 'home'; state.ddOpen = false; render(); }
+function guideEnd(){ guideSet('done'); if (guideLayer){ guideLayer.remove(); guideLayer = null; } }
+function guideVisible(el){ return el && el.getClientRects().length > 0 && !(document.getElementById('overlay') && !document.getElementById('overlay').contains(el)); }
+function guideTick(){
+  if (typeof GUIDE_I !== 'number' || state.ob || state.screen === 'onboard'){ if (guideLayer && typeof GUIDE_I !== 'number'){ guideLayer.remove(); guideLayer = null; } return; }
+  const st = GUIDE[GUIDE_I]; if (!st){ guideEnd(); return; }
+  if (!guideLayer){
+    guideLayer = document.createElement('div'); guideLayer.id = 'tourLayer'; guideLayer.className = 'guide';
+    guideLayer.innerHTML = '<div class="tourring"></div><div class="tourtip"><b class="tt"></b><p class="td"></p><div class="tbtns"><button class="linkbtn" id="gExit">Exit</button><span class="tdots"></span><button class="btn btn-sm" id="gSkip">Skip</button></div></div>';
+    document.body.appendChild(guideLayer);
+    guideLayer.querySelector('#gExit').onclick = guideEnd;
+    guideLayer.querySelector('#gSkip').onclick = ()=>{ if (GUIDE_I >= GUIDE.length - 1) guideEnd(); else guideSet(GUIDE_I + 1); };
+  }
+  const ring = guideLayer.querySelector('.tourring'), tip = guideLayer.querySelector('.tourtip');
+  const el = document.querySelector(st.sel), ok = guideVisible(el);
+  guideLayer.querySelector('.tt').textContent = st.t;
+  guideLayer.querySelector('.td').textContent = ok ? st.d : st.d + ' (Not on screen? Open the right screen, close any panel, or press Skip.)';
+  guideLayer.querySelector('.tdots').innerHTML = GUIDE.map((_, k)=>'<i' + (k === GUIDE_I ? ' class="on"' : '') + '></i>').join('');
+  guideLayer.querySelector('#gSkip').textContent = st.info ? 'Done' : 'Skip';
+  if (!ok){ ring.style.width = ring.style.height = '0px'; tip.style.top = 'auto'; tip.style.bottom = '16px'; return; }
+  if (guideShown !== GUIDE_I){ guideShown = GUIDE_I; try { el.scrollIntoView({ block:'center' }); } catch(e){} }
+  const r = el.getBoundingClientRect(), pad = 8;
+  ring.style.left = (r.left - pad) + 'px'; ring.style.top = (r.top - pad) + 'px'; ring.style.width = (r.width + pad*2) + 'px'; ring.style.height = (r.height + pad*2) + 'px';
+  if ((innerHeight - r.bottom) > 190 || r.top < 200){ tip.style.top = (r.bottom + pad + 16) + 'px'; tip.style.bottom = 'auto'; }
+  else { tip.style.bottom = (innerHeight - r.top + pad + 16) + 'px'; tip.style.top = 'auto'; }
+}
+document.addEventListener('click', e=>{
+  if (typeof GUIDE_I !== 'number') return;
+  const st = GUIDE[GUIDE_I]; if (!st || st.info || !e.target.closest || e.target.closest('#tourLayer')) return;
+  const hit = e.target.closest(st.sel), at = GUIDE_I;
+  if (hit) setTimeout(()=>{ if (GUIDE_I === at){ if (at >= GUIDE.length - 1) guideEnd(); else guideSet(at + 1); } }, 250);
+}, true);
+setInterval(guideTick, 300);
+
+/* ---------- pronunciation guide (one JSON per language: phonology/<code>.json, template: phonology/TEMPLATE.json) ---------- */
+function phonEl(){
+  const d = document.createElement('div');
+  d.innerHTML = '<div class="sectionhead">Pronunciation guides</div><div class="hint">A short sound summary and recommended listening sources for each language you study.</div>';
+  ACTIVE.forEach(c=>{ const b = document.createElement('button'); b.className = 'btn btn-ghost btn-sm'; b.style.margin = '4px 6px 0 0'; b.textContent = '🔊 ' + LG(c).name; b.onclick = ()=>phonOpen(c); d.appendChild(b); });
+  return d;
+}
+function phonOpen(code){
+  openSheet((sh, close)=>{
+    sh.innerHTML = `<h3>${esc(LG(code).name)} · pronunciation</h3><div id="phBody" class="hint">Loading…</div><div class="sheet-actions"><button class="btn btn-ghost" id="phClose">Close</button></div>`;
+    sh.querySelector('#phClose').onclick = close;
+    const box = sh.querySelector('#phBody');
+    fetch('phonology/' + code + '.json', { cache:'no-cache' }).then(r=>{ if (!r.ok) throw 0; return r.json(); }).then(j=>{
+      const src = (j.audio_sources || []).slice().sort((a, b)=>(b.recommended ? 1 : 0) - (a.recommended ? 1 : 0));
+      const link = x=>/^https?:\/\//.test(x.url || '') ? `<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.title || x.url)}</a>` : esc(x.title || '');
+      box.className = ''; box.innerHTML = `<p style="white-space:pre-line">${esc(j.summary || '')}</p>
+        ${(j.sounds || []).length ? '<div class="sectionhead">Sounds</div>' + j.sounds.map(x=>`<div class="improw"><b>${esc(x.symbol || '')}</b> ${esc(x.name || '')}<div class="hint">${esc(x.how || '')} ${esc(x.example || '')}</div></div>`).join('') : ''}
+        ${(j.common_mistakes || []).length ? '<div class="sectionhead">Common mistakes</div><ul>' + j.common_mistakes.map(m=>`<li>${esc(m)}</li>`).join('') + '</ul>' : ''}
+        ${src.length ? '<div class="sectionhead">Where to listen</div>' + src.map(x=>`<div class="improw">${x.recommended ? '⭐ ' : ''}${link(x)} <span class="hint">${esc(x.kind || '')} ${esc(x.license || '')}</span><div class="hint">${esc(x.why || '')}</div></div>`).join('') : ''}`;
+    }).catch(()=>{ box.innerHTML = 'No guide for this language yet. To add one, copy <a href="phonology/TEMPLATE.json" target="_blank" rel="noopener">phonology/TEMPLATE.json</a> to <code>phonology/' + esc(code) + '.json</code> and fill it in.'; });
+  });
+}
+
 /* ---------- spotlight tour on the real main page (runs once after the introduction) ---------- */
 function maybeTour(){
   runTour(LS.tour, 'home', [
@@ -8282,7 +8361,7 @@ function boot(){
   } catch(e){}
   buildNoteIdx(); rebuildSeen();
   if (!ONB2_DONE){ state.ob = newOb(); state.screen = 'onboard'; }
-  else if (INTRO_SEEN_VER < INTRO_VERSION){ state.ob = newOb(); state.ob.updated = true; state.ob.fromVer = INTRO_SEEN_VER; state.ob.step = 1; state.screen = 'onboard'; }   // changed since the user saw it: show it again with a note   // everyone who has not seen the v2 introduction sees it once; Settings → Introduction replays it
+  else if (INTRO_SEEN_VER < INTRO_VERSION) markIntroSeen();
   if (STATS.lastDay && STATS.lastDay !== todayStr()){
     const y = new Date(Date.now()-864e5).toISOString().slice(0,10);
     if (STATS.lastDay !== y) STATS.streak = 0;
