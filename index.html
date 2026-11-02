@@ -5494,7 +5494,8 @@ function renderGroup(){
   return f;
 }
 
-function renderLesson(){
+function renderLesson(){ const f = renderLesson0(); setTimeout(maybeTourLesson, 700); return f; }
+function renderLesson0(){
   const f = document.createElement('div');
   const s = state.sess, ex = state.ex, L = LG(ex.lang);
   const pct = sessPct();
@@ -8023,7 +8024,7 @@ function kwOptEl(){
 
 /* ---------- first-start introduction ---------- */
 function newOb(){ return { step:0, native:UI_LANG !== 'en' ? UI_LANG : (KNOWN !== 'en' ? KNOWN : 'en'), learn:new Set(ACTIVE), q:'', grade:GRADE_MODE, anki:!!ANKI_ON, fun:FUN_ON, theme:THEME }; }
-function obTotal(){ return BETA.known ? 8 : 7; }   // the known-words step exists only while that feature is on in Settings
+function obTotal(){ return BETA.known ? 6 : 5; }   // the known-words step exists only while that feature is on in Settings
 function obLangGrid(ob, multi, box){
   const codes = Object.keys(LANGS).sort((a, b)=>LANGS[a].name.localeCompare(LANGS[b].name));
   const all = (multi ? [] : ['en']).concat(codes);
@@ -8055,7 +8056,7 @@ function finishOnboarding(){
   ANKI_ON = ob.anki; saveLS(LS.anki, ANKI_ON);
   if (ob.anki) BETA.anki = true; if (ob.kw) BETA.known = true; saveLS(LS.beta, BETA);
   applyTheme(ob.theme); saveLS(LS.theme, ob.theme); setCssOn('');
-  ONB_DONE = true; saveLS(LS.onb, true); markIntroSeen(); if (!ob.updated) saveLS(LS.tour, 'pending');
+  ONB_DONE = true; saveLS(LS.onb, true); markIntroSeen(); if (!ob.updated){ saveLS(LS.tour, 'pending'); saveLS('arTrainer:tour2', 'pending'); }
   state.ob = null;
   if (missing.length){ state.obBack = true; state.store.q = LG(missing[0]).name; state.al.tab = 'store'; state.screen = 'addlang'; render(); if (state.store.status !== 'ok') loadCatalog(); toast('Get ' + missing.map(c=>LG(c).name).join(', ') + ' from “Ready-made”'); }
   else { state.screen = 'home'; render(); }
@@ -8066,8 +8067,9 @@ function renderOnboard(){
   f.innerHTML = `<div class="topbar"><div style="display:flex;gap:5px;flex:1">${dots}</div><button class="linkbtn" id="obSkip">Skip</button></div><div class="wrap obstep" id="obBody"></div>
     <div class="footer"><div class="footer-inner"><div class="footer-row">${ob.step > 0 ? '<button class="btn btn-ghost" id="obBack" style="flex:0 0 auto">←</button>' : ''}<button class="btn btn-green" id="obNext">${ob.step === obTotal() - 1 ? 'Finish' : 'Next'}</button></div></div></div>`;
   const q = s=>f.querySelector(s), body = q('#obBody');
+  const sid = [0, 1, 4, 5, 6, 7][ob.step];          // steps 2 (native language) and 3 (target language) are gone: the interface language is the translation language, and the target is chosen later
   if (ob.step === obTotal() - 1 && INTRO_SEEN_VER < INTRO_VERSION) markIntroSeen();   // seen = reached the last part
-  if (ob.step === 0){
+  if (sid === 0){
     body.innerHTML = `<div class="hero"><h1>🌐</h1><p>Interface language</p></div><div class="langgrid" id="obGrid" style="max-height:none"></div><div class="hint" id="obNote"></div>`;
     if (!ob.uiCat && !ob.uiLoading){
       ob.uiLoading = true;
@@ -8091,21 +8093,21 @@ function renderOnboard(){
     });
     if (ob.uiLoading) body.querySelector('#obNote').textContent = '…';
     else if (ob.uiErr) body.querySelector('#obNote').textContent = 'More languages need an internet connection.';
-  } else if (ob.step === 1){
+  } else if (sid === 1){
     body.innerHTML = `<div class="hero"><h1>Welcome 👋</h1><p>Learn real sentences.</p></div>
       <div class="obtiles"><div class="obtile"><span class="big">📖</span>See a sentence</div><div class="obtile"><span class="big">🧩</span>Build &amp; translate</div><div class="obtile"><span class="big">⭐</span>Rate yourself</div></div>
       <div class="obtiles"><div class="obtile"><span class="big">📈</span>Levels grow</div><div class="obtile"><span class="big">✎</span>Notes make words yours</div><div class="obtile"><span class="big">⚙</span>All changeable later</div></div>`;
-  } else if (ob.step === 2){
+  } else if (sid === 2){
     body.innerHTML = `<div class="hero"><h1>Your language</h1><p>The language you speak. Sentences are explained in it when your library has that translation; otherwise in English.</p></div>
       <input class="field" id="obQ" placeholder="Search" value="${esc(ob.q)}"><div class="langgrid" id="obGrid"></div>`;
     obLangGrid(ob, false, body.querySelector('#obGrid'));
     body.querySelector('#obQ').oninput = e=>{ ob.q = e.target.value; obLangGrid(ob, false, body.querySelector('#obGrid')); };
-  } else if (ob.step === 3){
+  } else if (sid === 3){
     body.innerHTML = `<div class="hero"><h1>What do you want to learn?</h1><p>Pick one or more. Languages that are not in your library yet are fetched from the ready-made list when you finish.</p></div>
       <input class="field" id="obQ" placeholder="Search" value="${esc(ob.q)}"><div class="langgrid" id="obGrid"></div>`;
     obLangGrid(ob, true, body.querySelector('#obGrid'));
     body.querySelector('#obQ').oninput = e=>{ ob.q = e.target.value; obLangGrid(ob, true, body.querySelector('#obGrid')); };
-  } else if (ob.step === 4){
+  } else if (sid === 4){
     body.innerHTML = `<div class="hero"><h1>How do you like to study?</h1></div>
       <div class="sectionhead">Answers</div><div id="obGrade"></div>
       <div class="sectionhead">Review</div><div id="obAnki"></div>
@@ -8124,7 +8126,7 @@ function renderOnboard(){
       THEMES.forEach(t=>{ const b = document.createElement('button'); b.type = 'button'; b.className = 'themecard' + (t.id === ob.theme ? ' on' : ''); b.innerHTML = `<span class="tsw">${t.sw.map(c=>`<i style="background:${c}"></i>`).join('')}</span><b>${esc(t.name)}</b>`; b.onclick = ()=>{ ob.theme = t.id; applyTheme(t.id); paint(); }; th.appendChild(b); });
     };
     paint();
-  } else if (ob.step === 5){
+  } else if (sid === 5){
     body.innerHTML = `<div class="hero"><h1>Inside a lesson</h1></div>
       <div class="obphone">
         <div class="obbar"><span class="iconbtn obx" style="position:relative">✕<i class="obn">1</i></span><div class="progress"><i style="width:40%"></i></div><span class="pill" style="position:relative">⭐ 12<i class="obn">2</i></span></div>
@@ -8139,7 +8141,7 @@ function renderOnboard(){
         <div><i class="obn">5</i>✎ Add note</div><div><i class="obn">6</i>👁 Show notes</div>
         <div><i class="obn">7</i>تَ Tashkīl on / off (Arabic)</div><div><i class="obn">8</i>Self / Auto grading</div><div style="grid-column:1/-1">🧩 Tap words in order</div>
       </div>`;
-  } else if (ob.step === 6){
+  } else if (sid === 6){
     body.innerHTML = `<div class="hero"><h1>The main page</h1></div>
       <div class="obmock">
         <div class="obtopm"><span class="titlebtn" style="position:relative"><span class="t">Arabic</span><span class="caret">▾</span><i class="obn l">1</i></span><span class="pill">🔥 3</span><span class="pill">⭐ 40</span></div>
@@ -8167,7 +8169,6 @@ function renderOnboard(){
     body.insertAdjacentHTML('afterbegin', `<div class="obnews"><b>✨ We changed something in the introduction</b>${news ? '<br>' + esc(news) : ''}</div>`);
   }
   q('#obNext').onclick = ()=>{
-    if (ob.step === 3 && !ob.learn.size){ toast('Pick at least one language'); return; }
     if (ob.step === obTotal() - 1){ finishOnboarding(); return; }
     ob.step++; ob.q = ''; render();
   };
@@ -8179,14 +8180,23 @@ function renderOnboard(){
 
 /* ---------- spotlight tour on the real main page (runs once after the introduction) ---------- */
 function maybeTour(){
-  if (loadLS(LS.tour, '') !== 'pending' || state.screen !== 'home' || state.ob || document.getElementById('tourLayer')) return;
-  const all = [
-    { sel:'#titleBtn', t:'Languages', d:'Tap here to switch or add a language.' },
-    { sel:'.lvcard', t:'Learn here', d:'Press Continue. The levels grow with you.' },
-    { sel:'.statgrid', t:'Your numbers', d:'Total stars and the sentences you know. Today’s stars are at the top.' },
-    { sel:'#libBtn', t:'Library', d:'Your decks, Anki style. Tap one to practise freely without levels; ⋯ edits its sentences.' },
-    { sel:'#setBtn', t:'Settings', d:'Themes, grading, exercises, and this introduction again.' }
-  ];
+  runTour(LS.tour, 'home', [
+    { sel:'#titleBtn', t:'1 · Load a language', d:'Tap here, then “Add a language” → Ready-made, and pick the language you want to learn.' },
+    { sel:'.lvcard', t:'2 · Start practising', d:'Press Continue. The levels grow with you.' },
+    { sel:'#notesBtn', t:'3 · Notes', d:'Your notes live here. You will try writing one inside a lesson next.' },
+    { sel:'#setBtn', t:'4 · Settings', d:'Appearance (themes), Text-to-speech, and “show the introduction again” are all here.' }
+  ]);
+}
+function maybeTourLesson(){
+  runTour('arTrainer:tour2', 'lesson', [
+    { sel:'[title="Add a note"]', t:'Write a note', d:'Attach your own note to a word or phrase of the sentence.' },
+    { sel:'.notebtn[class*="nv-"]', t:'Show notes', d:'Choose how your notes appear inside sentences.' },
+    { sel:'.tashbtn', t:'Vowel marks', d:'Show or hide vowel marks, for languages that have them.' },
+    { sel:'.tts-btn', t:'Listen', d:'Hear the sentence read aloud (set the voice in Settings → Text-to-speech).' }
+  ]);
+}
+function runTour(key, screen, all){
+  if (loadLS(key, '') !== 'pending' || state.screen !== screen || state.ob || document.getElementById('tourLayer')) return;
   const steps = all.filter(x=>document.querySelector(x.sel));
   if (!steps.length) return;
   let i = 0;
@@ -8194,7 +8204,7 @@ function maybeTour(){
   L.innerHTML = '<div class="tourshade"></div><div class="tourring"></div><div class="tourtip"><b class="tt"></b><p class="td"></p><div class="tbtns"><button class="linkbtn" id="tourSkip">Skip</button><span class="tdots"></span><button class="btn btn-sm" id="tourNext">Next</button></div></div>';
   document.body.appendChild(L);
   const ring = L.querySelector('.tourring'), tip = L.querySelector('.tourtip');
-  const end = ()=>{ saveLS(LS.tour, 'done'); window.removeEventListener('resize', place); L.remove(); document.body.style.overflow = ''; };
+  const end = ()=>{ saveLS(key, 'done'); window.removeEventListener('resize', place); L.remove(); document.body.style.overflow = ''; };
   function place(){
     const st = steps[i], el = document.querySelector(st.sel);
     if (!el){ end(); return; }
