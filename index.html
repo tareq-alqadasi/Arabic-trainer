@@ -6323,30 +6323,42 @@ function ttsEnvHint(){
   if (!e.online) return ' The device reports that it is offline.';
   return '';
 }
+const TTS_FN = {};                                // server -> { api_name: fn_index }
+async function ttsFn(base, api){
+  let m = TTS_FN[base];
+  if (!m){
+    const r = await ttsFetch(base + '/config', undefined, 'GET');
+    if (!r.ok) throw new Error('Voice server answered ' + r.status);
+    const c = await r.json(); m = {};
+    (c.dependencies || c.deps || []).forEach((d, i)=>{ if (d && d.api_name) m[d.api_name] = (d.id != null ? d.id : i); });
+    TTS_FN[base] = m;
+  }
+  if (m[api] == null) throw new Error('The Space has no function "' + api + '" (it may have changed). Known: ' + Object.keys(m).join(', ').slice(0, 120));
+  return m[api];
+}
 async function ttsRaw(api, data, o){
   o = o || {};
   const base = String(TTS.server || TTS_SERVER).replace(/\/+$/, '');
   const tries = o.tries || 3; let last = null;
   const once = async ()=>{
-    const r1 = await ttsFetch(base + '/gradio_api/call/' + api, { method:'POST', headers:{ 'Content-Type':'application/json' }, body:JSON.stringify(o.session ? { data, session_hash:o.session } : { data }) }, 'POST');
-    if (!r1.ok){ const e = new Error(r1.status >= 500 ? 'The voice server is waking up — try again in a minute' : 'Voice server answered ' + r1.status); e.retry = r1.status >= 500; throw e; }
+    const fn = await ttsFn(base, api), sess = o.session || ('r' + Math.random().toString(36).slice(2, 12));
+    const r1 = await ttsFetch(base + '/gradio_api/queue/join', { method:'POST', headers:{ 'Content-Type':'application/json' }, body:JSON.stringify({ data, event_data:null, fn_index:fn, trigger_id:null, session_hash:sess }) }, 'POST');
+    if (!r1.ok){ const e = new Error(r1.status >= 500 ? 'The voice server is waking up or busy — try again in a minute' : 'Voice server answered ' + r1.status); e.retry = r1.status >= 500; throw e; }
     const j = await r1.json();
     if (!j || !j.event_id) throw new Error('Unexpected answer from the voice server');
-    const r2 = await ttsFetch(base + '/gradio_api/call/' + api + '/' + j.event_id, undefined, 'GET');
+    const r2 = await ttsFetch(base + '/gradio_api/queue/data?session_hash=' + encodeURIComponent(sess), undefined, 'GET');
     if (!r2.ok) throw new Error('Voice server answered ' + r2.status);
-    const txt = await r2.text();
-    let ev = '', out = null, err = null;
+    const txt = await r2.text(); let done = null;
     txt.split(/\r?\n/).forEach(line=>{
-      if (line.indexOf('event:') === 0) ev = line.slice(6).trim();
-      else if (line.indexOf('data:') === 0){
-        const d = line.slice(5).trim();
-        if (ev === 'complete'){ try { out = JSON.parse(d); } catch(e){} }
-        else if (ev === 'error') err = d;
-      }
+      if (line.indexOf('data:') !== 0) return;
+      let m; try { m = JSON.parse(line.slice(5)); } catch(e){ return; }
+      if (m && m.msg === 'process_completed' && (!m.event_id || m.event_id === j.event_id)) done = m;
     });
-    if (err !== null) throw new Error('The voice server could not make this audio' + (err && err !== 'null' ? ': ' + err.slice(0, 120) : ' (model still loading? try again)'));
-    if (!Array.isArray(out)) throw new Error('Empty answer from the voice server');
-    return { out, base };
+    if (!done) throw new Error('The voice server closed the connection without an answer');
+    const em = done.output && done.output.error;
+    if (done.success === false || em) throw new Error('The voice server could not make this audio' + (em ? ': ' + String(em).slice(0, 140) : ' (model still loading? try again)'));
+    if (!done.output || !Array.isArray(done.output.data)) throw new Error('Empty answer from the voice server');
+    return { out:done.output.data, base };
   };
   for (let a = 0; a < tries; a++){
     try { return await ttsTimeout(once(), o.ms || 150000); }
@@ -6364,10 +6376,17 @@ async function ttsRaw(api, data, o){
 async function ttsSynth(cfg, text){
   let res = null;
   for (let k = 0; k < 2 && !res; k++){
-    const ss = ttsSession(cfg.label); await ss.ready;
-    if (TTS_LIVE[cfg.label] && TTS_LIVE[cfg.label].indexOf(cfg.model) < 0) throw new Error('This model is no longer offered by the server — choose another one');
-    try { res = await ttsRaw('process', [cfg.label, cfg.model, text, String(cfg.sid || 0), cfg.speed || 1], { session:ss.id }); }
-    catch(e){ if (k === 0 && /could not make this audio/.test(e.message)){ delete TTS_SESS[cfg.label]; continue; } throw e; }   // session expired on the server: open a new one once
+    const ss = await ttsLease(cfg.label);
+    try {
+      if (TTS_LIVE[cfg.label] && TTS_LIVE[cfg.label].indexOf(cfg.model) < 0) throw new Error('This model is no longer offered by the server — choose another one');
+      res = await ttsRaw('process', [cfg.label, cfg.model, text, String(cfg.sid || 0), cfg.speed || 1], { session:ss.id });
+      ttsUnlease(ss);
+    } catch(e){
+      const lost = k === 0 && /could not make this audio|not in the list|session/i.test(e.message);
+      if (lost){ ss.busy = false; delete TTS_POOL[cfg.label]; continue; }   // the Space forgot its sessions: open fresh ones once
+      ttsDrop(ss);
+      throw e;
+    }
   }
   const { out, base } = res;
   const html = String(out[1] || '');
@@ -6376,6 +6395,7 @@ async function ttsSynth(cfg, text){
   const f = out[0];
   let url = f && (f.url || (f.path ? base + '/gradio_api/file=' + f.path : ''));
   if (!url) throw new Error('No audio returned');
+  if (url[0] === '/') url = base + url;
   if (/^https:/.test(base)) url = url.replace(/^http:\/\//, 'https://');
   const r = await ttsFetch(url, undefined, 'GET');
   if (!r.ok) throw new Error('Audio download failed (' + r.status + ')');
@@ -6387,25 +6407,42 @@ async function ttsSynth(cfg, text){
 /* The Space checks the chosen model against the model dropdown of the caller's SESSION (the page of the Space fills it when you pick a
    language). A bare API call only knows the first list (voice cloning) and is refused — so every language gets its own session,
    opened by the Space's own "update_model_dropdown" call; that call also gives the current list of models. */
-const TTS_SESS = {};
-function ttsSession(label){
-  let s = TTS_SESS[label];
-  if (s) return s;
-  s = TTS_SESS[label] = { id:'s' + Math.random().toString(36).slice(2, 12) + Date.now().toString(36) };
-  s.ready = ttsRaw('update_model_dropdown', [label], { tries:2, ms:60000, session:s.id }).then(({ out })=>{
-    const u = out[0], ch = u && (u.choices || (u.value && u.value.choices));
-    if (Array.isArray(ch)){
-      const keys = ch.map(c=>Array.isArray(c) ? c[1] : c).filter(x=>typeof x === 'string' && x.indexOf('voice cloning') < 0);
-      if (keys.length) TTS_LIVE[label] = keys;
-    }
-  }).catch(e=>{ if (TTS_SESS[label] === s) delete TTS_SESS[label]; throw e; });
-  s.ready.catch(()=>{});
-  return s;
+const TTS_POOL = {};                              // label -> [{ id, busy, ready }]  (two at most: one per parallel request)
+function ttsPoolReset(){ Object.keys(TTS_POOL).forEach(k=>delete TTS_POOL[k]); }
+function ttsPrepare(s){                           // opens the session's model list for this language (and learns the current models)
+  if (!s.ready){
+    s.ready = ttsRaw('update_model_dropdown', [s.label], { tries:2, ms:60000, session:s.id }).then(({ out })=>{
+      const u = out[0], ch = u && (u.choices || (u.value && u.value.choices));
+      if (Array.isArray(ch)){
+        const keys = ch.map(c=>Array.isArray(c) ? c[1] : c).filter(x=>typeof x === 'string' && x.indexOf('voice cloning') < 0);
+        if (keys.length) TTS_LIVE[s.label] = keys;
+      }
+    });
+    s.ready.catch(()=>{});
+  }
+  return s.ready;
 }
+async function ttsLease(label){
+  const pool = TTS_POOL[label] || (TTS_POOL[label] = []);
+  for (let spin = 0; spin < 2000; spin++){
+    let s = pool.find(x=>!x.busy);
+    if (!s && pool.length < 2){ s = { id:'s' + Math.random().toString(36).slice(2, 12) + Date.now().toString(36), busy:false, ready:null, label }; pool.push(s); }
+    if (s){
+      s.busy = true;
+      try { await ttsPrepare(s); }
+      catch(e){ s.busy = false; const i = pool.indexOf(s); if (i >= 0) pool.splice(i, 1); throw e; }
+      return s;
+    }
+    await sleepMs(60);
+  }
+  throw new Error('Voice queue is full');
+}
+function ttsUnlease(s){ s.busy = false; }
+function ttsDrop(s){ const pool = TTS_POOL[s.label] || [], i = pool.indexOf(s); if (i >= 0) pool.splice(i, 1); s.busy = false; }
 async function ttsLiveLabel(label){
   if (TTS_LIVE_TRIED.has(label)) return;
   TTS_LIVE_TRIED.add(label);
-  try { await ttsSession(label).ready; } catch(e){ dbg('tts', 'live list failed for ' + label + ': ' + e.message); }
+  try { const s = await ttsLease(label); ttsUnlease(s); } catch(e){ dbg('tts', 'live list failed for ' + label + ': ' + e.message); }
 }
 
 /* ---------- audio store (Cache Storage, + a small in-memory layer) ---------- */
@@ -6740,7 +6777,7 @@ function ttsSettingsEl(){
     <div class="hint" style="margin:12px 0 4px">Voice server (change only if you copied the Space)</div>
     <input class="field" id="tsSrv" autocomplete="off" spellcheck="false">`;
   const srv = box.querySelector('#tsSrv'); srv.value = TTS.server;
-  srv.onchange = ()=>{ TTS.server = srv.value.trim().replace(/\/+$/, '') || TTS_SERVER; srv.value = TTS.server; TTS_LIVE = {}; TTS_LIVE_TRIED = new Set(); Object.keys(TTS_SESS).forEach(k=>delete TTS_SESS[k]); ttsSave(); toast('Voice server saved'); };
+  srv.onchange = ()=>{ TTS.server = srv.value.trim().replace(/\/+$/, '') || TTS_SERVER; srv.value = TTS.server; TTS_LIVE = {}; TTS_LIVE_TRIED = new Set(); ttsPoolReset(); Object.keys(TTS_FN).forEach(k=>delete TTS_FN[k]); ttsSave(); toast('Voice server saved'); };
   box.querySelector('#tsVoices').onclick = ()=>ttsOpenVoices();
   box.querySelector('#tsDiag').onclick = ()=>ttsOpenDiag();
   box.querySelector('#tsClear').onclick = async ()=>{ await ttsCacheClear(); box.querySelector('#tsCount').textContent = 'Saved audio: 0 sentences'; toast('Saved audio cleared'); };
