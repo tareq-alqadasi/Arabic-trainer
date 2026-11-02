@@ -614,7 +614,8 @@ html[dir=rtl] .deck-meta{text-align:start}
 .ttsmod .nm{flex:1;min-width:0;color:var(--blue-d);font-weight:700;font-size:15px;word-break:break-all}
 .ttsmod .sp{font-size:11px;font-weight:700;color:var(--ink3)}
 .ttsmod.sel{background:var(--blue)}
-.ttsmod.sel .nm,.ttsmod.sel .sp{color:#fff}
+.ttsmod .sp2{font-size:11px;font-weight:700;opacity:.8;margin-top:2px}
+.ttsmod.sel .nm,.ttsmod.sel .sp,.ttsmod.sel .sp2{color:#fff}
 .dgrow{border:1.5px solid var(--line2,#ddd);border-radius:12px;padding:8px 12px;margin-top:8px;font-size:14px;word-break:break-word}
 .dgrow b{font-weight:800}.dgrow span{float:right;font-size:12px;opacity:.6}
 .dgrow.ok{border-color:var(--green)}.dgrow.bad{border-color:var(--red,#c33);background:rgba(200,50,50,.07)}
@@ -6261,11 +6262,11 @@ Object.keys(TTS_CAT).forEach(l=>{ TTS_KEYS[l] = TTS_CAT[l].split(/\s+/).filter(B
 let TTS_LIVE = {}, TTS_LIVE_TRIED = new Set();          // lists fetched from the running Space (override the built-in ones)
 
 /* ---------- settings ---------- */
-let TTS = Object.assign({ on:true, q:true, a:true, i:true, pre:true, server:TTS_SERVER, langs:{} }, loadLS(LS.tts, {}));
-if (!TTS.langs || typeof TTS.langs !== 'object') TTS.langs = {};
+let TTS = Object.assign({ on:true, q:true, a:true, i:true, pre:true, dpre:false, dfall:false, server:TTS_SERVER, langs:{}, rate:{}, def:{} }, loadLS(LS.tts, {}));
+['langs', 'rate', 'def'].forEach(k=>{ if (!TTS[k] || typeof TTS[k] !== 'object') TTS[k] = {}; });
 if (!TTS.server) TTS.server = TTS_SERVER;
 function ttsSave(){ saveLS(LS.tts, TTS); }
-function ttsCfg(lang){ const c = TTS.on && TTS.langs[lang]; return c && c.model && c.label ? c : null; }
+function ttsCfg(lang){ if (!TTS.on) return null; const c = TTS.langs[lang] || TTS.def[lang]; return c && c.model && c.label ? c : null; }   // a saved default is used until you choose a voice
 
 /* ---------- models ---------- */
 function ttsInfo(label, key){
@@ -6445,31 +6446,223 @@ async function ttsLiveLabel(label){
   try { const s = await ttsLease(label); ttsUnlease(s); } catch(e){ dbg('tts', 'live list failed for ' + label + ': ' + e.message); }
 }
 
-/* ---------- audio store (Cache Storage, + a small in-memory layer) ---------- */
-const TTS_MEM = new Map(), TTS_FLIGHT = new Map();
+/* ---------- local Piper engine core (identical to the code tested in Node with a real voice) ---------- */
+async function piperPhonemize(factory, opts, text, espeakVoice){
+  const input = JSON.stringify([{ text: String(text).trim() }]);
+  let lastErr = '';
+  return await new Promise(async (resolve, reject)=>{
+    let done = false;
+    const to = setTimeout(()=>{ if (!done){ done = true; reject(new Error('The phonemizer gave no answer' + (lastErr ? ': ' + lastErr.slice(0, 120) : ''))); } }, 30000);
+    try {
+      const mod = await factory({
+        print:d=>{ if (done) return; try { const j = JSON.parse(d); if (j && j.phoneme_ids){ done = true; clearTimeout(to); resolve(j.phoneme_ids); } } catch(e){} },
+        printErr:m=>{ lastErr = String(m); },
+        locateFile:opts.locateFile,
+        instantiateWasm:opts.instantiateWasm
+      });
+      mod.callMain(['-l', espeakVoice, '--input', input, '--espeak_data', '/espeak-ng-data']);
+    } catch(e){ if (!done){ done = true; clearTimeout(to); reject(e); } }
+  });
+}
+async function piperRun(ort, session, cfg, ids, sid, speed){
+  const inf = cfg.inference || {};
+  const noise = inf.noise_scale != null ? inf.noise_scale : 0.667, len = (inf.length_scale != null ? inf.length_scale : 1) / (speed || 1), nw = inf.noise_w != null ? inf.noise_w : 0.8;
+  const feeds = {
+    input:new ort.Tensor('int64', BigInt64Array.from(ids, x=>BigInt(x)), [1, ids.length]),
+    input_lengths:new ort.Tensor('int64', BigInt64Array.from([BigInt(ids.length)]), [1]),
+    scales:new ort.Tensor('float32', Float32Array.from([noise, len, nw]), [3])
+  };
+  if (session.inputNames.indexOf('sid') >= 0) feeds.sid = new ort.Tensor('int64', BigInt64Array.from([BigInt(sid || 0)]), [1]);
+  const out = await session.run(feeds);
+  return out[session.outputNames[0]].data;
+}
+function pcmToWav(pcm, sampleRate){
+  const n = pcm.length, view = new DataView(new ArrayBuffer(44 + n * 2));
+  const w = (o, s)=>{ for (let i = 0; i < s.length; i++) view.setUint8(o + i, s.charCodeAt(i)); };
+  w(0, 'RIFF'); view.setUint32(4, 36 + n * 2, true); w(8, 'WAVE'); w(12, 'fmt '); view.setUint32(16, 16, true); view.setUint16(20, 1, true); view.setUint16(22, 1, true);
+  view.setUint32(24, sampleRate, true); view.setUint32(28, sampleRate * 2, true); view.setUint16(32, 2, true); view.setUint16(34, 16, true); w(36, 'data'); view.setUint32(40, n * 2, true);
+  for (let i = 0; i < n; i++){ const v = Math.max(-1, Math.min(1, pcm[i])); view.setInt16(44 + i * 2, v < 0 ? v * 32768 : v * 32767, true); }
+  return view.buffer;
+}
+function piperSplit(text, max){
+  max = max || 400; const t = String(text).trim();
+  if (!t) return []; if (t.length <= max) return [t];
+  const parts = t.match(/[^.!?…؟。\n]+[.!?…؟。]*\s*/g) || [t], out = []; let cur = '';
+  for (const p of parts){ if ((cur + p).length > max && cur.trim()){ out.push(cur.trim()); cur = ''; } cur += p; }
+  if (cur.trim()) out.push(cur.trim());
+  return out.reduce((a, c)=>{ if (c.length <= max) a.push(c); else for (let i = 0; i < c.length; i += max) a.push(c.slice(i, i + max)); return a; }, []);
+}
+
+/* ---------- audio store (Cache Storage + a small in-memory layer) ---------- */
+const TTS_MEM = new Map(), TTS_FLIGHT = new Map(), TTS_HAVE = new Set();
+const TTS_MAXAUDIO = 1500;                               // sentences kept; the oldest go first
+const TTS_STATS = { hit:0, local:0, demo:0, pre:0, localMs:0, demoMs:0, skipped:0 };
 let TTS_RUN = 0; const TTS_WAIT = [];
-function ttsAcquire(){ return new Promise(res=>{ const go = ()=>{ if (TTS_RUN < 2){ TTS_RUN++; res(); } else TTS_WAIT.push(go); }; go(); }); }
+function ttsAcquire(){ return new Promise(res=>{ const go = ()=>{ if (TTS_RUN < 1){ TTS_RUN++; res(); } else TTS_WAIT.push(go); }; go(); }); }   // the demo server: one request at a time
 function ttsRelease(){ TTS_RUN--; const n = TTS_WAIT.shift(); if (n) n(); }
 function ttsKey(cfg, text){ const s = cfg.model + '|' + (cfg.sid || 0) + '|' + (cfg.speed || 1) + '|' + text; return 'https://tts.invalid/' + h32(s, 2166136261) + h32(s, 5381); }
+async function ttsCacheScan(){ try { const c = await caches.open(TTS_CACHE); (await c.keys()).forEach(r=>TTS_HAVE.add(r.url)); } catch(e){} }
 async function ttsCacheGet(key){
   if (TTS_MEM.has(key)) return TTS_MEM.get(key);
-  try { const c = await caches.open(TTS_CACHE), r = await c.match(key); if (r){ const b = await r.blob(); TTS_MEM.set(key, b); return b; } } catch(e){}
+  try { const c = await caches.open(TTS_CACHE), r = await c.match(key); if (r){ const b = await r.blob(); TTS_MEM.set(key, b); TTS_HAVE.add(key); return b; } } catch(e){}
   return null;
+}
+let TTS_PUTS = 0;
+async function ttsTrim(){
+  try { const c = await caches.open(TTS_CACHE), ks = await c.keys(); if (ks.length <= TTS_MAXAUDIO) return;
+    for (const r of ks.slice(0, ks.length - TTS_MAXAUDIO + 100)){ await c.delete(r); TTS_HAVE.delete(r.url); TTS_MEM.delete(r.url); } } catch(e){}
 }
 async function ttsCachePut(key, blob){
   TTS_MEM.set(key, blob); if (TTS_MEM.size > 60) TTS_MEM.delete(TTS_MEM.keys().next().value);
+  TTS_HAVE.add(key);
   try { const c = await caches.open(TTS_CACHE); await c.put(key, new Response(blob, { headers:{ 'Content-Type':blob.type || 'audio/wav' } })); } catch(e){}
+  if (++TTS_PUTS % 40 === 0) ttsTrim();
 }
 async function ttsCacheCount(){ try { const c = await caches.open(TTS_CACHE); return (await c.keys()).length; } catch(e){ return 0; } }
-async function ttsCacheClear(){ TTS_MEM.clear(); try { await caches.delete(TTS_CACHE); } catch(e){} }
-async function ttsGet(cfg, text){
+async function ttsCacheClear(){ TTS_MEM.clear(); TTS_HAVE.clear(); try { await caches.delete(TTS_CACHE); } catch(e){} }
+async function ttsHasAudio(cfg, text){ const k = ttsKey(cfg, text); return TTS_HAVE.has(k) || TTS_MEM.has(k) || !!(await ttsCacheGet(k)); }
+
+/* ---------- voices on this device (like SherpaTTS: download once, then it runs locally) ---------- */
+const TTS_VOICE_CACHE = 'arTrainer-voices-v1';
+const TTS_VOICE_HOSTS = ['https://huggingface.co/diffusionstudio/piper-voices/resolve/main/', 'https://huggingface.co/rhasspy/piper-voices/resolve/main/'];
+const TTS_ORT = 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.18.0/dist/', TTS_PHON = 'https://cdn.jsdelivr.net/npm/@diffusionstudio/piper-wasm@1.0.0/build/';
+const TTS_PIPER = new Set(('ar_JO-kareem-low ar_JO-kareem-medium ca_ES-upc_ona-medium ca_ES-upc_ona-x_low ca_ES-upc_pau-x_low cs_CZ-jirka-low cs_CZ-jirka-medium da_DK-talesyntese-medium de_DE-eva_k-x_low de_DE-karlsson-low de_DE-kerstin-low de_DE-mls-medium de_DE-pavoque-low de_DE-ramona-low de_DE-thorsten-high de_DE-thorsten-low de_DE-thorsten-medium de_DE-thorsten_emotional-medium el_GR-rapunzelina-low en_GB-alan-low en_GB-alan-medium en_GB-alba-medium en_GB-aru-medium en_GB-cori-high en_GB-cori-medium en_GB-jenny_dioco-medium en_GB-northern_english_male-medium en_GB-semaine-medium en_GB-southern_english_female-low en_GB-vctk-medium en_US-amy-low en_US-amy-medium en_US-arctic-medium en_US-danny-low en_US-hfc_female-medium en_US-hfc_male-medium en_US-joe-medium en_US-kathleen-low en_US-kristin-medium en_US-kusal-medium en_US-l2arctic-medium en_US-lessac-high en_US-lessac-low en_US-lessac-medium en_US-libritts-high en_US-libritts_r-medium en_US-ljspeech-high en_US-ljspeech-medium en_US-ryan-high en_US-ryan-low en_US-ryan-medium es_ES-carlfm-x_low es_ES-davefx-medium es_ES-mls_10246-low es_ES-mls_9972-low es_ES-sharvard-medium es_MX-ald-medium es_MX-claude-high fa_IR-amir-medium fa_IR-gyro-medium fi_FI-harri-low fi_FI-harri-medium fr_FR-gilles-low fr_FR-mls-medium fr_FR-mls_1840-low fr_FR-siwis-low fr_FR-siwis-medium fr_FR-tom-medium fr_FR-upmc-medium hu_HU-anna-medium hu_HU-berta-medium hu_HU-imre-medium is_IS-bui-medium is_IS-salka-medium is_IS-steinn-medium is_IS-ugla-medium it_IT-riccardo-x_low ka_GE-natia-medium kk_KZ-iseke-x_low kk_KZ-issai-high kk_KZ-raya-x_low lb_LU-marylux-medium ne_NP-google-medium ne_NP-google-x_low nl_BE-nathalie-medium nl_BE-nathalie-x_low nl_BE-rdh-medium nl_BE-rdh-x_low nl_NL-mls-medium nl_NL-mls_5809-low nl_NL-mls_7432-low no_NO-talesyntese-medium pl_PL-darkman-medium pl_PL-gosia-medium pl_PL-mc_speech-medium pl_PL-mls_6892-low pt_BR-edresson-low pt_BR-faber-medium pt_PT-tugão-medium ro_RO-mihai-medium ru_RU-denis-medium ru_RU-dmitri-medium ru_RU-irina-medium ru_RU-ruslan-medium sk_SK-lili-medium sl_SI-artur-medium sr_RS-serbski_institut-medium sv_SE-nst-medium sw_CD-lanfrica-medium tr_TR-dfki-medium tr_TR-fahrettin-medium tr_TR-fettah-medium uk_UA-lada-x_low uk_UA-ukrainian_tts-medium vi_VN-25hours_single-low vi_VN-vais1000-medium vi_VN-vivos-x_low zh_CN-huayan-medium zh_CN-huayan-x_low cy_GB-gwryw_gogleddol-medium en_US-bryce-medium en_US-john-medium en_US-norman-medium it_IT-paola-medium').split(' '));
+const TTS_VOICES = new Set();                           // voice ids stored on this device
+function ttsLocalId(model){                             // Space model key -> Piper voice id (null = only the demo server has it)
+  const m = String(model).match(/^csukuangfj\/vits-piper-(.+?)(\|.*)?$/); if (!m) return null;
+  let id = m[1]; if (id === 'pt_PT-tugao-medium') id = 'pt_PT-tugão-medium';
+  return TTS_PIPER.has(id) ? id : null;
+}
+function ttsVoicePath(id){ const m = id.match(/^([a-z]{2,3})_([A-Z]{2})-(.+)-(x_low|low|medium|high)$/); return m ? m[1] + '/' + m[1] + '_' + m[2] + '/' + m[3] + '/' + m[4] + '/' + id : null; }
+function ttsVoiceMB(id){ return /-x_low$/.test(id) ? 20 : (/-high$/.test(id) ? 114 : 63); }   // typical download size
+function ttsVoiceKey(id){ return 'https://voice.invalid/' + encodeURIComponent(id) + '.onnx'; }
+function ttsEngine(cfg){ const id = ttsLocalId(cfg.model); return id ? { kind:TTS_VOICES.has(id) ? 'local' : 'need', id } : { kind:'demo' }; }
+function ttsNotDownloaded(id){ const e = new Error('This voice is not downloaded yet — open Voices and tap it to download'); e.needVoice = id; return e; }
+async function ttsVoiceScan(){ try { const c = await caches.open(TTS_VOICE_CACHE); (await c.keys()).forEach(r=>{ const m = r.url.match(/voice\.invalid\/(.+)\.onnx$/); if (m) TTS_VOICES.add(decodeURIComponent(m[1])); }); } catch(e){} }
+async function ttsVoiceList(){                           // [{ id, size }]
+  const out = [];
+  try { const c = await caches.open(TTS_VOICE_CACHE);
+    for (const r of await c.keys()){ const m = r.url.match(/voice\.invalid\/(.+)\.onnx$/); if (!m) continue; const rr = await c.match(r); out.push({ id:decodeURIComponent(m[1]), size:+(rr.headers.get('X-Size') || 0) }); } } catch(e){}
+  return out;
+}
+async function ttsVoiceDelete(id){ TTS_VOICES.delete(id); TTS_LS.delete(id); try { const c = await caches.open(TTS_VOICE_CACHE); await c.delete(ttsVoiceKey(id)); await c.delete(ttsVoiceKey(id) + '.json'); } catch(e){} }
+async function ttsVoiceDownload(id, onProg){
+  if (typeof caches === 'undefined') throw new Error('Voices can only be stored on an https page (for example GitHub Pages)');
+  const path = ttsVoicePath(id); if (!path) throw new Error('Unknown voice ' + id);
+  let lastErr = null;
+  for (const host of TTS_VOICE_HOSTS){
+    try {
+      const jr = await ttsFetch(host + encodeURI(path) + '.onnx.json', undefined, 'GET'); if (!jr.ok) throw new Error('config answered ' + jr.status);
+      const cfgText = await jr.text(); JSON.parse(cfgText);
+      const r = await ttsFetch(host + encodeURI(path) + '.onnx', undefined, 'GET'); if (!r.ok) throw new Error('model answered ' + r.status);
+      const total = +(r.headers.get('Content-Length') || 0), reader = r.body && r.body.getReader, chunks = []; let got = 0;
+      if (reader){ const rd = r.body.getReader(); for (;;){ const { done, value } = await rd.read(); if (done) break; chunks.push(value); got += value.length; if (onProg) onProg(got, total); } }
+      else { const b0 = await r.blob(); chunks.push(b0); got = b0.size; if (onProg) onProg(got, got); }
+      const blob = new Blob(chunks, { type:'application/octet-stream' });
+      if (blob.size < 100000) throw new Error('model file too small (' + blob.size + ' bytes)');
+      const c = await caches.open(TTS_VOICE_CACHE), k = ttsVoiceKey(id);
+      await c.put(k + '.json', new Response(cfgText, { headers:{ 'Content-Type':'application/json' } }));
+      await c.put(k, new Response(blob, { headers:{ 'Content-Type':'application/octet-stream', 'X-Size':String(blob.size) } }));
+      TTS_VOICES.add(id);
+      try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch(e){}
+      ttsLog('voice stored · ' + id + ' · ' + Math.round(blob.size / 1048576) + ' MB');
+      return blob.size;
+    } catch(e){ lastErr = e; ttsLog('voice host failed: ' + host.slice(8, 40) + ' → ' + e.message); }
+  }
+  throw new Error('Could not download the voice' + (lastErr ? ': ' + lastErr.message : ''));
+}
+
+/* ---------- local engine: libraries (loaded once from a CDN), voice sessions, synthesis ---------- */
+const TTS_SCRIPTS = {};
+function ttsScript(url){
+  return TTS_SCRIPTS[url] || (TTS_SCRIPTS[url] = new Promise((res, rej)=>{
+    const s = document.createElement('script'); s.src = url; s.async = true; s.onload = ()=>res();
+    s.onerror = ()=>{ delete TTS_SCRIPTS[url]; rej(new Error('Could not load ' + url.split('/').pop() + ' (CDN blocked or offline)')); };
+    document.head.appendChild(s);
+  }));
+}
+let TTS_LIB = null;
+function ttsLocalLibs(){
+  if (TTS_LIB) return TTS_LIB;
+  TTS_LIB = (async ()=>{
+    const t0 = performance.now();
+    await Promise.all([ttsScript(TTS_ORT + 'ort.wasm.min.js'), ttsScript(TTS_PHON + 'piper_phonemize.js')]);
+    const ort = window.ort, factory = window.createPiperPhonemize;
+    if (!ort || !factory) throw new Error('The voice libraries did not start');
+    ort.env.wasm.wasmPaths = TTS_ORT; ort.env.wasm.numThreads = 1; ort.env.wasm.proxy = false;
+    const [wr, dr] = await Promise.all([ttsFetch(TTS_PHON + 'piper_phonemize.wasm', undefined, 'GET'), ttsFetch(TTS_PHON + 'piper_phonemize.data', undefined, 'GET')]);
+    if (!wr.ok || !dr.ok) throw new Error('Could not download the phonemizer (' + wr.status + '/' + dr.status + ')');
+    const wasm = await WebAssembly.compile(await wr.arrayBuffer()), dataUrl = URL.createObjectURL(await dr.blob());
+    ttsLog('local libraries ready in ' + Math.round(performance.now() - t0) + ' ms');
+    return { ort, factory, wasm, dataUrl };
+  })();
+  TTS_LIB.catch(()=>{ TTS_LIB = null; });
+  return TTS_LIB;
+}
+const TTS_LS = new Map();                                // voice id -> { session, cfg }  (two at most)
+async function ttsLocalVoice(id){
+  if (TTS_LS.has(id)) return TTS_LS.get(id);
+  const lib = await ttsLocalLibs();
+  const c = await caches.open(TTS_VOICE_CACHE), k = ttsVoiceKey(id);
+  const [jr, mr] = await Promise.all([c.match(k + '.json'), c.match(k)]);
+  if (!jr || !mr){ TTS_VOICES.delete(id); throw ttsNotDownloaded(id); }
+  const cfg = await jr.json(), buf = await mr.arrayBuffer();
+  const session = await lib.ort.InferenceSession.create(buf, { executionProviders:['wasm'], enableMemPattern:false });
+  while (TTS_LS.size >= 2){ const [ok, ov] = TTS_LS.entries().next().value; TTS_LS.delete(ok); try { if (ov.session.release) ov.session.release(); } catch(e){} }
+  const v = { session, cfg }; TTS_LS.set(id, v); return v;
+}
+const TTS_LQW = []; let TTS_LBUSY = false;               // local jobs one by one; the card on screen goes before preparation
+function ttsLocalRun(job, prio){ return new Promise((res, rej)=>{ const it = { job, res, rej }; if (prio) TTS_LQW.unshift(it); else TTS_LQW.push(it); ttsLocalKick(); }); }
+async function ttsLocalKick(){
+  if (TTS_LBUSY) return; TTS_LBUSY = true;
+  try { while (TTS_LQW.length){ const it = TTS_LQW.shift(); try { it.res(await it.job()); } catch(e){ it.rej(e); } await sleepMs(0); } }
+  finally { TTS_LBUSY = false; }
+}
+async function ttsLocalSynth(cfg, text, id, prio){
+  return ttsLocalRun(async ()=>{
+    const t0 = performance.now(), lib = await ttsLocalLibs(), v = await ttsLocalVoice(id);
+    const opts = { locateFile:u=>u.endsWith('.data') ? lib.dataUrl : TTS_PHON + u, instantiateWasm:(imp, cb)=>{ WebAssembly.instantiate(lib.wasm, imp).then(inst=>cb(inst, lib.wasm)); return {}; } };
+    const pcms = [];
+    for (const part of piperSplit(text)){
+      const ids = await piperPhonemize(lib.factory, opts, part, (v.cfg.espeak && v.cfg.espeak.voice) || 'en-us');
+      pcms.push(await piperRun(lib.ort, v.session, v.cfg, ids, cfg.sid || 0, cfg.speed || 1));
+      await sleepMs(0);
+    }
+    const total = pcms.reduce((n, p)=>n + p.length, 0), merged = new Float32Array(total); let o = 0; pcms.forEach(p=>{ merged.set(p, o); o += p.length; });
+    if (!total) throw new Error('The voice produced no sound for this text');
+    const rate = (v.cfg.audio && v.cfg.audio.sample_rate) || 22050, blob = new Blob([pcmToWav(merged, rate)], { type:'audio/wav' });
+    const ms = Math.round(performance.now() - t0); TTS_STATS.local++; TTS_STATS.localMs = TTS_STATS.local === 1 ? ms : TTS_STATS.localMs * 0.8 + ms * 0.2;
+    ttsLog('local · ' + id + ' · ' + ms + ' ms for ' + (total / rate).toFixed(1) + ' s of audio');
+    return blob;
+  }, prio);
+}
+
+/* ---------- the demo server (kept gentle: one request at a time, spaced, capped per page visit) ---------- */
+let TTS_DEMO_T = 0, TTS_DEMO_GAP = 1200; const TTS_DEMO_CAP = 60;
+async function ttsDemoGate(){
+  if (TTS_STATS.demo >= TTS_DEMO_CAP) throw new Error('Demo-server limit for this visit reached (' + TTS_DEMO_CAP + ' sentences) — download the voice to continue without it');
+  const wait = TTS_DEMO_T + TTS_DEMO_GAP - Date.now(); if (wait > 0) await sleepMs(wait);
+  TTS_DEMO_T = Date.now(); TTS_STATS.demo++;
+}
+async function ttsDemoGet(cfg, text){
+  await ttsAcquire();
+  try { await ttsDemoGate(); const t0 = performance.now(), b = await ttsSynth(cfg, text); TTS_STATS.demoMs = Math.round(performance.now() - t0); return b; }
+  finally { ttsRelease(); }
+}
+
+/* ---------- one entry point: saved audio → local engine → demo server (only if allowed) ---------- */
+async function ttsGet(cfg, text, o){
+  o = o || {}; await TTS_SCAN;
   const key = ttsKey(cfg, text), hit = await ttsCacheGet(key);
-  if (hit) return hit;
+  if (hit){ TTS_STATS.hit++; return hit; }
   if (TTS_FLIGHT.has(key)) return TTS_FLIGHT.get(key);
+  const eng = ttsEngine(cfg);
   const p = (async ()=>{
-    await ttsAcquire();
-    try { const b = await ttsSynth(cfg, text); await ttsCachePut(key, b); return b; }
-    finally { ttsRelease(); }
+    let b;
+    if (eng.kind === 'local') b = await ttsLocalSynth(cfg, text, eng.id, !o.prefetch);
+    else if (eng.kind === 'need'){ if (!(TTS.dfall || o.preview)) throw ttsNotDownloaded(eng.id); b = await ttsDemoGet(cfg, text); }
+    else b = await ttsDemoGet(cfg, text);
+    await ttsCachePut(key, b); return b;
   })();
   TTS_FLIGHT.set(key, p);
   p.then(()=>TTS_FLIGHT.delete(key), ()=>TTS_FLIGHT.delete(key));
@@ -6497,14 +6690,14 @@ function ttsErr(e, quiet){
   if (quiet && Date.now() - TTS_ERR_T < 20000) return;
   TTS_ERR_T = Date.now(); toast('🔊 ' + m);
 }
-async function ttsSpeak(cfg, text, btn, quiet){
+async function ttsSpeak(cfg, text, btn, quiet, o){
   if (!cfg || !text) return;
   ttsStop(); const tok = TTS_TOK;
   ttsBusy(true);
   try {
-    const blob = await ttsGet(cfg, text);
+    const blob = await ttsGet(cfg, text, o);
     if (tok !== TTS_TOK) return;
-    setTimeout(ttsPrefetch, 300);
+    setTimeout(ttsPump, 300);
     const url = URL.createObjectURL(blob); TTS_URL = url;
     TTS_EL.src = url;
     await TTS_EL.play();
@@ -6529,6 +6722,7 @@ function ttsBtn(ex){
     const c = ttsCfg(lang);
     if (!c){ ttsOpenVoices(lang); return; }
     if (ttsLocked(state.ex)){ toast('Plays after you check your answer'); return; }
+    if (ttsEngine(c).kind === 'need' && !TTS.dfall){ toast('This voice is not downloaded yet'); ttsOpenVoices(lang); return; }
     ttsSpeak(c, ttsText(state.ex.sent), b);
   };
   return b;
@@ -6540,108 +6734,194 @@ function ttsAuto(){
   const key = s.uid + ':' + ph + ':' + state.session;
   if (key === TTS_LASTKEY) return;
   TTS_LASTKEY = key; ttsStop();
+  if (ph !== 'a') ttsPaceTick();                                   // a new card appeared: learn how fast you go
   const c = ttsCfg(ex.lang);
   if (c){
     const text = ttsText(s);
     const want = ph === 'i' ? TTS.i : (ph === 'q' ? (TTS.q && ex.promptLang === 'fl') : (TTS.a && ex.answerLang === 'fl'));
     if (want) ttsSpeak(c, text, null, true);
-    else if (ph === 'q' && TTS.a && ex.answerLang === 'fl') ttsGet(c, text).catch(()=>{});   // the answer will be spoken after "Check": have it ready
+    else if (ph === 'q' && TTS.a && ex.answerLang === 'fl') ttsGet(c, text, { prefetch:true }).catch(()=>{});   // the answer is spoken after "Check": have it ready
   }
-  setTimeout(ttsPrefetch, 800);
+  setTimeout(ttsPump, 400);
 }
-let TTS_PRE_BUSY = false;
-async function ttsPrefetch(){
-  if (!TTS.on || !TTS.pre || TTS_PRE_BUSY || !state.sess || !state.sess.queue) return;
-  TTS_PRE_BUSY = true;
+
+/* ---------- planner: which sentences will be needed soon ---------- */
+const TTS_PACE = { last:0, avg:25 };                     // seconds you spend per card (rolling)
+function ttsPaceTick(){
+  const n = Date.now();
+  if (TTS_PACE.last){ const d = (n - TTS_PACE.last) / 1000; if (d > 1.5 && d < 240) TTS_PACE.avg = TTS_PACE.avg * 0.75 + d * 0.25; }
+  TTS_PACE.last = n;
+}
+function ttsLookahead(cfg){                                // cards of audio kept ready: ~2.5 minutes of your practice (more when the voice is on the device)
+  const k = Math.ceil(150 / Math.max(5, TTS_PACE.avg));
+  return ttsEngine(cfg).kind === 'local' ? Math.max(8, Math.min(40, k * 2)) : Math.max(2, Math.min(5, k));
+}
+function pipeUpcoming(lang, steps){                        // sentences of the next chunk stages (the plan after the one on screen)
+  const v = lv(lang), all = pipeUnits(lang); if (!all.length || !v.stg) return [];
+  const stg = Object.assign({}, v.stg), st = u=>stg[u.key] || 0, out = [], G = Math.max(1, parseInt(STAGE_LAG, 10) || 1);
+  const cur = all.find(u=>u.L === v.level && u.c === v.chunk); if (cur && st(cur) === v.sub) stg[cur.key] = v.sub + 1;
+  let lastKey = cur ? cur.key : null, lastSub = v.sub;
+  for (let n = 0; n < steps; n++){
+    const open = all.find(u=>st(u) < 3); if (!open) break;
+    const LU = all.filter(u=>u.L === open.L), N = LU.length;
+    const a = LU.filter(u=>st(u) >= 1).length, b = LU.filter(u=>st(u) >= 2).length, c = LU.filter(u=>st(u) >= 3).length;
+    const lu = LU.find(u=>u.key === lastKey), last = lu && st(lu) === lastSub + 1 ? lastSub : -1;
+    const pick = pipeOpts(N, G, a, b, c, last)[0]; if (!pick) break;
+    const u = LU[pick.st === 0 ? a : pick.st === 1 ? b : c]; out.push(chunkPool(lang, u.L, u.c)); stg[u.key] = pick.st + 1; lastKey = u.key; lastSub = pick.st;
+  }
+  return out;
+}
+function ttsPlan(){                                        // in the order they will probably appear
+  const s = state.sess, out = [], seen = new Set(); if (!s) return out;
+  const add = (sent, why)=>{ if (sent && !seen.has(sent.uid)){ seen.add(sent.uid); out.push({ sent, why }); } };
+  if (ANKI_ON && s.mode === 'level'){                      // spaced-review cards come first, they are served before the queue
+    const skip = new Set();
+    for (let i = 0; i < 10; i++){ const d = srsNextDue(s.lang, Date.now() + 20 * 60000, skip); if (!d) break; skip.add(d.uid); add(BY_UID.get(d.uid), 'due'); }
+  }
+  (s.queue || []).forEach(it=>add(it.sent, 'queue'));
+  if (s.mode === 'level'){ try { pipeUpcoming(s.lang, 4).forEach(pool=>pool.forEach(x=>add(x, 'next'))); } catch(e){ ttsLog('plan: ' + e.message); } }
+  return out;
+}
+let TTS_PUMP_BUSY = false, TTS_PUMP_AGAIN = false;
+const ttsIdle = ()=>new Promise(r=>{ if (window.requestIdleCallback) window.requestIdleCallback(()=>r(), { timeout:800 }); else setTimeout(r, 120); });
+async function ttsPump(){                                  // background: make the audio of the plan, nearest first, never in the way of the card on screen
+  if (!TTS.on || !TTS.pre || !state.sess) return;
+  if (TTS_PUMP_BUSY){ TTS_PUMP_AGAIN = true; return; }
+  TTS_PUMP_BUSY = true;
   try {
-    let n = 0;
-    for (const it of state.sess.queue.slice(0, 6)){
-      if (n >= 2) break;
-      const s = it && it.sent; if (!s) continue;
-      const c = ttsCfg(s.lang); if (!c) continue;
-      n++;
-      try { await ttsGet(c, ttsText(s)); } catch(e){ break; }
-    }
-  } finally { TTS_PRE_BUSY = false; }
+    do {
+      TTS_PUMP_AGAIN = false;
+      const plan = ttsPlan(), used = {};
+      for (const p of plan){
+        if (TTS_PUMP_AGAIN || !state.sess) break;
+        const c = ttsCfg(p.sent.lang); if (!c) continue;
+        const eng = ttsEngine(c);
+        if (eng.kind === 'need') continue;                                       // not downloaded: nothing to prepare
+        if (eng.kind === 'demo' && !TTS.dpre){ TTS_STATS.skipped++; continue; }   // the demo server is not used for preparation unless allowed
+        const lang = p.sent.lang; used[lang] = (used[lang] || 0) + 1;
+        if (used[lang] > ttsLookahead(c)) continue;
+        const text = ttsText(p.sent);
+        if (await ttsHasAudio(c, text)) continue;
+        try { await ttsGet(c, text, { prefetch:true }); TTS_STATS.pre++; } catch(e){ ttsLog('prepare stopped: ' + e.message); break; }
+        await ttsIdle();
+      }
+    } while (TTS_PUMP_AGAIN);
+  } finally { TTS_PUMP_BUSY = false; }
+}
+async function ttsPlanStatus(){                            // for the diagnostics
+  const plan = ttsPlan(), per = {};
+  for (const p of plan){ const c = ttsCfg(p.sent.lang); if (!c) continue; const l = p.sent.lang; per[l] = per[l] || { n:0, ready:0, limit:ttsLookahead(c) }; per[l].n++; if (await ttsHasAudio(c, ttsText(p.sent))) per[l].ready++; }
+  return { plan:plan.length, per };
 }
 
 /* ---------- diagnostics: the whole chain, step by step, with a reason and a remedy for every failure ---------- */
 function ttsErr2(msg, hint){ const e = new Error(msg); if (hint) e.hint = hint; return e; }
 async function ttsDiagnose(onStep){
   const R = [], server = String(TTS.server || TTS_SERVER).replace(/\/+$/, ''), env = ttsEnv();
-  const step = async (name, fn)=>{
+  const step = async (name, fn, ms)=>{
     const t0 = performance.now(); let r;
-    try { r = Object.assign({ ok:true }, (await ttsTimeout(fn(), 60000)) || {}); }
-    catch(e){ r = { ok:false, msg:(e && e.name === 'AbortError') ? 'no answer within 60 s' : ((e && e.message) || String(e)), hint:e && e.hint }; }
+    try { r = Object.assign({ ok:true }, (await ttsTimeout(fn(), ms || 60000)) || {}); }
+    catch(e){ r = { ok:false, msg:(e && e.name === 'AbortError') ? 'no answer in time' : ((e && e.message) || String(e)), hint:e && e.hint }; }
     r.name = name; r.ms = Math.round(performance.now() - t0); R.push(r); onStep(r); return r;
   };
-  await step('This page', async ()=>({ info:true, msg:env.proto + '//' + (env.host || '') + ' · origin ' + env.origin + ' · ' + (env.secure ? 'secure' : 'not secure') + ' · ' + (env.framed ? 'inside another page' : 'own tab') + ' · ' + (env.online ? 'online' : 'offline') + ' · ' + (env.caches ? 'audio store ok' : 'no audio store'),
-    hint:env.framed ? 'Embedded pages (chat artifacts) normally cannot call outside servers.' : (env.proto === 'file:' ? 'A page opened from a file has the origin "null": the server must accept every origin.' : '') }));
+  await step('This page', async ()=>({ info:true, msg:env.proto + '//' + (env.host || '') + ' · origin ' + env.origin + ' · ' + (env.secure ? 'secure' : 'not secure') + ' · ' + (env.framed ? 'inside another page' : 'own tab') + ' · ' + (env.online ? 'online' : 'offline') + ' · ' + (env.caches ? 'storage ok' : 'no storage'),
+    hint:env.framed ? 'Embedded pages (chat artifacts) normally cannot call outside servers.' : (env.proto === 'file:' ? 'A page opened from a file has the origin "null"; voices cannot be stored there. Use an https page (GitHub Pages).' : '') }));
   const ctl = await step('Outside connection (control)', async ()=>{
     try { await ttsFetch('https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js', { mode:'no-cors' }, 'GET*'); return { msg:'works' }; }
     catch(e){ throw ttsErr2(e.message || 'failed', 'No outside request works from this page, so it is sandboxed (typical for a chat artifact) or the device is offline. Open the file in a normal browser tab, or host it (GitHub Pages).'); }
   });
-  await step('Space status (huggingface.co)', async ()=>{
-    let r; try { r = await ttsFetch('https://huggingface.co/api/spaces/k2-fsa/text-to-speech', undefined, 'GET'); }
-    catch(e){ throw ttsErr2(e.message || 'failed', ctl.ok ? 'huggingface.co refuses this page (CORS) or is blocked on this network.' : 'See the control line above.'); }
-    if (!r.ok) throw ttsErr2('answered ' + r.status);
-    const j = await r.json(), s = j && j.runtime && j.runtime.stage;
-    if (s && s !== 'RUNNING') throw ttsErr2('Space is ' + s, 'The Space is not running (sleeping or rebuilding). The first request wakes it — wait 1–3 minutes, then run the tests again.');
-    return { msg:'Space is ' + (s || 'unknown') };
-  });
-  const reach = await step('Voice server reachable', async ()=>{
-    try { await ttsFetch(server + '/', { mode:'no-cors' }, 'GET*'); return { msg:server }; }
-    catch(e){ throw ttsErr2(e.message || 'failed', ctl.ok ? 'The server cannot be reached: it is down, asleep, or the address in Settings is wrong.' : 'See the control line above.'); }
-  });
-  await step('Voice server accepts this page (CORS)', async ()=>{
-    let r; try { r = await ttsFetch(server + '/config', undefined, 'GET'); }
-    catch(e){ throw ttsErr2(e.message || 'failed', reach.ok ? 'The server answers, but refuses this page (CORS). A page served over https (GitHub Pages) is normally accepted; a local file or an embedded page may not be.' : 'Not reachable (previous line).'); }
-    if (!r.ok) throw ttsErr2('answered ' + r.status);
-    const j = await r.json();
-    return { msg:'Gradio ' + (j.version || '?') + (j.api_prefix ? ' · ' + j.api_prefix : '') };
-  });
-  let lang = ACTIVE.find(c=>ttsCfg(c)) || Object.keys(TTS.langs).find(c=>TTS.langs[c] && TTS.langs[c].model);
-  const cfg = lang ? TTS.langs[lang] : { label:'English', model:'csukuangfj/vits-piper-en_US-amy-low|1 speaker', sid:0, speed:1 };
+  const lang = ACTIVE.find(c=>ttsCfg(c)) || Object.keys(TTS.langs).find(c=>TTS.langs[c] && TTS.langs[c].model);
+  const cfg = lang ? ttsCfg(lang) : { label:'English', model:'csukuangfj/vits-piper-en_US-amy-low|1 speaker', sid:0, speed:1 };
   const text = lang ? ttsSample(lang) : 'Hello, this is a test.';
-  await step('Model list · ' + cfg.label, async ()=>{
-    const { out } = await ttsRaw('update_model_dropdown', [cfg.label], { tries:1, ms:45000, session:'dg' + Math.random().toString(36).slice(2, 10) });
-    const u = out[0], ch = u && (u.choices || (u.value && u.value.choices)), keys = Array.isArray(ch) ? ch.map(c=>Array.isArray(c) ? c[1] : c) : [];
-    if (!keys.length) throw ttsErr2('the server returned no models', 'The Space may have changed its interface. Send this report.');
-    if (keys.indexOf(cfg.model) < 0) throw ttsErr2(keys.length + ' models, but yours is not among them', 'Open Voices and choose another model for this language.');
-    return { msg:keys.length + ' models · yours is in the list' };
-  });
+  const eng = ttsEngine(cfg);
   let blob = null;
-  await step('Make a test sentence', async ()=>{ blob = await ttsSynth(cfg, text); return { msg:cfg.model.split('|')[0].split('/').pop() + ' · ' + Math.round(blob.size / 1024) + ' KB' }; });
-  await step('Decode the audio', async ()=>{
-    if (!blob) throw ttsErr2('no audio from the previous step');
-    const AC = window.AudioContext || window.webkitAudioContext;
-    if (!AC) return { info:true, msg:'skipped (no Web Audio here)' };
-    const ac = new AC();
-    try { const buf = await ac.decodeAudioData(await blob.arrayBuffer()); return { msg:buf.duration.toFixed(1) + ' s · ' + buf.sampleRate + ' Hz' }; }
-    catch(e){ throw ttsErr2('the browser cannot decode it', 'The server sent something that is not audio (an error page?).'); }
-    finally { try { ac.close(); } catch(e){} }
-  });
-  await step('Play it', async ()=>{
-    if (!blob) throw ttsErr2('no audio from the previous steps');
-    ttsStop(); TTS_URL = URL.createObjectURL(blob); TTS_EL.src = TTS_URL;
-    try { await TTS_EL.play(); } catch(e){ throw ttsErr2(e.name || 'play failed', e.name === 'NotAllowedError' ? 'The browser wants a tap first: press "Run again".' : 'The browser refused to play it.'); }
-    return { msg:'playing now' };
-  });
+  await step('Engine for ' + (lang ? LG(lang).name : 'a test voice'), async ()=>({ info:true, msg:cfg.model.split('|')[0].split('/').pop() + ' → ' + (eng.kind === 'local' ? 'runs on this device' : eng.kind === 'need' ? 'can run on this device but is NOT downloaded yet' : 'online only (demo server)'),
+    hint:eng.kind === 'need' ? 'Open Voices and tap the voice to download it (about ' + ttsVoiceMB(eng.id) + ' MB).' : (eng.kind === 'demo' ? 'This model exists only on the free demo server. Please keep use light.' : '') }));
+  if (eng.kind !== 'demo'){
+    await step('Voice libraries (CDN)', async ()=>{
+      try { const lib = await ttsLocalLibs(); return { msg:'onnxruntime-web 1.18 · phonemizer ready' + (lib ? '' : '') }; }
+      catch(e){ throw ttsErr2(e.message, ctl.ok ? 'jsdelivr.net is blocked on this network, or the CDN is down.' : 'See the control line above.'); }
+    }, 120000);
+    if (eng.kind === 'need'){
+      await step('Voice files host (Hugging Face)', async ()=>{
+        const path = ttsVoicePath(eng.id); let last = null;
+        for (const host of TTS_VOICE_HOSTS){ try { const r = await ttsFetch(host + encodeURI(path) + '.onnx.json', undefined, 'GET'); if (r.ok) return { msg:host.replace('https://', '').split('/resolve')[0] + ' answers' }; last = new Error('answered ' + r.status); } catch(e){ last = e; } }
+        throw ttsErr2(last ? last.message : 'failed', 'The voice file host cannot be reached from this page.');
+      });
+    } else {
+      const sz = (await ttsVoiceList()).find(v=>v.id === eng.id);
+      R.push({ ok:true, info:true, name:'Voice on this device', ms:0, msg:eng.id + (sz && sz.size ? ' · ' + Math.round(sz.size / 1048576) + ' MB' : '') }); onStep(R[R.length - 1]);
+      await step('Make a test sentence (local)', async ()=>{
+        const t0 = performance.now(); blob = await ttsLocalSynth(cfg, text, eng.id, true); const ms = performance.now() - t0;
+        return { msg:Math.round(blob.size / 1024) + ' KB in ' + Math.round(ms) + ' ms' };
+      }, 120000);
+    }
+  } else {
+    await step('Space status (huggingface.co)', async ()=>{
+      let r; try { r = await ttsFetch('https://huggingface.co/api/spaces/k2-fsa/text-to-speech', undefined, 'GET'); }
+      catch(e){ throw ttsErr2(e.message || 'failed', ctl.ok ? 'huggingface.co refuses this page (CORS) or is blocked on this network.' : 'See the control line above.'); }
+      if (!r.ok) throw ttsErr2('answered ' + r.status);
+      const j = await r.json(), s = j && j.runtime && j.runtime.stage;
+      if (s && s !== 'RUNNING') throw ttsErr2('Space is ' + s, 'The Space is not running (sleeping or rebuilding). The first request wakes it — wait 1–3 minutes, then run the tests again.');
+      return { msg:'Space is ' + (s || 'unknown') };
+    });
+    const reach = await step('Voice server reachable', async ()=>{
+      try { await ttsFetch(server + '/', { mode:'no-cors' }, 'GET*'); return { msg:server }; }
+      catch(e){ throw ttsErr2(e.message || 'failed', ctl.ok ? 'The server cannot be reached: it is down, asleep, or the address in Settings is wrong.' : 'See the control line above.'); }
+    });
+    await step('Voice server accepts this page (CORS)', async ()=>{
+      let r; try { r = await ttsFetch(server + '/config', undefined, 'GET'); }
+      catch(e){ throw ttsErr2(e.message || 'failed', reach.ok ? 'The server answers, but refuses this page (CORS). A page served over https (GitHub Pages) is normally accepted; a local file or an embedded page may not be.' : 'Not reachable (previous line).'); }
+      if (!r.ok) throw ttsErr2('answered ' + r.status);
+      const j = await r.json();
+      return { msg:'Gradio ' + (j.version || '?') + (j.api_prefix ? ' · ' + j.api_prefix : '') };
+    });
+    await step('Model list · ' + cfg.label, async ()=>{
+      const { out } = await ttsRaw('update_model_dropdown', [cfg.label], { tries:1, ms:45000, session:'dg' + Math.random().toString(36).slice(2, 10) });
+      const u = out[0], ch = u && (u.choices || (u.value && u.value.choices)), keys = Array.isArray(ch) ? ch.map(c=>Array.isArray(c) ? c[1] : c) : [];
+      if (!keys.length) throw ttsErr2('the server returned no models', 'The Space may have changed its interface. Send this report.');
+      if (keys.indexOf(cfg.model) < 0) throw ttsErr2(keys.length + ' models, but yours is not among them', 'Open Voices and choose another model for this language.');
+      return { msg:keys.length + ' models · yours is in the list' };
+    });
+    await step('Make a test sentence (demo server)', async ()=>{ blob = await ttsSynth(cfg, text); return { msg:cfg.model.split('|')[0].split('/').pop() + ' · ' + Math.round(blob.size / 1024) + ' KB' }; });
+  }
+  if (blob){
+    await step('Decode the audio', async ()=>{
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return { info:true, msg:'skipped (no Web Audio here)' };
+      const ac = new AC();
+      try { const buf = await ac.decodeAudioData(await blob.arrayBuffer()); return { msg:buf.duration.toFixed(1) + ' s · ' + buf.sampleRate + ' Hz' }; }
+      catch(e){ throw ttsErr2('the browser cannot decode it', 'The data is not valid audio.'); }
+      finally { try { ac.close(); } catch(e){} }
+    });
+    await step('Play it', async ()=>{
+      ttsStop(); TTS_URL = URL.createObjectURL(blob); TTS_EL.src = TTS_URL;
+      try { await TTS_EL.play(); } catch(e){ throw ttsErr2(e.name || 'play failed', e.name === 'NotAllowedError' ? 'The browser wants a tap first: press "Run again".' : 'The browser refused to play it.'); }
+      return { msg:'playing now' };
+    });
+  }
   await step('Saved audio store', async ()=>{
-    if (typeof caches === 'undefined') throw ttsErr2('not available here', 'Audio is still played, but sentences are only kept until the page closes (needs an https page).');
+    if (typeof caches === 'undefined') throw ttsErr2('not available here', 'Audio is still played, but sentences and voices cannot be kept (needs an https page).');
     const k = 'https://tts.invalid/diag', c = await caches.open(TTS_CACHE);
     await c.put(k, new Response(new Blob(['x']))); const hit = await c.match(k); await c.delete(k);
     if (!hit) throw ttsErr2('written but not read back');
-    return { msg:'write + read ok' };
+    return { msg:'write + read ok · ' + (await ttsCacheCount()) + ' sentences saved' };
+  });
+  await step('Preparation (queue + due cards + next chunks)', async ()=>{
+    const ps = await ttsPlanStatus();
+    const per = Object.keys(ps.per).map(l=>LG(l).name + ' ' + ps.per[l].ready + '/' + Math.min(ps.per[l].n, ps.per[l].limit) + ' ready').join(' · ');
+    return { info:true, msg:'pace ' + Math.round(TTS_PACE.avg) + ' s/card · ' + (state.sess ? ps.plan + ' sentences planned' + (per ? ' · ' + per : '') : 'no lesson open') + ' · this visit: ' + TTS_STATS.local + ' local (' + Math.round(TTS_STATS.localMs) + ' ms avg), ' + TTS_STATS.demo + ' demo, ' + TTS_STATS.hit + ' from saved audio' };
   });
   return R;
 }
 function ttsReport(R){
   const env = ttsEnv();
-  return ['Voice diagnostics · ' + new Date().toISOString(), 'Server: ' + (TTS.server || TTS_SERVER), 'Page: ' + env.proto + '//' + (env.host || '') + ' · origin ' + env.origin + ' · framed ' + env.framed, 'Browser: ' + navigator.userAgent, ''].concat(
+  return ['Voice diagnostics · ' + new Date().toISOString(), 'Server: ' + (TTS.server || TTS_SERVER), 'Page: ' + env.proto + '//' + (env.host || '') + ' · origin ' + env.origin + ' · framed ' + env.framed, 'Browser: ' + navigator.userAgent,
+    'Voices on device: ' + (Array.from(TTS_VOICES).join(', ') || 'none'), 'Chosen: ' + (Object.keys(TTS.langs).map(l=>l + '=' + (TTS.langs[l].model || '').split('|')[0].split('/').pop()).join(', ') || 'none'), ''].concat(
     R.map(r=>(r.info ? 'i  ' : (r.ok ? 'OK ' : 'ERR')) + ' ' + r.name + ' (' + r.ms + ' ms)' + (r.msg ? ' — ' + r.msg : '') + (!r.ok && r.hint ? '\n      → ' + r.hint : '')),
     ['', 'Recent requests:'], TTS_LOG).join('\n');
 }
+
 function ttsOpenDiag(){
   openSheet((sh, close)=>{
     sh.innerHTML = `<h3>Voice diagnostics</h3>
@@ -6680,27 +6960,37 @@ function ttsSample(lang){
   try { const l = langSentences(lang); if (l.length) return ttsText(l[0]); } catch(e){}
   return LG(lang).hello || 'Hello';
 }
+/* ---------- ratings per language: model, speaker and speed (kept in the voice profile, part of the app backup) ---------- */
+const ttsStar = n=>'★'.repeat(n) + '☆'.repeat(5 - n);
+const ttsSpdKey = x=>String(Math.round(x * 100) / 100);
+function ttsRateGet(lang, model){ const r = TTS.rate[lang] && TTS.rate[lang][model]; return r || { s:0, spk:{}, spd:{}, note:'' }; }
+function ttsRateRef(lang, model){ const r = TTS.rate[lang] || (TTS.rate[lang] = {}); const x = r[model] || (r[model] = { s:0, spk:{}, spd:{}, note:'' }); if (!x.spk) x.spk = {}; if (!x.spd) x.spd = {}; return x; }
+
 function ttsOpenVoices(lang0){
   const codes = Object.keys(TTS_LANGMAP);
   const act = ACTIVE.filter(c=>TTS_LANGMAP[c]);
   const rest = codes.filter(c=>act.indexOf(c) < 0).sort((a, b)=>LG(a).name.localeCompare(LG(b).name));
   let lang = lang0 && TTS_LANGMAP[lang0] ? lang0 : (act[0] || 'en');
+  const dl = {};                                           // voice id -> { got, total } while it downloads
   openSheet((sh, close)=>{
     sh.innerHTML = `<h3>Voices</h3>
       <div class="ttsnote">Only 1 model per language!</div>
       <select class="field" id="tvLang"></select>
       <div class="hint" id="tvCur" style="margin-top:8px"></div>
-      <div style="display:flex;gap:8px">
+      <div id="tvRate"></div>
+      <div style="display:flex;gap:8px;margin-top:8px">
         <div style="flex:1"><div class="hint" style="margin:0 0 4px">Speaker (multi-speaker models)</div><input class="field" id="tvSpk" type="number" min="0" step="1"></div>
         <div style="flex:1"><div class="hint" style="margin:0 0 4px">Speed</div><input class="field" id="tvSpd" type="number" min="0.5" max="2" step="0.1"></div>
       </div>
       <div class="hint" style="margin:10px 0 4px">Test sentence</div>
       <input class="field" id="tvTxt" autocomplete="off">
       <div style="display:flex;gap:8px;align-items:center;margin-top:10px"><button class="btn btn-ghost btn-sm" id="tvOff">No voice for this language</button><span class="hint" id="tvLive" style="margin:0"></span></div>
+      <div class="hint" id="tvInfo" style="margin-top:8px"></div>
       <div id="tvList"></div>
       <div class="sheet-actions"><button class="btn btn-green" id="tvDone">Done</button></div>`;
     const $ = q=>sh.querySelector(q);
     const sel = $('#tvLang'), spk = $('#tvSpk'), spd = $('#tvSpd'), txt = $('#tvTxt');
+    const alive = ()=>document.body.contains(sh);
     const opt = c=>`<option value="${c}">${esc(LG(c).name)}${TTS.langs[c] ? ' ✓' : ''}</option>`;
     const fillSel = ()=>{
       sel.innerHTML = (act.length ? `<optgroup label="Learning">${act.map(opt).join('')}</optgroup>` : '') + `<optgroup label="Other languages">${rest.map(opt).join('')}</optgroup>`;
@@ -6712,45 +7002,98 @@ function ttsOpenVoices(lang0){
       spk.value = c ? (c.sid || 0) : 0; spd.value = c ? (c.speed || 1) : 1;
       txt.value = ttsSample(lang); txt.dir = LG(lang).rtl ? 'rtl' : 'ltr';
     };
+    const curModel = ()=>{ const c = TTS.langs[lang]; return c ? ttsModelsFor(lang).find(m=>m.key === c.model && m.label === c.label) : null; };
+    const stateOf = m=>{
+      const id = ttsLocalId(m.key);
+      if (!id) return 'online only · demo server';
+      if (dl[id]) return '⬇ ' + (dl[id].total ? Math.round(dl[id].got * 100 / dl[id].total) + '%' : Math.round(dl[id].got / 1048576) + ' MB');
+      return TTS_VOICES.has(id) ? '✓ on this device' : '⬇ download ~' + ttsVoiceMB(id) + ' MB';
+    };
+    const ratePanel = ()=>{
+      const box = $('#tvRate'), c = TTS.langs[lang]; box.innerHTML = '';
+      if (!c){ box.innerHTML = '<div class="hint" style="margin-top:8px">Choose a voice to rate it (model, speaker and speed are rated separately).</div>'; return; }
+      const r = ttsRateRef(lang, c.model), sk = String(c.sid || 0), pk = ttsSpdKey(c.speed || 1);
+      const mk = (label, get, set)=>{ const b = document.createElement('button'); b.className = 'btn btn-ghost btn-sm'; b.style.cssText = 'flex:1;min-width:0;font-size:12px;padding:6px 4px'; b.innerHTML = esc(label) + '<br>' + ttsStar(get()); b.onclick = ()=>{ set((get() + 1) % 6); ttsSave(); ratePanel(); drawList(); }; return b; };
+      const row = document.createElement('div'); row.style.cssText = 'display:flex;gap:6px;margin-top:8px';
+      row.appendChild(mk('Model', ()=>r.s || 0, v=>{ r.s = v; }));
+      row.appendChild(mk('Speaker ' + sk, ()=>r.spk[sk] || 0, v=>{ r.spk[sk] = v; }));
+      row.appendChild(mk('Speed ' + pk, ()=>r.spd[pk] || 0, v=>{ r.spd[pk] = v; }));
+      box.appendChild(row);
+      const note = document.createElement('input'); note.className = 'field'; note.placeholder = 'Note about this voice (kept with the profile)'; note.style.marginTop = '6px'; note.value = r.note || '';
+      note.onchange = ()=>{ r.note = note.value.trim().slice(0, 200); ttsSave(); };
+      box.appendChild(note);
+    };
+    const choose = async m=>{
+      const n = nums(), id = ttsLocalId(m.key), need = id && !TTS_VOICES.has(id);
+      if (need){
+        if (dl[id]) return;
+        if (!confirm('Download this voice (about ' + ttsVoiceMB(id) + ' MB) so that it runs on this device?\nOnly 1 model per language.')) return;
+      }
+      TTS.langs[lang] = { label:m.label, model:m.key, sid:Math.min(n.spk, m.spk - 1), speed:n.spd }; ttsSave(); fillSel(); drawList(); ratePanel();
+      if (!need){ toast('Voice set · ' + m.name); return; }
+      dl[id] = { got:0, total:0 }; let t = 0;
+      try { await ttsVoiceDownload(id, (g, tot)=>{ dl[id].got = g; dl[id].total = tot; const now = Date.now(); if (now - t > 300){ t = now; if (alive()) drawList(); } }); toast('Voice ready — it works offline now'); }
+      catch(e){ toast('🔊 ' + e.message); }
+      finally { delete dl[id]; if (alive()) drawList(); }
+    };
     const drawList = ()=>{
       const list = $('#tvList'); list.innerHTML = '';
       const ms = ttsModelsFor(lang), cur = TTS.langs[lang];
+      const rowFor = m=>{
+        const r = document.createElement('div'), rt = ttsRateGet(lang, m.key).s || 0;
+        r.className = 'ttsmod' + (cur && cur.model === m.key && cur.label === m.label ? ' sel' : '');
+        r.innerHTML = `<div class="nm">${esc(m.name)}${m.spk > 1 ? ` <span class="sp">· ${m.spk} speakers</span>` : ''}<div class="sp2">${esc(stateOf(m))}</div></div>`;
+        const sb = document.createElement('button'); sb.className = 'btn btn-ghost btn-sm'; sb.textContent = rt ? '★' + rt : '☆'; sb.title = 'Rate this model';
+        sb.onclick = e=>{ e.stopPropagation(); const x = ttsRateRef(lang, m.key); x.s = ((x.s || 0) + 1) % 6; ttsSave(); drawList(); ratePanel(); };
+        const pb = document.createElement('button'); pb.className = 'btn btn-ghost btn-sm tts-btn'; pb.textContent = '▶'; pb.title = 'Try this model';
+        pb.onclick = e=>{ e.stopPropagation(); const n = nums(); ttsSpeak({ label:m.label, model:m.key, sid:Math.min(n.spk, m.spk - 1), speed:n.spd }, txt.value.trim() || 'Hello', pb, false, { preview:true }); };
+        r.onclick = ()=>choose(m);
+        r.appendChild(sb); r.appendChild(pb); return r;
+      };
+      const fav = ms.filter(m=>(ttsRateGet(lang, m.key).s || 0) >= 4);
+      if (fav.length){ const h = document.createElement('div'); h.className = 'ttsgrp'; h.textContent = '★ Your favourites'; list.appendChild(h); fav.forEach(m=>list.appendChild(rowFor(m))); }
       TTS_FAM.forEach(fm=>{
         const g = ms.filter(m=>m.fam === fm); if (!g.length) return;
         const h = document.createElement('div'); h.className = 'ttsgrp'; h.textContent = fm + ' models'; list.appendChild(h);
-        g.forEach(m=>{
-          const r = document.createElement('div');
-          r.className = 'ttsmod' + (cur && cur.model === m.key && cur.label === m.label ? ' sel' : '');
-          r.innerHTML = `<div class="nm">${esc(m.name)}${m.spk > 1 ? ` <span class="sp">· ${m.spk} speakers</span>` : ''}</div>`;
-          const pb = document.createElement('button'); pb.className = 'btn btn-ghost btn-sm tts-btn'; pb.textContent = '▶'; pb.title = 'Try this model';
-          pb.onclick = e=>{ e.stopPropagation(); const n = nums(); ttsSpeak({ label:m.label, model:m.key, sid:Math.min(n.spk, m.spk - 1), speed:n.spd }, txt.value.trim() || 'Hello', pb); };
-          r.onclick = ()=>{ const n = nums(); TTS.langs[lang] = { label:m.label, model:m.key, sid:Math.min(n.spk, m.spk - 1), speed:n.spd }; ttsSave(); fillSel(); drawList(); toast('Voice set · ' + m.name); };
-          r.appendChild(pb); list.appendChild(r);
-        });
+        g.forEach(m=>list.appendChild(rowFor(m)));
       });
       if (!ms.length) list.innerHTML = '<div class="empty">No voices for this language.</div>';
-      const cm = cur && ms.find(m=>m.key === cur.model && m.label === cur.label);
-      $('#tvCur').textContent = cur ? 'Now: ' + (cm ? cm.name : cur.model.split('|')[0].split('/').pop()) + ' · speaker ' + (cur.sid || 0) + ' · speed ' + (cur.speed || 1) : 'No voice selected — this language stays silent.';
+      const cm = curModel(), d = TTS.def && TTS.def[lang];
+      $('#tvCur').textContent = cur ? 'Now: ' + (cm ? cm.name : cur.model.split('|')[0].split('/').pop()) + ' · speaker ' + (cur.sid || 0) + ' · speed ' + (cur.speed || 1)
+        : (d && d.model ? 'No voice chosen — your saved default is used: ' + d.model.split('|')[0].split('/').pop() : 'No voice selected — this language stays silent.');
+      const id = cur && ttsLocalId(cur.model);
+      $('#tvInfo').textContent = !cur ? '' : (id ? (TTS_VOICES.has(id) ? 'Runs on this device (no internet needed).' : 'Not downloaded yet — tap the voice again to download it.') : 'Online-only model: it runs on the free demo server, so please keep tests short.');
     };
     const live = async ()=>{
       const L = lang, labels = TTS_LANGMAP[L].filter(l=>!TTS_LIVE_TRIED.has(l));
       if (!labels.length) return;
       $('#tvLive').textContent = 'Checking the server…';
       await Promise.all(labels.map(ttsLiveLabel));
-      if (!document.body.contains(sh)) return;
+      if (!alive()) return;
       if (L === lang){ drawList(); $('#tvLive').textContent = labels.some(l=>TTS_LIVE[l]) ? 'List updated from the server' : ''; }
     };
     const upd = ()=>{                                        // speaker / speed edited while a voice is chosen
-      const c = TTS.langs[lang]; if (!c) return;
-      const cm = ttsModelsFor(lang).find(m=>m.key === c.model && m.label === c.label), n = nums();
-      c.sid = Math.min(n.spk, (cm ? cm.spk : 1) - 1); c.speed = n.spd; ttsSave(); drawList();
+      const c = TTS.langs[lang]; if (!c){ return; }
+      const cm = curModel(), n = nums();
+      c.sid = Math.min(n.spk, (cm ? cm.spk : 1) - 1); c.speed = n.spd; ttsSave(); drawList(); ratePanel();
     };
-    sel.onchange = ()=>{ lang = sel.value; loadFields(); drawList(); live(); };
+    sel.onchange = ()=>{ lang = sel.value; loadFields(); drawList(); ratePanel(); live(); };
     spk.onchange = upd; spd.onchange = upd;
-    $('#tvOff').onclick = ()=>{ delete TTS.langs[lang]; ttsSave(); fillSel(); drawList(); toast('Voice removed for ' + LG(lang).name); };
+    $('#tvOff').onclick = ()=>{ delete TTS.langs[lang]; ttsSave(); fillSel(); drawList(); ratePanel(); toast('Voice removed for ' + LG(lang).name); };
     $('#tvDone').onclick = ()=>{ ttsStop(); close(); if (state.screen === 'settings' || state.screen === 'lesson') render(true); };
-    fillSel(); loadFields(); drawList(); live();
+    fillSel(); loadFields(); drawList(); ratePanel(); live();
   });
+}
+
+/* ---------- voice profile: choices, ratings, notes and defaults (export / import / use as defaults) ---------- */
+function ttsProfile(){ return { app:'arTrainer-voice', v:1, exported:new Date().toISOString(), langs:TTS.langs, rate:TTS.rate, def:TTS.def, prefs:{ q:TTS.q, a:TTS.a, i:TTS.i, pre:TTS.pre } }; }
+function ttsProfileImport(text){
+  let p; try { p = JSON.parse(String(text).replace(/^\uFEFF/, '')); } catch(e){ return { ok:false, msg:'Not a valid voice profile' }; }
+  if (!p || p.app !== 'arTrainer-voice' || typeof p.langs !== 'object') return { ok:false, msg:'Not a valid voice profile' };
+  Object.keys(p.langs || {}).forEach(l=>{ const c = p.langs[l]; if (c && c.model && c.label) TTS.langs[l] = { label:c.label, model:c.model, sid:+c.sid || 0, speed:+c.speed || 1 }; });
+  Object.keys(p.rate || {}).forEach(l=>{ TTS.rate[l] = Object.assign(TTS.rate[l] || {}, p.rate[l]); });
+  Object.keys(p.def || {}).forEach(l=>{ const c = p.def[l]; if (c && c.model && c.label) TTS.def[l] = { label:c.label, model:c.model, sid:+c.sid || 0, speed:+c.speed || 1 }; });
+  ttsSave(); return { ok:true, msg:'Voice profile imported' };
 }
 
 /* ---------- Settings section ---------- */
@@ -6763,29 +7106,55 @@ function ttsSettingsEl(){
     r.onclick = fn; d.appendChild(r);
   };
   const flip = k=>()=>{ TTS[k] = !TTS[k]; ttsSave(); render(true); };
-  row(TTS.on, 'Speak sentences', 'Natural voices from the k2-fsa text-to-speech Space. Needs internet the first time; each sentence is kept on this device afterwards.', flip('on'));
+  row(TTS.on, 'Speak sentences', 'Voices are downloaded once and run on this device (like SherpaTTS). A few models exist only on a free demo server.', flip('on'));
   row(TTS.q, 'Auto-play on the question', 'When the sentence is shown in the language you learn (match, choose or build the translation, type the English).', flip('q'));
   row(TTS.a, 'Auto-play on the answer', 'After you check, when the answer is in the language you learn. Before that the 🔊 button stays locked so it cannot give the answer away.', flip('a'));
   row(TTS.i, 'Auto-play on the introduction card', 'When a new sentence is introduced.', flip('i'));
-  row(TTS.pre, 'Prepare the next cards', 'While you practise, fetches the audio of the next sentences in the queue.', flip('pre'));
+  row(TTS.pre, 'Prepare audio ahead', 'Keeps the audio of the next cards ready — the queue, review cards that are about to be due, and the next chunks — more of it when you go fast. Saved audio is kept between visits.', flip('pre'));
+  row(TTS.dfall, 'Use the demo server for voices not downloaded yet', 'Off: the free demo server is not loaded for lessons. Voices that exist only there still use it.', flip('dfall'));
+  row(TTS.dpre, 'Also prepare ahead from the demo server', 'Only for online-only models. Leave off unless you really need it.', flip('dpre'));
   const box = document.createElement('div'); box.style.cssText = 'padding:12px 0';
   const have = Object.keys(TTS.langs).filter(c=>TTS.langs[c] && TTS.langs[c].model);
+  const eg = c=>{ const e = ttsEngine(TTS.langs[c]); return e.kind === 'local' ? 'on this device' : e.kind === 'need' ? 'not downloaded' : 'demo server'; };
   box.innerHTML = `<div class="ttsnote" style="margin-top:0">Only 1 model per language!</div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-blue btn-sm" id="tsVoices">🔊 Voices · try models</button><button class="btn btn-ghost btn-sm" id="tsClear">Clear saved audio</button><button class="btn btn-ghost btn-sm" id="tsDiag">🧪 Diagnose voice</button></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-blue btn-sm" id="tsVoices">🔊 Voices · try models</button><button class="btn btn-ghost btn-sm" id="tsDiag">🧪 Diagnose voice</button><button class="btn btn-ghost btn-sm" id="tsClear">Clear saved audio</button></div>
     <div class="hint" id="tsCount" style="margin:8px 0 0"></div>
-    <div class="hint" style="margin:10px 0 0">${have.length ? have.map(c=>esc(LG(c).name) + ' — ' + esc(TTS.langs[c].model.split('|')[0].split('/').pop().replace(/^vits-(piper|coqui|mimic3|mms)-/, ''))).join('<br>') : 'No voice chosen yet.'}</div>
-    <div class="hint" style="margin:12px 0 4px">Voice server (change only if you copied the Space)</div>
+    <div class="hint" style="margin:10px 0 0">${have.length ? have.map(c=>esc(LG(c).name) + ' — ' + esc(TTS.langs[c].model.split('|')[0].split('/').pop().replace(/^vits-(piper|coqui|mimic3|mms)-/, '')) + ' (' + eg(c) + ')').join('<br>') : 'No voice chosen yet.'}</div>
+    <div class="hint" style="margin:14px 0 4px"><b>On this device</b></div><div id="tsVList" class="hint" style="margin:0">…</div>
+    <div class="hint" style="margin:14px 0 4px"><b>Voice profile</b> — your choices, ratings and notes per language. It is part of the app backup; you can also keep it as a default for new devices.</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-ghost btn-sm" id="tsDef">Save my voices as defaults</button><button class="btn btn-ghost btn-sm" id="tsUseDef">Use my defaults</button><button class="btn btn-ghost btn-sm" id="tsExp">Export profile</button><button class="btn btn-ghost btn-sm" id="tsImp">Import profile</button></div>
+    <input type="file" id="tsFile" accept="application/json,.json" style="display:none">
+    <div class="hint" style="margin:12px 0 4px">Voice server of the demo (change only if you copied the Space)</div>
     <input class="field" id="tsSrv" autocomplete="off" spellcheck="false">`;
-  const srv = box.querySelector('#tsSrv'); srv.value = TTS.server;
+  const $ = q=>box.querySelector(q);
+  const srv = $('#tsSrv'); srv.value = TTS.server;
   srv.onchange = ()=>{ TTS.server = srv.value.trim().replace(/\/+$/, '') || TTS_SERVER; srv.value = TTS.server; TTS_LIVE = {}; TTS_LIVE_TRIED = new Set(); ttsPoolReset(); Object.keys(TTS_FN).forEach(k=>delete TTS_FN[k]); ttsSave(); toast('Voice server saved'); };
-  box.querySelector('#tsVoices').onclick = ()=>ttsOpenVoices();
-  box.querySelector('#tsDiag').onclick = ()=>ttsOpenDiag();
-  box.querySelector('#tsClear').onclick = async ()=>{ await ttsCacheClear(); box.querySelector('#tsCount').textContent = 'Saved audio: 0 sentences'; toast('Saved audio cleared'); };
-  ttsCacheCount().then(n=>{ const e = box.querySelector('#tsCount'); if (e) e.textContent = 'Saved audio: ' + n + ' sentence' + (n === 1 ? '' : 's'); });
+  $('#tsVoices').onclick = ()=>ttsOpenVoices();
+  $('#tsDiag').onclick = ()=>ttsOpenDiag();
+  $('#tsClear').onclick = async ()=>{ await ttsCacheClear(); $('#tsCount').textContent = 'Saved audio: 0 sentences'; toast('Saved audio cleared'); };
+  $('#tsDef').onclick = ()=>{ TTS.def = JSON.parse(JSON.stringify(TTS.langs)); ttsSave(); toast('Saved as your defaults (' + Object.keys(TTS.def).length + ' language(s))'); };
+  $('#tsUseDef').onclick = ()=>{ if (!Object.keys(TTS.def).length){ toast('No defaults saved yet'); return; } if (!confirm('Replace the voices of all languages with your saved defaults?')) return; TTS.langs = JSON.parse(JSON.stringify(TTS.def)); ttsSave(); render(true); };
+  $('#tsExp').onclick = ()=>{ const text = JSON.stringify(ttsProfile(), null, 1), name = 'voice-profile-' + todayStr() + '.json'; download(name, text, 'application/json'); };
+  $('#tsImp').onclick = ()=>$('#tsFile').click();
+  $('#tsFile').onchange = async e=>{ const f = (e.target.files || [])[0]; e.target.value = ''; if (!f) return; const r = ttsProfileImport(await f.text()); toast(r.msg); if (r.ok) render(true); };
+  ttsCacheCount().then(n=>{ const e = $('#tsCount'); if (e) e.textContent = 'Saved audio: ' + n + ' sentence' + (n === 1 ? '' : 's'); });
+  ttsVoiceList().then(list=>{
+    const e = $('#tsVList'); if (!e) return;
+    if (!list.length){ e.textContent = 'No voice downloaded yet.'; return; }
+    e.innerHTML = '';
+    list.forEach(v=>{
+      const line = document.createElement('div'); line.style.cssText = 'display:flex;align-items:center;gap:8px;margin:4px 0';
+      line.innerHTML = `<span style="flex:1;min-width:0;word-break:break-all">${esc(v.id)}${v.size ? ' · ' + Math.round(v.size / 1048576) + ' MB' : ''}</span>`;
+      const b = document.createElement('button'); b.className = 'btn btn-ghost btn-sm'; b.textContent = 'Delete';
+      b.onclick = async ()=>{ if (!confirm('Delete ' + v.id + ' from this device?')) return; await ttsVoiceDelete(v.id); line.remove(); toast('Voice deleted'); };
+      line.appendChild(b); e.appendChild(line);
+    });
+  });
   d.appendChild(box);
   return d;
 }
 
+const TTS_SCAN = Promise.all([ttsCacheScan(), ttsVoiceScan()]);   // what is already saved on this device
 /* ==================== SETTINGS ==================== */
 let SET_OPEN = new Set();                              // titles of the open Settings sections (kept while the screen redraws)
 function accordionize(wrap){
