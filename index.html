@@ -2184,7 +2184,7 @@ function nextCard(){
   const s = state.sess;
   if (s && s.mode === 'level' && BETA.known && KW_OPT.inline){
     s.kwN = (s.kwN || 0) + 1;
-    if (s.kwN > 1 && (s.kwN - 1) % KW_OPT.every === 0 && kwInline(nextCard0)) return;
+    if (s.kwN > 1 && (s.kwN - 1) % KW_OPT.every === 0 && kwInline(()=>{ nextCard0(); render(); })) return;
   }
   nextCard0();
 }
