@@ -554,7 +554,12 @@ html[dir=rtl] .deck-meta{text-align:start}
 #tourLayer .tourring{position:absolute;border-radius:18px;box-shadow:0 0 0 9999px rgba(10,24,10,.74);outline:6px solid rgba(255,255,255,.45);transition:all .25s ease;pointer-events:none}
 #tourLayer.guide{pointer-events:none}
 #tourLayer.guide .tourring{box-shadow:0 0 0 9999px rgba(10,24,10,.45)}
-#tourLayer.guide .tourtip{pointer-events:auto}
+#tourLayer.guide .tourtip{pointer-events:auto;padding:12px 14px;max-height:46vh;overflow:auto}
+#tourLayer.guide .tt{font-size:15px}
+#tourLayer.guide .td{font-size:14px;line-height:1.4;margin:6px 0}
+#tourLayer.guide .tact{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 8px}
+#tourLayer.guide .tourtip.min .td,#tourLayer.guide .tourtip.min .tact,#tourLayer.guide .tourtip.min .tbtns{display:none}
+#tourLayer.guide .gmin{float:right;background:none;border:0;color:inherit;font:inherit;font-weight:800;cursor:pointer;padding:0 4px}
 #tourLayer .tourtip{position:absolute;left:50%;transform:translateX(-50%);width:calc(100% - 32px);max-width:420px;background:var(--green,#58cc02);color:#fff;border-radius:22px;padding:16px 18px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
 #tourLayer .tt{display:block;font-size:20px;font-weight:800;margin-bottom:4px}
 #tourLayer .td{margin:0 0 12px;font-size:15px;line-height:1.4;font-weight:600}
@@ -7202,7 +7207,7 @@ function accordionize(wrap){
     }
     head.innerHTML = `<span class="accn">${i + 1}</span><span class="acct"></span><span class="accc"></span><span class="accar">▾</span>`;
     head.querySelector('.accc').textContent = cnt;
-    head.querySelector('.acct').textContent = g.title;
+    head.querySelector('.acct').textContent = g.title; head.dataset.acc = g.title;
     g.body.classList.add('accbody');
     const set = open=>{ acc.classList.toggle('open', open); g.body.hidden = !open; if (open) SET_OPEN.add(g.title); else SET_OPEN.delete(g.title); };
     head.onclick = ()=>set(g.body.hidden);
@@ -7473,13 +7478,14 @@ let ONB_DONE = loadLS(LS.onb, false);
    A user who finished an older version sees it again, with a note “We changed something” (INTRO_NEWS says what).
    IDEA (not built): feature previews = small cards for users who 1) have seen the intro and 2) have an older INTRO_VERSION,
    each card tied to ONE new feature (id → text + a link to its screen), shown once and then dismissed. */
-const INTRO_VERSION = 3;
+const INTRO_VERSION = 4;
 const INTRO_NEWS = { 3: 'The main page changed: the Library is now its own page, and stars restart every day.' /* , 4: '…' */ };
 let ONB2_DONE = loadLS(LS.onb2, false);          // the introduction has been seen (at least once)
 Object.assign(LS, { beta:'arTrainer:beta' });
 let INTRO_SEEN_VER = loadLS(LS.onbVer, ONB2_DONE ? 2 : 0);          // the introduction version the user last saw
 function markIntroSeen(){ ONB2_DONE = true; saveLS(LS.onb2, true); INTRO_SEEN_VER = INTRO_VERSION; saveLS(LS.onbVer, INTRO_VERSION); }
 let BETA = Object.assign({ gloss:false, phon:false, anki:!!ANKI_ON, known:true }, loadLS(LS.beta, {}));
+BETA.known = true;                              // the known-words test is a normal feature now, not a beta switch
 if (!BETA.anki && ANKI_ON){ ANKI_ON = false; saveLS(LS.anki, false); }
 if (BETA.anki && !ANKI_ON){ BETA.anki = false; saveLS(LS.beta, BETA); }          // older versions had two switches (unlock + on): keep it simple, on = both   // Anki review exists only while its beta switch is on   // advanced / beta features, off by default
 let TAG_LANG = loadLS(LS.tagLang, '');           // language the tags are displayed in ('' = as written)
@@ -7698,8 +7704,8 @@ function tashkilSettingsEl(){
 }
 function introAgainEl(){
   const d = document.createElement('div');
-  d.innerHTML = `<div class="sectionhead">Introduction</div><button class="btn btn-ghost btn-sm" id="onbAgain">▶ Show the tour again</button>`;
-  d.querySelector('#onbAgain').onclick = ()=>{ guideStart(); };
+  d.innerHTML = `<div class="sectionhead">Introduction</div><button class="btn btn-ghost btn-sm" id="onbAgain">${typeof GUIDE_I === 'number' ? '■ End the tour' : '▶ Show the tour again'}</button>`;
+  d.querySelector('#onbAgain').onclick = ()=>{ if (typeof GUIDE_I === 'number'){ guideEnd(); render(true); } else guideStart(); };
   return d;
 }
 function betaSettingsEl(){
@@ -7708,7 +7714,6 @@ function betaSettingsEl(){
     <div class="hint">Unfinished features. They are off until you turn them on.</div><div id="bRows"></div><div id="bMore"></div>`;
   const rows = d.querySelector('#bRows');
   [['anki', 'Spaced repetition (Anki mode)', 'Decides WHEN a finished sentence comes back: on a schedule (Again / Good) with daily limits per deck. Independent of Grading.'],
-   ['known', 'Known-words test', 'Tell the app which words you already know, so it does not explain them again.'],
    ['gloss', 'Glossary', 'A table of ideas × languages (tags in your language, masculine/feminine forms, links between forms).'],
    ['phon', 'Sound guide (phonology)', 'A short wiki-style page about the sounds of each language, written as a markdown file in the repository (phonology/<code>.md) and shown like on GitHub. Plus your own notes.']].forEach(([k, t, s])=>{
     const r = document.createElement('div'); r.className = 'rowcb';
@@ -8060,8 +8065,7 @@ function finishOnboarding(){
   applyTheme(ob.theme); saveLS(LS.theme, ob.theme); setCssOn('');
   ONB_DONE = true; saveLS(LS.onb, true); markIntroSeen(); GUIDE_I = 0; saveLS(GUIDE_KEY, 0);
   state.ob = null;
-  if (missing.length){ state.obBack = true; state.store.q = LG(missing[0]).name; state.al.tab = 'store'; state.screen = 'addlang'; render(); if (state.store.status !== 'ok') loadCatalog(); toast('Get ' + missing.map(c=>LG(c).name).join(', ') + ' from “Ready-made”'); }
-  else { state.screen = 'home'; render(); }
+  state.obBack = false; state.store.q = ''; state.al.tab = 'store'; state.screen = 'home'; state.ddOpen = false; render();
 }
 function renderOnboard(){
   const f = document.createElement('div'), ob = state.ob || (state.ob = newOb());
@@ -8183,54 +8187,87 @@ function renderOnboard(){
 
 /* ---------- guided tour: the user really clicks, in this order ---------- */
 const GUIDE_KEY = 'arTrainer:guide';
-let GUIDE_I = loadLS(GUIDE_KEY, 'done'), guideLayer = null, guideShown = -1;
+let GUIDE_I = loadLS(GUIDE_KEY, 'done'), guideLayer = null, guideShown = -1, guideTaps = 0;
+const NV_NAME = { off:'notes hidden', hl:'highlights only', list:'highlights + notes list' };
 const GUIDE = [
   { sel:'#titleBtn', t:'1 · Load a language', d:'Tap the title to open the language list.' },
   { sel:'#ddAdd', t:'1 · Load a language', d:'Tap “Add language”.' },
-  { sel:'.deck button.btn-green:not([disabled])', t:'1 · Load a language', d:'Tap Get on the language you want to learn (the translation language is your interface language).' },
+  { sel:'.deck button.btn-green:not([disabled])', t:'1 · Load a language', d:'Tap Get on the language you want to learn. (Sentences are translated into your interface language.)' },
   { sel:'#backBtn', t:'1 · Load a language', d:'Go back to the main page.' },
   { sel:'.lvcard [data-lv]', t:'2 · Start practising', d:'Tap Continue to begin a lesson.' },
-  { sel:'[title="Add a note"]', t:'3 · Notes: write', d:'Tap ✎ to write a note on this sentence. Save it, then come back.' },
-  { sel:'.notebtn[class*="nv-"]', t:'3 · Notes: show', d:'Tap 👁 to change how notes appear in the sentence.' },
-  { sel:'.flagbtn:not(.notebtn)', t:'3 · Notes: report', d:'Tap 🚩 to flag a sentence you are unsure about or that looks wrong.' },
+  { sel:'[title="Add a note"]', t:'3 · Notes: write', d:'Tap ✎ to add a note to this sentence.' },
+  { sel:'#nWords', t:'3 · Notes: pick', d:'Tap the word you want the note for.' },
+  { sel:'#nLetters', until:()=>/[…]|\.\.\./.test((document.querySelector('#nPat') || {}).value || ''), t:'3 · Notes: prefix / suffix',
+    d:'The letters of the word are buttons. Tap the first one or two to build a prefix: the Pattern box shows them with … (“ال…” = starts with). Tap Clear to start over.' },
+  { sel:'#nTxt', until:()=>{ const t = document.querySelector('#nTxt'); return t && t.value.trim().length > 0; }, t:'3 · Notes: write', d:'Type a meaning or a reminder here.' },
+  { sel:'#nOk', t:'3 · Notes: write', d:'Tap Save.' },
+  { sel:'.notebtn[class*="nv-"]', taps:3, place:'bottom', enter:()=>{ if (!HL_ON){ HL_ON = true; saveLS(LS.hl, true); render(true); } }, t:'3 · Notes: show',
+    d:()=>'Tap 👁 three times and watch the sentence below change. Now: ' + NV_NAME[NOTES_VIEW] + ' (' + guideTaps + '/3).' },
+  { sel:'.flagbtn:not(.notebtn)', place:'bottom', t:'3 · Notes: report', d:'Tap 🚩 to flag a sentence you are unsure about or that looks wrong.' },
   { sel:'#quitBtn', t:'Finish the lesson', d:'Tap ✕ to leave the lesson.' },
   { sel:'#setBtn', t:'4 · Settings', d:'Tap Settings.' },
-  { sel:'.themegrid', t:'4 · Appearance', d:'Pick a theme (tap one).' },
-  { sel:'#ttsSec', t:'4 · Text-to-speech', d:'Voices for listening are set here. Tap this section.' },
-  { sel:'#onbAgain', info:true, t:'4 · Show the tour again', d:'This button replays the tour any time. That was all!' }
+  { sel:'.themegrid', place:'bottom', enter:()=>guideOpenAcc('Appearance'), t:'4 · Appearance', d:'Tap a theme to try it.' },
+  { sel:'#ttsSec > .rowcb:nth-child(1)', info:true, place:'bottom', enter:()=>guideOpenAcc('Voice (TTS)'), t:'4 · Text-to-speech: on / off',
+    d:()=>'“Speak sentences” turns reading aloud on or off (now ' + (TTS.on ? 'ON' : 'OFF') + '). Voices are downloaded once and then run on your device, with no internet needed.' },
+  { sel:'#ttsSec > .rowcb:nth-child(2)', info:true, place:'bottom', t:'4 · Text-to-speech: auto-play',
+    d:'These switches decide WHEN a sentence is read for you: on the question, on the answer (after you check), and on the introduction card. The 🔊 button in a lesson always works by hand.' },
+  { sel:'#tsVoices', place:'bottom', t:'4 · Text-to-speech: voices', d:'Tap “Voices · try models” to choose the voice of each language.' },
+  { sel:'#overlay > *', info:true, until:()=>{ const o = !!document.getElementById('overlay'); if (o) guideOv = true; return guideOv && !o; }, enter:()=>{ guideOv = false; }, t:'4 · Text-to-speech: voices',
+    d:'Pick a voice for each language, play a sample, and download it. One voice per language is used in lessons. Close this panel (tap outside it) when you are done.' },
+  { sel:'#onbAgain', place:'bottom', enter:()=>guideOpenAcc('Introduction'), t:'4 · End the tour', d:'Tap this button to end the tour. Later it becomes “Show the tour again”, so you can replay it any time.' }
 ];
-function guideSet(i){ GUIDE_I = i; saveLS(GUIDE_KEY, i); guideShown = -1; }
-function guideStart(){ guideSet(0); state.screen = 'home'; state.ddOpen = false; render(); }
+function guideOpenAcc(title){ const h = document.querySelector('[data-acc="' + title + '"]'); if (h && !h.parentElement.classList.contains('open')) h.click(); }
+/* The tour's content is hashed: change a step and the new version opens by itself, once, for everyone who opens the app again. */
+const GUIDE_SIG = (str=>{ let h = 7; for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) | 0; return h; })(JSON.stringify(GUIDE.map(g=>[g.sel, g.t, typeof g.d === 'function' ? g.d.toString() : g.d, !!g.info, g.taps || 0])));
+if (ONB2_DONE && loadLS('arTrainer:guideSig', null) !== GUIDE_SIG){ GUIDE_I = 0; saveLS(GUIDE_KEY, 0); }
+saveLS('arTrainer:guideSig', GUIDE_SIG);
+function guideSet(i){ GUIDE_I = i; saveLS(GUIDE_KEY, i); guideShown = -1; guideTaps = 0; }
+function guideStart(){ guideSet(0); state.store.q = ''; state.obBack = false; state.screen = 'home'; state.ddOpen = false; render(); }
 function guideEnd(){ guideSet('done'); if (guideLayer){ guideLayer.remove(); guideLayer = null; } }
 function guideVisible(el){ return el && el.getClientRects().length > 0 && !(document.getElementById('overlay') && !document.getElementById('overlay').contains(el)); }
+let guideMin = false, guideOv = false;
 function guideTick(){
   if (typeof GUIDE_I !== 'number' || state.ob || state.screen === 'onboard'){ if (guideLayer && typeof GUIDE_I !== 'number'){ guideLayer.remove(); guideLayer = null; } return; }
   const st = GUIDE[GUIDE_I]; if (!st){ guideEnd(); return; }
   if (!guideLayer){
     guideLayer = document.createElement('div'); guideLayer.id = 'tourLayer'; guideLayer.className = 'guide';
-    guideLayer.innerHTML = '<div class="tourring"></div><div class="tourtip"><b class="tt"></b><p class="td"></p><div class="tbtns"><button class="linkbtn" id="gExit">Exit</button><span class="tdots"></span><button class="btn btn-sm" id="gSkip">Skip</button></div></div>';
+    guideLayer.innerHTML = '<div class="tourring"></div><div class="tourtip"><button class="gmin" id="gMin" title="Hide / show">▾</button><b class="tt"></b><p class="td"></p><div class="tact"></div><div class="tbtns"><button class="linkbtn" id="gExit">Exit</button><span class="tdots"></span><button class="btn btn-sm" id="gSkip">Skip</button></div></div>';
     document.body.appendChild(guideLayer);
     guideLayer.querySelector('#gExit').onclick = guideEnd;
     guideLayer.querySelector('#gSkip').onclick = ()=>{ if (GUIDE_I >= GUIDE.length - 1) guideEnd(); else guideSet(GUIDE_I + 1); };
+    guideLayer.querySelector('#gMin').onclick = ()=>{ guideMin = !guideMin; guideShown = -2; };
   }
   const ring = guideLayer.querySelector('.tourring'), tip = guideLayer.querySelector('.tourtip');
   const el = document.querySelector(st.sel), ok = guideVisible(el);
+  if (st.until && st.until()){ guideSet(GUIDE_I + 1); return; }
+  const dd = typeof st.d === 'function' ? st.d() : st.d;
   guideLayer.querySelector('.tt').textContent = st.t;
-  guideLayer.querySelector('.td').textContent = ok ? st.d : st.d + ' (Not on screen? Open the right screen, close any panel, or press Skip.)';
+  guideLayer.querySelector('.td').textContent = ok ? dd : dd + ' (Not on screen? Open the right screen, close any panel, or press Skip.)';
   guideLayer.querySelector('.tdots').innerHTML = GUIDE.map((_, k)=>'<i' + (k === GUIDE_I ? ' class="on"' : '') + '></i>').join('');
-  guideLayer.querySelector('#gSkip').textContent = st.info ? 'Done' : 'Skip';
-  if (!ok){ ring.style.width = ring.style.height = '0px'; tip.style.top = 'auto'; tip.style.bottom = '16px'; return; }
-  if (guideShown !== GUIDE_I){ guideShown = GUIDE_I; try { el.scrollIntoView({ block:'center' }); } catch(e){} }
+  guideLayer.querySelector('#gSkip').textContent = st.info ? (GUIDE_I >= GUIDE.length - 1 ? 'Done' : 'Next') : 'Skip';
+  tip.classList.toggle('min', guideMin); guideLayer.querySelector('#gMin').textContent = guideMin ? '▴' : '▾';
+  if (guideShown !== GUIDE_I){
+    if (guideShown !== -2){ guideMin = false; tip.classList.remove('min'); if (st.enter) st.enter(); }
+    guideShown = GUIDE_I;
+    const act = guideLayer.querySelector('.tact'); act.innerHTML = '';
+    (st.actions || []).forEach(a=>{ const b = document.createElement('button'); b.className = 'btn btn-sm'; b.textContent = a.label; b.onclick = a.fn; act.appendChild(b); });
+    if (ok){ try { el.scrollIntoView({ block:'center' }); } catch(e){} }
+  }
+  const inSheet = !!document.getElementById('overlay');
+  if (!ok){ ring.style.width = ring.style.height = '0px'; tip.style.top = '12px'; tip.style.bottom = 'auto'; return; }
   const r = el.getBoundingClientRect(), pad = 8;
   ring.style.left = (r.left - pad) + 'px'; ring.style.top = (r.top - pad) + 'px'; ring.style.width = (r.width + pad*2) + 'px'; ring.style.height = (r.height + pad*2) + 'px';
-  if ((innerHeight - r.bottom) > 190 || r.top < 200){ tip.style.top = (r.bottom + pad + 16) + 'px'; tip.style.bottom = 'auto'; }
-  else { tip.style.bottom = (innerHeight - r.top + pad + 16) + 'px'; tip.style.top = 'auto'; }
+  const bottom = st.place === 'bottom' || (!inSheet && st.place !== 'top' && (r.top < innerHeight * 0.4 ? false : false));
+  if (inSheet || st.place === 'top'){ tip.style.top = '12px'; tip.style.bottom = 'auto'; }                 // a panel sits at the bottom: keep the tip clear of it
+  else if (bottom || r.top < innerHeight * 0.45){ tip.style.bottom = '12px'; tip.style.top = 'auto'; }     // target in the upper half: tip goes to the bottom edge, so the sentence / list stays visible
+  else { tip.style.top = '12px'; tip.style.bottom = 'auto'; }
 }
 document.addEventListener('click', e=>{
   if (typeof GUIDE_I !== 'number') return;
-  const st = GUIDE[GUIDE_I]; if (!st || st.info || !e.target.closest || e.target.closest('#tourLayer')) return;
+  const st = GUIDE[GUIDE_I]; if (!st || st.info || st.until || !e.target.closest || e.target.closest('#tourLayer')) return;
   const hit = e.target.closest(st.sel), at = GUIDE_I;
-  if (hit) setTimeout(()=>{ if (GUIDE_I === at){ if (at >= GUIDE.length - 1) guideEnd(); else guideSet(at + 1); } }, 250);
+  if (hit && st.taps){ guideTaps++; if (guideTaps < st.taps) return; }
+  if (hit) setTimeout(()=>{ if (GUIDE_I === at){ if (at >= GUIDE.length - 1) guideEnd(); else guideSet(at + 1); } }, st.taps ? 900 : 250);
 }, true);
 setInterval(guideTick, 300);
 
@@ -8361,7 +8398,7 @@ function boot(){
   } catch(e){}
   buildNoteIdx(); rebuildSeen();
   if (!ONB2_DONE){ state.ob = newOb(); state.screen = 'onboard'; }
-  else if (INTRO_SEEN_VER < INTRO_VERSION) markIntroSeen();
+  else if (INTRO_SEEN_VER < INTRO_VERSION){ markIntroSeen(); GUIDE_I = 0; saveLS(GUIDE_KEY, 0); }   // existing users see the new tour once
   if (STATS.lastDay && STATS.lastDay !== todayStr()){
     const y = new Date(Date.now()-864e5).toISOString().slice(0,10);
     if (STATS.lastDay !== y) STATS.streak = 0;
