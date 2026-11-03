@@ -5316,27 +5316,38 @@ async function phonFetch(code){
   saveLS('arTrainer:phonMd', PHON_MD);
 }
 const PHON_TRIED = new Set();
+const PHON_USER_KEY = 'arTrainer:phonUser';          // your own pages: language code → markdown text (replaces the shared page on this device)
+function phonUser(){ return loadLS(PHON_USER_KEY, {}); }
 function renderPhon(){
   const f = document.createElement('div');
   const st = state.phon || (state.phon = { lang:ACTIVE[0] || 'ar' });
   if (!ACTIVE.includes(st.lang)) st.lang = ACTIVE[0] || st.lang;
-  const lang = st.lang, dl = PHON_MD[lang], text = dl ? dl.text : PHON_EMBEDDED[lang];
+  const lang = st.lang, dl = PHON_MD[lang], mine = phonUser()[lang], text = mine || (dl ? dl.text : PHON_EMBEDDED[lang]);
   f.innerHTML = `<div class="topbar"><button class="iconbtn" id="backBtn">←</button><div style="font-weight:800;font-size:19px;flex:1">Sounds</div></div>
     <div class="wrap statwrap">
       <div id="phLangs" style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0"></div>
       <div class="hint" id="phSrc"></div>
       <div class="md" id="phMd"></div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin:12px 0"><button class="btn btn-ghost btn-sm" id="phGet">⬇ Get / update from the repository</button></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin:12px 0"><button class="btn btn-ghost btn-sm" id="phGet">⬇ Get / update from the repository</button><button class="btn btn-ghost btn-sm" id="phAdd">＋ Add my own file</button><button class="btn btn-ghost btn-sm" id="phDel" style="display:none">Remove my file</button><input type="file" id="phFile" accept=".md,.txt,text/markdown,text/plain" style="display:none"></div>
       <div class="sectionhead">My notes</div>
       <textarea class="field" id="phNotes" rows="6"></textarea>
     </div>`;
   const chips = f.querySelector('#phLangs');
   ACTIVE.forEach(c=>{ const b = document.createElement('button'); b.type = 'button'; b.className = 'tchip' + (c === lang ? ' on' : ''); b.textContent = LG(c).name; b.onclick = ()=>{ st.lang = c; render(true); }; chips.appendChild(b); });
-  f.querySelector('#phSrc').textContent = dl ? 'Downloaded from the repository (phonology/' + lang + '.md).' : (text ? 'Built-in sample. The repository page replaces it once downloaded.' : '');
+  f.querySelector('#phSrc').textContent = mine ? 'Your own file (kept on this device; it replaces the shared page).' : dl ? 'Downloaded from the repository (phonology/' + lang + '.md).' : (text ? 'Built-in sample. The repository page replaces it once downloaded.' : '');
   f.querySelector('#phMd').innerHTML = text ? mdToHtml(text) : `<div class="empty">There is no sound guide for ${esc(LG(lang).name)} yet.<br>A page is a markdown file named <b>phonology/${esc(lang)}.md</b> in the repository.</div>`;
   const get = quiet=>phonFetch(lang).then(()=>{ if (state.screen === 'phon' && state.phon.lang === lang) render(true); if (!quiet) toast('Sound guide updated'); })
     .catch(e=>{ if (!quiet) toast(e.message === 'none' ? 'No page for ' + LG(lang).name + ' in the repository yet' : 'Could not download (needs the web version, online)'); });
   f.querySelector('#phGet').onclick = ()=>get(false);
+  const del = f.querySelector('#phDel'); del.style.display = mine ? '' : 'none';
+  f.querySelector('#phAdd').onclick = ()=>f.querySelector('#phFile').click();
+  f.querySelector('#phFile').onchange = async e=>{
+    const file = (e.target.files || [])[0]; e.target.value = ''; if (!file) return;
+    if (file.size > 300000){ toast('File is too big (max 300 KB)'); return; }
+    const t = (await file.text()).trim(); if (t.length < 20){ toast('The file is empty'); return; }
+    const all = phonUser(); all[lang] = t; saveLS(PHON_USER_KEY, all); toast('Your file was added'); render(true);
+  };
+  del.onclick = ()=>{ if (!confirm('Remove your file for ' + LG(lang).name + '?')) return; const all = phonUser(); delete all[lang]; saveLS(PHON_USER_KEY, all); render(true); };
   if (!dl && !PHON_TRIED.has(lang)){ PHON_TRIED.add(lang); get(true); }
   const ta = f.querySelector('#phNotes'); ta.placeholder = 'Your own notes about the sounds of ' + LG(lang).name; ta.value = PHON_NOTES[lang] || '';
   ta.oninput = ()=>{ PHON_NOTES[lang] = ta.value; saveLS(LS.phonNotes, PHON_NOTES); };
@@ -7307,7 +7318,7 @@ function renderSettings(){
   dt.querySelector('#expData').onclick = exportData;
   dt.querySelector('#impData').onclick = ()=>document.getElementById('dataInput').click();
   wrap.insertBefore(appearanceEl(), wrap.firstChild); wrap.insertBefore(customCssEl(), wrap.children[1]); wrap.insertBefore(funSettingsEl(), wrap.children[2]); wrap.insertBefore(introAgainEl(), wrap.children[3]); 
-  wrap.appendChild(tashkilSettingsEl()); wrap.appendChild(ttsSettingsEl()); wrap.appendChild(phonEl()); wrap.appendChild(gradingSettingsEl()); wrap.appendChild(repeatSettingsEl()); wrap.appendChild(resumeSettingsEl()); wrap.appendChild(notesSettingsEl()); wrap.appendChild(uiSettingsEl()); wrap.appendChild(betaSettingsEl()); wrap.appendChild(introSettingsEl()); wrap.appendChild(debugSettingsEl());
+  wrap.appendChild(tashkilSettingsEl()); wrap.appendChild(ttsSettingsEl()); wrap.appendChild(gradingSettingsEl()); wrap.appendChild(repeatSettingsEl()); wrap.appendChild(resumeSettingsEl()); wrap.appendChild(notesSettingsEl()); wrap.appendChild(uiSettingsEl()); wrap.appendChild(betaSettingsEl()); wrap.appendChild(introSettingsEl()); wrap.appendChild(debugSettingsEl());
   wrap.appendChild(dbg); wrap.appendChild(dt);
   accordionize(wrap);
   f.querySelector('#backBtn').onclick = ()=>{ state.screen = 'home'; render(); };
@@ -8192,7 +8203,8 @@ const NV_NAME = { off:'notes hidden', hl:'highlights only', list:'highlights + n
 const GUIDE = [
   { sel:'#titleBtn', t:'1 · Load a language', d:'Tap the title to open the language list.' },
   { sel:'#ddAdd', t:'1 · Load a language', d:'Tap “Add language”.' },
-  { sel:'.deck button.btn-green:not([disabled])', t:'1 · Load a language', d:'Tap Get on the language you want to learn. (Sentences are translated into your interface language.)' },
+  { sel:'#stQ', until:()=>{ const q = document.querySelector('#stQ'); return q && q.value.trim().length > 0; }, t:'1 · Load a language', d:'Type the name of the language you want to learn (for example “German”).' },
+  { sel:'.deck button.btn-green:not([disabled])', t:'1 · Load a language', d:'Tap Get next to your language. Sentences are translated into your interface language.' },
   { sel:'#backBtn', t:'1 · Load a language', d:'Go back to the main page.' },
   { sel:'.lvcard [data-lv]', t:'2 · Start practising', d:'Tap Continue to begin a lesson.' },
   { sel:'[title="Add a note"]', t:'3 · Notes: write', d:'Tap ✎ to add a note to this sentence.' },
@@ -8270,29 +8282,6 @@ document.addEventListener('click', e=>{
   if (hit) setTimeout(()=>{ if (GUIDE_I === at){ if (at >= GUIDE.length - 1) guideEnd(); else guideSet(at + 1); } }, st.taps ? 900 : 250);
 }, true);
 setInterval(guideTick, 300);
-
-/* ---------- pronunciation guide (one JSON per language: phonology/<code>.json, template: phonology/TEMPLATE.json) ---------- */
-function phonEl(){
-  const d = document.createElement('div');
-  d.innerHTML = '<div class="sectionhead">Pronunciation guides</div><div class="hint">A short sound summary and recommended listening sources for each language you study.</div>';
-  ACTIVE.forEach(c=>{ const b = document.createElement('button'); b.className = 'btn btn-ghost btn-sm'; b.style.margin = '4px 6px 0 0'; b.textContent = '🔊 ' + LG(c).name; b.onclick = ()=>phonOpen(c); d.appendChild(b); });
-  return d;
-}
-function phonOpen(code){
-  openSheet((sh, close)=>{
-    sh.innerHTML = `<h3>${esc(LG(code).name)} · pronunciation</h3><div id="phBody" class="hint">Loading…</div><div class="sheet-actions"><button class="btn btn-ghost" id="phClose">Close</button></div>`;
-    sh.querySelector('#phClose').onclick = close;
-    const box = sh.querySelector('#phBody');
-    fetch('phonology/' + code + '.json', { cache:'no-cache' }).then(r=>{ if (!r.ok) throw 0; return r.json(); }).then(j=>{
-      const src = (j.audio_sources || []).slice().sort((a, b)=>(b.recommended ? 1 : 0) - (a.recommended ? 1 : 0));
-      const link = x=>/^https?:\/\//.test(x.url || '') ? `<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.title || x.url)}</a>` : esc(x.title || '');
-      box.className = ''; box.innerHTML = `<p style="white-space:pre-line">${esc(j.summary || '')}</p>
-        ${(j.sounds || []).length ? '<div class="sectionhead">Sounds</div>' + j.sounds.map(x=>`<div class="improw"><b>${esc(x.symbol || '')}</b> ${esc(x.name || '')}<div class="hint">${esc(x.how || '')} ${esc(x.example || '')}</div></div>`).join('') : ''}
-        ${(j.common_mistakes || []).length ? '<div class="sectionhead">Common mistakes</div><ul>' + j.common_mistakes.map(m=>`<li>${esc(m)}</li>`).join('') + '</ul>' : ''}
-        ${src.length ? '<div class="sectionhead">Where to listen</div>' + src.map(x=>`<div class="improw">${x.recommended ? '⭐ ' : ''}${link(x)} <span class="hint">${esc(x.kind || '')} ${esc(x.license || '')}</span><div class="hint">${esc(x.why || '')}</div></div>`).join('') : ''}`;
-    }).catch(()=>{ box.innerHTML = 'No guide for this language yet. To add one, copy <a href="phonology/TEMPLATE.json" target="_blank" rel="noopener">phonology/TEMPLATE.json</a> to <code>phonology/' + esc(code) + '.json</code> and fill it in.'; });
-  });
-}
 
 /* ---------- spotlight tour on the real main page (runs once after the introduction) ---------- */
 function maybeTour(){
