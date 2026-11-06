@@ -134,6 +134,8 @@ button{font-family:inherit}
 .titlebtn{background:none;border:none;font-family:inherit;font-weight:800;font-size:19px;letter-spacing:-.4px;color:var(--ink);cursor:pointer;display:flex;align-items:center;gap:6px;padding:4px 6px 4px 0;flex:1;min-width:0;text-align:left}
 .titlebtn .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .caret{font-size:14px;color:var(--ink3);transition:transform .15s}
+.titlebtn{border:2px solid var(--line);border-bottom-width:4px;border-radius:14px;padding:6px 12px;background:var(--card,#fff)}
+.titlebtn .caret{color:var(--accent,var(--green));font-size:16px;font-weight:800}
 .titlebtn.open .caret{transform:rotate(180deg)}
 .dd{position:absolute;top:100%;left:12px;right:12px;max-width:340px;background:#fff;border:2px solid var(--line);border-radius:var(--r);box-shadow:0 8px 24px rgba(0,0,0,.12);padding:6px;z-index:40}
 .ddrow{display:flex;align-items:center;gap:12px;padding:11px 10px;border-radius:10px;cursor:pointer;font-weight:700;font-size:15px}
@@ -549,17 +551,52 @@ html[dir=rtl] .deck-meta{text-align:start}
 .obhint b{font-size:22px}
 .iconbtn.obpulse{background:var(--green-l);color:var(--green-t);border-radius:10px;padding:4px 10px;animation:obpulse 1.2s ease-in-out infinite}
 @keyframes obpulse{50%{transform:scale(1.18)}}
+.lgx{border:2px solid var(--line);border-radius:var(--r);padding:12px;margin:10px 0 14px;background:var(--card,#fff)}
+.lgx h4{margin:0 0 4px;font-size:15px}
+.lgx .lgxp{font-size:13px;line-height:1.5;margin:0 0 10px;color:var(--ink2)}
+.lgx .lgxrow{margin:8px 0}
+.lgx .lgxlab{display:flex;align-items:center;gap:8px;font-weight:800;font-size:13px;margin-bottom:6px}
+.lgx .lgxlab .obn{position:static;flex-shrink:0}
+.lgx .lgxchips{display:flex;gap:6px;flex-wrap:wrap}
+.lgx .lgxchips button{font:inherit;font-weight:800;font-size:13px;border:2px solid var(--line);border-bottom-width:4px;border-radius:12px;padding:6px 10px;background:var(--card,#fff);color:var(--ink);cursor:pointer;min-height:36px}
+.lgx .lgxchips button.on{border-color:var(--green);background:var(--green-l);color:var(--green-t)}
+.lgx .lgxchips button[disabled]{opacity:.4;cursor:not-allowed}
+.lgx .lgxcard{border:2px solid var(--line);border-radius:var(--r);padding:14px;margin-top:12px;background:var(--bg2,#f7f7f7)}
+.lgx .lgxtag{font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--ink3);margin-bottom:6px}
+.lgx .lgxt{font-size:24px;font-weight:700;direction:rtl;text-align:center;line-height:1.5}
+.lgxline{display:flex;align-items:center;gap:8px;margin-top:8px;padding:6px 8px;border-radius:12px;border:2px dashed var(--line)}
+.lgxline.a{border:2px solid var(--green);background:var(--green-l);font-size:19px;font-weight:700}
+.lgxline.b{border:2px solid var(--blue,#1cb0f6);font-size:15px;font-weight:600;color:var(--ink2)}
+.lgxline.none{font-size:13px;color:var(--ink3);font-weight:700}
+.lgxline .obn{position:static;flex-shrink:0}
+.lgxline.b .obn{background:var(--blue,#1cb0f6)}
+.lgxline span{flex:1;text-align:start}
+.lgx .lgxk{font-size:19px;font-weight:700;line-height:1.4;margin-top:8px;text-align:center}
+.lgx .lgxs{font-size:15px;font-weight:600;color:var(--ink2);line-height:1.4;margin-top:4px;text-align:center}
+.lgx .lgxnote{font-size:12px;line-height:1.5;margin-top:10px;color:var(--ink3);font-weight:700}
+.lgx .lgxmap{display:flex;gap:6px;align-items:stretch;margin:6px 0 10px}
+.lgx .lgxmap div{flex:1;border:2px dashed var(--line);border-radius:12px;padding:8px 4px;text-align:center;font-size:12px;font-weight:800;line-height:1.4}
+.lgx .lgxmap b{display:block;font-size:20px}
 #tourLayer{position:fixed;inset:0;z-index:300}
 #tourLayer .tourshade{position:absolute;inset:0}
 #tourLayer .tourring{position:absolute;border-radius:18px;box-shadow:0 0 0 9999px rgba(10,24,10,.74);outline:6px solid rgba(255,255,255,.45);transition:all .25s ease;pointer-events:none}
 #tourLayer.guide{pointer-events:none}
 #tourLayer.guide .tourring{box-shadow:0 0 0 9999px rgba(10,24,10,.45)}
-#tourLayer.guide .tourtip{pointer-events:auto;padding:12px 14px;max-height:46vh;overflow:auto}
+#tourLayer.guide .tourtip{pointer-events:auto;padding:12px 14px;max-height:none;overflow:visible;overflow-wrap:anywhere}
+@media (max-height:480px){#tourLayer.guide .tourtip{max-height:calc(100vh - 24px);max-height:calc(100dvh - 24px);overflow:auto}}
+#tourLayer.guide .gpanel{position:absolute;left:12px;right:12px;top:12px;bottom:140px;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;pointer-events:auto;background:var(--card,#fff);color:var(--ink,#111);border-radius:22px;padding:14px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+#tourLayer.guide .gpanel h4{margin:0 0 4px;font-size:16px}
+#tourLayer.guide .gpanel .lgxp{font-size:13px;line-height:1.5;margin:0 0 10px}
+#tourLayer.guide .thead{display:flex;align-items:flex-start;gap:8px}
+#tourLayer.guide .thead .tt{flex:1;min-width:0}
+#tourLayer.guide .tprog{height:6px;border-radius:3px;background:rgba(255,255,255,.35);overflow:hidden;margin:6px 0 10px}
+#tourLayer.guide .tprog i{display:block;height:100%;background:#fff;border-radius:3px;transition:width .25s}
+#tourLayer.guide .tcount{flex:1;text-align:center;font-weight:800;font-size:13px;opacity:.9}
 #tourLayer.guide .tt{font-size:15px}
 #tourLayer.guide .td{font-size:14px;line-height:1.4;margin:6px 0}
 #tourLayer.guide .tact{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 8px}
-#tourLayer.guide .tourtip.min .td,#tourLayer.guide .tourtip.min .tact,#tourLayer.guide .tourtip.min .tbtns{display:none}
-#tourLayer.guide .gmin{float:right;background:none;border:0;color:inherit;font:inherit;font-weight:800;cursor:pointer;padding:0 4px}
+#tourLayer.guide .tourtip.min .td,#tourLayer.guide .tourtip.min .tact,#tourLayer.guide .tourtip.min .tbtns,#tourLayer.guide .tourtip.min .tprog{display:none}
+#tourLayer.guide .gmin{flex:0 0 auto;background:rgba(255,255,255,.25);border:0;border-radius:8px;color:inherit;font:inherit;font-weight:800;cursor:pointer;min-width:34px;min-height:30px;padding:0 8px}
 #tourLayer .tourtip{position:absolute;left:50%;transform:translateX(-50%);width:calc(100% - 32px);max-width:420px;background:var(--green,#58cc02);color:#fff;border-radius:22px;padding:16px 18px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
 #tourLayer .tt{display:block;font-size:20px;font-weight:800;margin-bottom:4px}
 #tourLayer .td{margin:0 0 12px;font-size:15px;line-height:1.4;font-weight:600}
@@ -7489,8 +7526,8 @@ let ONB_DONE = loadLS(LS.onb, false);
    A user who finished an older version sees it again, with a note “We changed something” (INTRO_NEWS says what).
    IDEA (not built): feature previews = small cards for users who 1) have seen the intro and 2) have an older INTRO_VERSION,
    each card tied to ONE new feature (id → text + a link to its screen), shown once and then dismissed. */
-const INTRO_VERSION = 4;
-const INTRO_NEWS = { 3: 'The main page changed: the Library is now its own page, and stars restart every day.' /* , 4: '…' */ };
+const INTRO_VERSION = 5;
+const INTRO_NEWS = { 3: 'The main page changed: the Library is now its own page, and stars restart every day.', 4: 'Fixed: the guide tips.', 5: 'New: a step in the guide that explains the translation language and the side language, with a practice copy of the setting and the lesson.' };
 let ONB2_DONE = loadLS(LS.onb2, false);          // the introduction has been seen (at least once)
 Object.assign(LS, { beta:'arTrainer:beta' });
 let INTRO_SEEN_VER = loadLS(LS.onbVer, ONB2_DONE ? 2 : 0);          // the introduction version the user last saw
@@ -8062,6 +8099,47 @@ function obLangGrid(ob, multi, box){
   if (!list.length) box.innerHTML = '<div class="empty">No language matches.</div>';
 }
 function presentCodes(){ return langsPresent().map(p=>p.code); }
+/* ---------- interactive demo: Settings → Languages, and where it shows in the lesson ---------- */
+function obLangDemo(host){
+  if (!host) return;
+  const T = { sent:'أنا أقرأ كتابًا', words:['كتابًا','أقرأ','أنا'], en:'I am reading a book.', de:'Ich lese ein Buch.', fr:'Je lis un livre.', es:'Leo un libro.' };
+  const N = { en:'English (default)', de:'Deutsch', fr:'Français', es:'Español' };
+  const short = { en:'English', de:'Deutsch', fr:'Français', es:'Español' };
+  const st = { known:'en', side:'' };
+  const line = (k, code, cls)=>`<div class="lgxline ${cls}"><i class="obn">${k}</i><span dir="ltr">${T[code]}</span></div>`;
+  const lines = ()=>line('A', st.known, 'a') + (st.side ? line('B', st.side, 'b') : '<div class="lgxline none"><i class="obn">B</i><span>— none —</span></div>');
+  const paint = ()=>{
+    host.innerHTML = `
+      <h4>Where to set it</h4>
+      <p class="lgxp">Settings → <b>Languages</b>. Change the two lists below (this is a practice copy: your real settings stay as they are).</p>
+      <div class="acc open" style="margin:0"><div class="acchead" style="cursor:default"><span class="accn">1</span><span class="acct">Languages</span><span class="accar">▴</span></div>
+        <div class="accbody" style="padding-top:8px">
+          <div class="hint">Learning: Arabic (change it from the title menu)</div>
+          <div class="hint" style="margin-top:10px"><i class="obn" style="position:static;display:inline-block;margin-inline-end:6px">A</i>Known language — the language the sentences are translated into</div>
+          <select class="field" id="lgK">${Object.keys(N).map(c=>`<option value="${c}"${c === st.known ? ' selected' : ''}>${N[c]}</option>`).join('')}</select>
+          <div class="hint" style="margin-top:12px"><i class="obn" style="position:static;display:inline-block;margin-inline-end:6px">B</i>Side translation — shown beside the known-language sentence</div>
+          <select class="field" id="lgS"><option value="">None</option>${Object.keys(short).filter(c=>c !== st.known).map(c=>`<option value="${c}"${c === st.side ? ' selected' : ''}>${short[c]}</option>`).join('')}</select>
+        </div></div>
+      <h4 style="margin-top:16px">Where it appears in the lesson</h4>
+      <div class="obphone" style="margin-top:6px">
+        <div class="lgxtag">Introduction card</div>
+        <div class="lgxcard" style="margin-top:0">
+          <div class="lgxt">${T.sent}</div>
+          ${lines()}
+        </div>
+        <div class="lgxtag" style="margin-top:12px">Build the sentence: you read A (and B), then tap the Arabic words</div>
+        <div class="lgxcard" style="margin-top:0">
+          ${lines()}
+          <div class="obchips" style="direction:rtl">${T.words.map(w=>`<span>${w}</span>`).join('')}</div>
+        </div>
+      </div>
+      <div class="lgxnote">• A = the main translation, big. B = the optional second one, smaller and grey, under A.<br>• B can never be the same language as A.<br>• A language is offered in the real list only if at least half of its sentences match your library; with no translation, English is shown instead.</div>`;
+    host.querySelector('#lgK').onchange = e=>{ st.known = e.target.value; if (st.side === st.known) st.side = ''; paint(); };
+    host.querySelector('#lgS').onchange = e=>{ st.side = e.target.value; paint(); };
+  };
+  paint();
+}
+
 function finishOnboarding(){
   const ob = state.ob;
   const present = presentCodes(), want = [...ob.learn].filter(c=>c !== ob.native || c === 'en' ? true : true);
@@ -8201,11 +8279,12 @@ const GUIDE_KEY = 'arTrainer:guide';
 let GUIDE_I = loadLS(GUIDE_KEY, 'done'), guideLayer = null, guideShown = -1, guideTaps = 0;
 const NV_NAME = { off:'notes hidden', hl:'highlights only', list:'highlights + notes list' };
 const GUIDE = [
-  { sel:'#titleBtn', t:'1 · Load a language', d:'Tap the title to open the language list.' },
+  { sel:'#titleBtn', t:'1 · Load a language', d:'Tap the white button at the top (the title with ▾) to open the language list.' },
   { sel:'#ddAdd', t:'1 · Load a language', d:'Tap “Add language”.' },
   { sel:'#stQ', until:()=>{ const q = document.querySelector('#stQ'); return q && q.value.trim().length > 0; }, t:'1 · Load a language', d:'Type the name of the language you want to learn (for example “German”).' },
   { sel:'.deck button.btn-green:not([disabled])', t:'1 · Load a language', d:'Tap Get next to your language. Sentences are translated into your interface language.' },
   { sel:'#backBtn', t:'1 · Load a language', d:'Go back to the main page.' },
+  { sel:'body', panel:'lang', info:true, t:'1 · Translation & side language', d:'Set once in Settings → Languages, before you start. Try it here and see where it shows up in the lesson.' },
   { sel:'.lvcard [data-lv]', t:'2 · Start practising', d:'Tap Continue to begin a lesson.' },
   { sel:'[title="Add a note"]', t:'3 · Notes: write', d:'Tap ✎ to add a note to this sentence.' },
   { sel:'#nWords', t:'3 · Notes: pick', d:'Tap the word you want the note for.' },
@@ -8243,7 +8322,7 @@ function guideTick(){
   const st = GUIDE[GUIDE_I]; if (!st){ guideEnd(); return; }
   if (!guideLayer){
     guideLayer = document.createElement('div'); guideLayer.id = 'tourLayer'; guideLayer.className = 'guide';
-    guideLayer.innerHTML = '<div class="tourring"></div><div class="tourtip"><button class="gmin" id="gMin" title="Hide / show">▾</button><b class="tt"></b><p class="td"></p><div class="tact"></div><div class="tbtns"><button class="linkbtn" id="gExit">Exit</button><span class="tdots"></span><button class="btn btn-sm" id="gSkip">Skip</button></div></div>';
+    guideLayer.innerHTML = '<div class="tourring"></div><div class="tourtip"><div class="thead"><b class="tt"></b><button class="gmin" id="gMin" title="Hide / show">▾</button></div><p class="td"></p><div class="tact"></div><div class="tprog"><i></i></div><div class="tbtns"><button class="linkbtn" id="gExit">Exit</button><span class="tcount"></span><button class="btn btn-sm" id="gSkip">Skip</button></div></div>';
     document.body.appendChild(guideLayer);
     guideLayer.querySelector('#gExit').onclick = guideEnd;
     guideLayer.querySelector('#gSkip').onclick = ()=>{ if (GUIDE_I >= GUIDE.length - 1) guideEnd(); else guideSet(GUIDE_I + 1); };
@@ -8255,7 +8334,7 @@ function guideTick(){
   const dd = typeof st.d === 'function' ? st.d() : st.d;
   guideLayer.querySelector('.tt').textContent = st.t;
   guideLayer.querySelector('.td').textContent = ok ? dd : dd + ' (Not on screen? Open the right screen, close any panel, or press Skip.)';
-  guideLayer.querySelector('.tdots').innerHTML = GUIDE.map((_, k)=>'<i' + (k === GUIDE_I ? ' class="on"' : '') + '></i>').join('');
+  guideLayer.querySelector('.tprog i').style.width = Math.round((GUIDE_I + 1) / GUIDE.length * 100) + '%'; guideLayer.querySelector('.tcount').textContent = (GUIDE_I + 1) + ' / ' + GUIDE.length;
   guideLayer.querySelector('#gSkip').textContent = st.info ? (GUIDE_I >= GUIDE.length - 1 ? 'Done' : 'Next') : 'Skip';
   tip.classList.toggle('min', guideMin); guideLayer.querySelector('#gMin').textContent = guideMin ? '▴' : '▾';
   if (guideShown !== GUIDE_I){
@@ -8265,6 +8344,12 @@ function guideTick(){
     (st.actions || []).forEach(a=>{ const b = document.createElement('button'); b.className = 'btn btn-sm'; b.textContent = a.label; b.onclick = a.fn; act.appendChild(b); });
     if (ok){ try { el.scrollIntoView({ block:'center' }); } catch(e){} }
   }
+  let pn = guideLayer.querySelector('.gpanel');
+  if (st.panel && !guideMin){
+    if (!pn || pn.dataset.k !== st.panel){ if (pn) pn.remove(); pn = document.createElement('div'); pn.className = 'gpanel'; pn.dataset.k = st.panel; guideLayer.insertBefore(pn, tip); if (st.panel === 'lang') obLangDemo(pn); }
+    pn.style.bottom = (tip.offsetHeight + 24) + 'px';
+  } else if (pn){ pn.remove(); }
+  if (st.panel){ ring.style.width = ring.style.height = '0px'; tip.style.bottom = '12px'; tip.style.top = 'auto'; return; }
   const inSheet = !!document.getElementById('overlay');
   if (!ok){ ring.style.width = ring.style.height = '0px'; tip.style.top = '12px'; tip.style.bottom = 'auto'; return; }
   const r = el.getBoundingClientRect(), pad = 8;
