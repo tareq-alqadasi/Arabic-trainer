@@ -751,11 +751,13 @@ pre.ttslog{font-size:11px;line-height:1.35;white-space:pre-wrap;word-break:break
 </script>
 <script>
 /* ==================== LANGUAGES ==================== */
+/* ==================== LANGUAGES ==================== */
 const LANGS = {};
 (function(){
   const T = { translit:true }, R = { rtl:true, arf:true, translit:true }, N = { translit:true, noSpace:true };
   const add = (code, name, native, hello, o)=>{ LANGS[code] = Object.assign({ name, native, hello:hello||'' }, o||{}); };
   // Latin script
+  add('en','English','English','Hello');
   add('af','Afrikaans','Afrikaans','Hallo'); add('sq','Albanian','Shqip','Përshëndetje'); add('eu','Basque','Euskara','Kaixo');
   add('bs','Bosnian','Bosanski','Zdravo'); add('ca','Catalan','Català','Hola'); add('hr','Croatian','Hrvatski','Zdravo');
   add('cs','Czech','Čeština','Ahoj'); add('da','Danish','Dansk','Hej'); add('nl','Dutch','Nederlands','Hallo');
@@ -798,8 +800,10 @@ const LANGS = {};
   add('th','Thai','ไทย','สวัสดี',N); add('ko','Korean','한국어','안녕하세요',T);
   add('lo','Lao','ລາວ','ສະບາຍດີ',T); add('km','Khmer','ខ្មែរ','សួស្តី',T); add('my','Burmese','မြန်မာ','မင်္ဂလာပါ',T);
   add('am','Amharic','አማርኛ','ሰላም',T);
+  // Non-listed (user's language isn't in the list above)
+  add('xx','Non-listed','—','',{ nonListed:true });
 })();
-const LG = c => LANGS[c] || (c === 'en' ? { name:'English', native:'English', hello:'Hello' } : { name:String(c).toUpperCase(), native:'', hello:'' });
+const LG = c => LANGS[c] || { name:String(c).toUpperCase(), native:'', hello:'' };
 function langFromName(s){
   const t = String(s||'').trim().toLowerCase(); if (!t) return null;
   for (const c of Object.keys(LANGS)){
