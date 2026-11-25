@@ -32,3 +32,4 @@ by استقراء التعديلات الي يسويها الذكاء الاصط
 [phrase book]
 + االمستخدمين يضيفوا ملفات : لغات|Uı|themes
 + whatsapp : v2.7 #
++ pinyen for the sentence building block (toggled by the tashkiil button : which should become an extra writing system button (not only arabic orignted)
